@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인 화면</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #e5e7eb;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4 sm:p-6">
+    <div class="w-full max-w-sm bg-white rounded-xl shadow-lg p-6 sm:p-8">
+        <div class="flex justify-center mb-6">
+            <h1 class="text-3xl font-bold text-gray-800">Bapick!</h1>
+        </div>
+        
+        <div id="login-form-container" class="space-y-4 transition-opacity duration-300">
+            <div class="mb-4">
+                <label for="email-login" class="block text-sm font-medium text-gray-700">이메일</label>
+                <input type="email" id="email-login" class="mt-1 block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#FF7242] focus:border-[#FF7242]" placeholder="yourname@example.com">
+            </div>
+            <div class="mb-4">
+                <label for="password-login" class="block text-sm font-medium text-gray-700">비밀번호</label>
+                <input type="password" id="password-login" class="mt-1 block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#FF7242] focus:border-[#FF7242]" placeholder="********">
+            </div>
+            <div>
+                <button onclick="handleLogin()" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-[#FF7242] hover:bg-[#E0653B] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF7242]">
+                    로그인
+                </button>
+            </div>
+            <p class="text-center text-sm text-gray-600 mt-4">
+                계정이 없으신가요? 
+                <button onclick="showRegisterForm()" class="font-medium text-[#FF7242] hover:text-[#E0653B]">
+                    회원가입
+                </button>
+            </p>
+        </div>
+        <div id="register-form-container" class="space-y-4 hidden transition-opacity duration-300">
+            <div class="mb-4">
+                <label for="email-register" class="block text-sm font-medium text-gray-700">이메일</label>
+                <input type="email" id="email-register" class="mt-1 block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#FF7242] focus:border-[#FF7242]" placeholder="yourname@example.com">
+            </div>
+            <div class="mb-4">
+                <label for="password-register" class="block text-sm font-medium text-gray-700">비밀번호</label>
+                <input type="password" id="password-register" class="mt-1 block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#FF7242] focus:border-[#FF7242]" placeholder="8자 이상">
+            </div>
+            <div class="mb-4">
+                <label for="password-confirm" class="block text-sm font-medium text-gray-700">비밀번호 확인</label>
+                <input type="password" id="password-confirm" class="mt-1 block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#FF7242] focus:border-[#FF7242]" placeholder="비밀번호를 다시 입력하세요">
+            </div>
+            <div>
+                <button onclick="handleRegister()" class="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-[#FF7242] hover:bg-[#E0653B] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FF7242]">
+                    회원가입
+                </button>
+            </div>
+            <p class="text-center text-sm text-gray-600 mt-4">
+                이미 계정이 있으신가요? 
+                <button onclick="showLoginForm()" class="font-medium text-[#FF7242] hover:text-[#E0653B]">
+                    로그인
+                </button>
+            </p>
+        </div>
+
+        <!-- 모달 창 (알림 대신 사용) -->
+        <div id="message-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden">
+            <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm mx-auto">
+                <p id="message-text" class="text-center text-lg font-semibold text-gray-800"></p>
+                <div class="mt-4 flex justify-center">
+                    <button onclick="closeModal()" class="py-2 px-4 rounded-lg bg-[#FF7242] text-white hover:bg-[#E0653B]">확인</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const loginForm = document.getElementById('login-form-container');
+        const registerForm = document.getElementById('register-form-container');
+        const messageModal = document.getElementById('message-modal');
+        const messageText = document.getElementById('message-text');
+
+        function showMessage(message) {
+            messageText.textContent = message;
+            messageModal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            messageModal.classList.add('hidden');
+        }
+        
+        function showRegisterForm() {
+            loginForm.classList.add('hidden');
+            registerForm.classList.remove('hidden');
+        }
+
+        function showLoginForm() {
+            registerForm.classList.add('hidden');
+            loginForm.classList.remove('hidden');
+        }
+
+        function handleLogin() {
+            const email = document.getElementById('email-login').value;
+            const password = document.getElementById('password-login').value;
+            
+            if (!email || !password) {
+                showMessage("이메일과 비밀번호를 모두 입력해주세요.");
+                return;
+            }
+            
+            // 여기에 실제 로그인 로직을 추가합니다.
+            // 예: 서버 API 호출
+            showMessage(`로그인 성공! 이메일: ${email}`);
+            console.log('Login attempt with:', { email, password });
+        }
+
+        function handleRegister() {
+            const email = document.getElementById('email-register').value;
+            const password = document.getElementById('password-register').value;
+            const confirmPassword = document.getElementById('password-confirm').value;
+
+            if (!email || !password || !confirmPassword) {
+                showMessage("모든 필드를 입력해주세요.");
+                return;
+            }
+
+            if (password.length < 8) {
+                showMessage("비밀번호는 8자 이상이어야 합니다.");
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showMessage("비밀번호가 일치하지 않습니다.");
+                return;
+            }
+
+            // 여기에 실제 회원가입 로직을 추가합니다.
+            // 예: 서버 API 호출
+            showMessage(`회원가입 성공! 이메일: ${email}`);
+            console.log('Register attempt with:', { email, password });
+        }
+
+    </script>
+</body>
+</html>
