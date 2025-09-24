@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원정보 수정</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+        }
+        body {
+            font-family: 'Noto Sans KR', 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        #overlay {
+            transition: opacity 0.3s ease-in-out;
+        }
+        #side-menu {
+            opacity: 0;
+            transform: scale(0.95) translateX(-10px);
+            transform-origin: top left;
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: none;
+        }
+        #side-menu.open {
+            opacity: 1;
+            transform: scale(1) translateX(0);
+            pointer-events: auto;
+        }
+        
+        input[type="radio"]:checked {
+            background-color: #FF7A5A;
+            border-color: #FF7A5A;
+        }
+        input[type="radio"]:checked:hover {
+            background-color: #FF7A5A;
+            border-color: #FF7A5A;
+        }
+        .bg-custom-point { background-color: #FF7A5A !important; }
+        .hover-bg-custom-point:hover { background-color: #FF7A5A !important; color: white !important; }
+        .border-custom-point { border-color: #FF7A5A !important; }
+    </style>
+</head>
+<body class="bg-white">
+    
+    <div id="overlay" class="fixed inset-0 bg-black bg-opacity-20 z-40 hidden"></div>
+
+   
+    <aside id="side-menu" class="fixed top-[72px] left-4 bg-[#FEF7E5] shadow-lg z-50 p-2 flex flex-col rounded-full">
+        <nav>
+            <ul class="flex flex-col items-center space-y-2">
+                <li><a href="#" class="flex items-center justify-center w-12 h-12 rounded-full text-[#2A2C41] hover:bg-[#FDBF50]/60"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></a></li>
+                <li><a href="#" class="flex items-center justify-center w-12 h-12 rounded-full text-[#2A2C41] hover:bg-[#FDBF50]/60"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></a></li>
+                <li><a href="#" class="flex items-center justify-center w-12 h-12 rounded-full text-[#2A2C41] hover:bg-[#FDBF50]/60"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg></a></li>
+                <li><a href="#" class="flex items-center justify-center w-12 h-12 rounded-full bg-[#FDBF50] text-[#2A2C41]"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <div class="h-full flex flex-col">
+        
+        <header class="grid grid-cols-3 items-center p-4 border-b border-gray-200 flex-shrink-0">
+            <div>
+                <a href="mypage.index.html" class="text-gray-600 hover:text-gray-900 transition-colors duration-200">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg>
+                </a>
+            </div>
+            <h1 class="text-xl font-bold text-center text-gray-800">회원정보 수정</h1>
+            <div class="justify-self-end"><div class="w-6 h-6"></div></div>
+        </header>
+
+        
+        <main class="flex-1 overflow-y-auto bg-white p-6 flex flex-col">
+            <div class="space-y-6">
+                <div>
+                    <label for="phone" class="block text-sm font-medium text-gray-500 mb-2">휴대폰 번호</label>
+                    <input type="tel" id="phone" class="w-full p-3.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF7A5A] focus:border-transparent" value="010 1234 5678">
+                </div>
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-500 mb-2">이메일</label>
+                    <input type="email" id="email" class="w-full p-3.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF7A5A] focus:border-transparent" value="example@gmail.com">
+                </div>
+                <div>
+                    <label for="birthdate" class="block text-sm font-medium text-gray-500 mb-2">생년월일</label>
+                    <div class="relative">
+                        <input type="text" id="birthdate" placeholder="YYYY/MM/DD" class="w-full p-3.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF7A5A] focus:border-transparent pr-10" value="1997/01/12">
+                        <div id="calendar-icon" class="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer">
+                            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M19,19H5V8H19M19,3H18V1H16V3H8V1H6V3H5C3.89,3,3,3.9,3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V5A2,2 0 0,0 19,3M17,10H7V12H17V10Z"></path></svg>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-500 mb-3">채식 여부</label>
+                    <div class="grid grid-cols-2 gap-x-6 gap-y-4">
+                        <label class="flex items-center"><input type="radio" name="vegetarian" class="w-5 h-5 mr-2 border-gray-300 text-[#FF7A5A] focus:ring-[#FF7A5A]" checked><span class="text-gray-700">채식 아님</span></label>
+                        <label class="flex items-center"><input type="radio" name="vegetarian" class="w-5 h-5 mr-2 border-gray-300 text-[#FF7A5A] focus:ring-[#FF7A5A]"><span class="text-gray-700">비건 (Vegan)</span></label>
+                        <label class="flex items-center"><input type="radio" name="vegetarian" class="w-5 h-5 mr-2 border-gray-300 text-[#FF7A5A] focus:ring-[#FF7A5A]"><span class="text-gray-700">락토-오보 (Lacto-Ovo)</span></label>
+                        <label class="flex items-center"><input type="radio" name="vegetarian" class="w-5 h-5 mr-2 border-gray-300 text-[#FF7A5A] focus:ring-[#FF7A5A]"><span class="text-gray-700">페스코 (Pescatarian)</span></label>
+                    </div>
+                </div>
+                <div>
+                    <label for="avoid-food-input" class="block text-sm font-medium text-gray-500 mb-2">먹지 않는 음식</label>
+                    <div class="flex space-x-2">
+                        <input type="text" id="avoid-food-input" placeholder="예: 고수" class="flex-1 w-full p-3.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF7A5A] focus:border-transparent">
+                        <button id="add-food-btn" class="px-5 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300">추가</button>
+                    </div>
+                    <div id="food-tags-container" class="mt-3 flex flex-wrap gap-2"></div>
+                </div>
+            </div>
+            
+            <button class="w-full p-4 bg-[#FF7A5A] text-white text-base font-bold rounded-xl cursor-pointer mt-auto">저장</button>
+        </main>
+    </div>
+
+  
+    <div id="calendar-modal" class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center hidden z-50 p-4">
+        <div id="calendar-container" class="bg-white p-5 rounded-lg shadow-xl w-full max-w-xs relative">
+            <div class="flex items-center justify-between mb-4">
+                <button id="monthYearBtn" class="text-lg font-semibold cursor-pointer p-2 rounded-md hover:bg-gray-100"></button>
+                <div class="flex space-x-2">
+                    <button id="prevMonthBtn" class="text-gray-500 p-2 rounded-full hover:bg-gray-200"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
+                    <button id="nextMonthBtn" class="text-gray-500 p-2 rounded-full hover:bg-gray-200"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></button>
+                </div>
+            </div>
+            <div class="grid grid-cols-7 text-center text-sm font-medium text-gray-400 mb-2">
+                <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
+            </div>
+            <div id="calendarGrid" class="grid grid-cols-7 justify-items-center gap-y-2"></div>
+            <div id="monthYearPanel" class="absolute top-0 left-0 w-full h-full bg-white bg-opacity-95 backdrop-blur-sm p-5 rounded-lg flex-col items-center justify-center hidden">
+                <h3 class="text-lg font-bold mb-4 text-center">날짜 선택</h3>
+                <div class="flex justify-center items-center w-full space-x-6 mb-6">
+                    <button id="prevYearBtn" class="text-gray-500 hover:bg-gray-200 p-2 rounded-full"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg></button>
+                    <span id="panelYear" class="font-bold text-lg"></span>
+                    <button id="nextYearBtn" class="text-gray-500 hover:bg-gray-200 p-2 rounded-full"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></button>
+                </div>
+                <div id="monthSelector" class="grid grid-cols-3 gap-3 w-full"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            const addFoodBtn = document.getElementById('add-food-btn');
+            const foodInput = document.getElementById('avoid-food-input');
+            const tagsContainer = document.getElementById('food-tags-container');
+            const createTag = (foodName) => {
+                const tag = document.createElement('div');
+                tag.className = 'flex items-center bg-gray-200 text-gray-800 text-sm font-medium px-3 py-1 rounded-full';
+                tag.innerHTML = `<span>${foodName}</span><button class="ml-2 text-gray-500 hover:text-gray-800">&times;</button>`;
+                tag.querySelector('button').addEventListener('click', () => tag.remove());
+                tagsContainer.appendChild(tag);
+            };
+            addFoodBtn.addEventListener('click', () => {
+                const foodName = foodInput.value.trim();
+                if (foodName) {
+                    createTag(foodName);
+                    foodInput.value = '';
+                }
+            });
+            foodInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addFoodBtn.click();
+                }
+            });
+
+            
+            const birthdateInput = document.getElementById('birthdate');
+            const calendarIcon = document.getElementById('calendar-icon');
+            const calendarModal = document.getElementById('calendar-modal');
+            const monthYearBtn = document.getElementById('monthYearBtn');
+            const calendarGrid = document.getElementById('calendarGrid');
+            const prevMonthBtn = document.getElementById('prevMonthBtn');
+            const nextMonthBtn = document.getElementById('nextMonthBtn');
+            const monthYearPanel = document.getElementById('monthYearPanel');
+            const monthSelector = document.getElementById('monthSelector');
+            const prevYearBtn = document.getElementById('prevYearBtn');
+            const nextYearBtn = document.getElementById('nextYearBtn');
+            const panelYear = document.getElementById('panelYear');
+            
+            let currentDate = new Date();
+            let selectedDate = null;
+            
+            const parseDate = (dateString) => {
+                const parts = dateString.split(/[\/-]/);
+                if (parts.length === 3) {
+                    const year = parseInt(parts[0], 10);
+                    const month = parseInt(parts[1], 10) - 1;
+                    const day = parseInt(parts[2], 10);
+                    if (!isNaN(year) && !isNaN(month) && !isNaN(day)) return new Date(year, month, day);
+                }
+                return new Date();
+            };
+            
+            selectedDate = parseDate(birthdateInput.value);
+            currentDate = new Date(selectedDate);
+            
+            const formatDate = (date) => {
+                const y = date.getFullYear();
+                const m = String(date.getMonth() + 1).padStart(2, '0');
+                const d = String(date.getDate()).padStart(2, '0');
+                return `${y}/${m}/${d}`;
+            };
+
+            const renderCalendar = () => {
+                const year = currentDate.getFullYear();
+                const month = currentDate.getMonth();
+                monthYearBtn.textContent = `${year}년 ${month + 1}월`;
+                calendarGrid.innerHTML = '';
+                const firstDayOfMonth = new Date(year, month, 1).getDay();
+                const lastDateOfMonth = new Date(year, month + 1, 0).getDate();
+                const today = new Date();
+
+                for (let i = 0; i < firstDayOfMonth; i++) calendarGrid.appendChild(document.createElement('div'));
+
+                for (let date = 1; date <= lastDateOfMonth; date++) {
+                    const dayCell = document.createElement('button');
+                    dayCell.textContent = date;
+                    dayCell.className = 'w-10 h-10 flex items-center justify-center rounded-full transition-colors text-gray-800';
+                    const isSelected = selectedDate && date === selectedDate.getDate() && month === selectedDate.getMonth() && year === selectedDate.getFullYear();
+                    if (isSelected) dayCell.classList.add('bg-custom-point', 'text-white');
+                    const isToday = date === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+                    if (isToday && !isSelected) dayCell.classList.add('border', 'border-custom-point');
+                    if (!isSelected) dayCell.classList.add('hover:bg-gray-200');
+                    dayCell.onclick = () => {
+                        selectedDate = new Date(year, month, date);
+                        birthdateInput.value = formatDate(selectedDate);
+                        calendarModal.classList.add('hidden');
+                    };
+                    calendarGrid.appendChild(dayCell);
+                }
+            };
+            
+            const renderMonthPanel = () => {
+                const year = currentDate.getFullYear();
+                panelYear.textContent = year;
+                monthSelector.innerHTML = '';
+                const monthNames = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"];
+                monthNames.forEach((name, index) => {
+                    const monthButton = document.createElement('button');
+                    monthButton.textContent = name;
+                    monthButton.className = 'p-3 rounded-lg transition-colors hover-bg-custom-point font-medium';
+                    if (currentDate.getMonth() === index) monthButton.classList.add('bg-custom-point', 'text-white');
+                    monthButton.onclick = () => {
+                        currentDate.setMonth(index);
+                        monthYearPanel.classList.add('hidden');
+                        renderCalendar();
+                    };
+                    monthSelector.appendChild(monthButton);
+                });
+            };
+
+            const openCalendar = () => {
+                selectedDate = parseDate(birthdateInput.value);
+                currentDate = new Date(selectedDate);
+                renderCalendar();
+                calendarModal.classList.remove('hidden');
+            }
+            
+            birthdateInput.addEventListener('focus', openCalendar);
+            calendarIcon.addEventListener('click', openCalendar);
+            calendarModal.addEventListener('click', (e) => { if (e.target === calendarModal) calendarModal.classList.add('hidden'); });
+            monthYearBtn.addEventListener('click', () => {
+                renderMonthPanel();
+                monthYearPanel.classList.remove('hidden');
+            });
+            prevMonthBtn.addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() - 1);
+                renderCalendar();
+            });
+            nextMonthBtn.addEventListener('click', () => {
+                currentDate.setMonth(currentDate.getMonth() + 1);
+                renderCalendar();
+            });
+            prevYearBtn.addEventListener('click', () => {
+                currentDate.setFullYear(currentDate.getFullYear() - 1);
+                renderMonthPanel();
+            });
+            nextYearBtn.addEventListener('click', () => {
+                currentDate.setFullYear(currentDate.getFullYear() + 1);
+                renderMonthPanel();
+            });
+        });
+    </script>
+</body>
+</html>

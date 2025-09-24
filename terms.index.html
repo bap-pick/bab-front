@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이용약관</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+        }
+        body {
+            font-family: 'Noto Sans KR', 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        #overlay {
+            transition: opacity 0.3s ease-in-out;
+        }
+        #side-menu {
+            opacity: 0;
+            transform: scale(0.95) translateX(-10px);
+            transform-origin: top left;
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: none;
+        }
+        #side-menu.open {
+            opacity: 1;
+            transform: scale(1) translateX(0);
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body class="bg-white">
+  
+    <div id="overlay" class="fixed inset-0 bg-black bg-opacity-20 z-40 hidden"></div>
+
+    
+    <aside id="side-menu" class="fixed top-[72px] left-4 bg-[#FEF7E5] shadow-lg z-50 p-2 flex flex-col rounded-full">
+        <nav>
+            <ul class="flex flex-col items-center space-y-2">
+                <li><a href="#" class="flex items-center justify-center w-12 h-12 rounded-full text-[#2A2C41] hover:bg-[#FDBF50]/60"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></a></li>
+                <li><a href="#" class="flex items-center justify-center w-12 h-12 rounded-full text-[#2A2C41] hover:bg-[#FDBF50]/60"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></a></li>
+                <li><a href="#" class="flex items-center justify-center w-12 h-12 rounded-full text-[#2A2C41] hover:bg-[#FDBF50]/60"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg></a></li>
+                <li><a href="#" class="flex items-center justify-center w-12 h-12 rounded-full bg-[#FDBF50] text-[#2A2C41]"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <div class="h-full flex flex-col">
+        
+        <header class="grid grid-cols-3 items-center p-4 border-b border-gray-200 flex-shrink-0">
+            <div>
+                <a href="mypage.index.html" class="text-gray-600 hover:text-gray-900 transition-colors duration-200">
+                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg>
+                </a>
+            </div>
+            <h1 class="text-xl font-bold text-center text-gray-800">이용약관</h1>
+            <div class="justify-self-end"><div class="w-6 h-6"></div></div>
+        </header>
+
+       
+        <main class="flex-1 overflow-y-auto bg-white p-6">
+            <div class="prose max-w-none">
+                <h2 class="text-lg font-bold">제 1조 (목적)</h2>
+                <p class="text-gray-600">
+                    본 약관은 밥픽 회사(이하 "회사")가 제공하는 밥픽 및 밥픽 관련 제반 서비스(이하 "서비스")의 이용과 관련하여 회사와 회원과의 권리, 의무 및 책임사항, 기타 필요한 사항을 규정함을 목적으로 합니다.
+                </p>
+
+                <h2 class="text-lg font-bold mt-6">제 2조 (정의)</h2>
+                <p class="text-gray-600">
+                    본 약관에서 사용하는 용어의 정의는 다음과 같습니다.
+                </p>
+                <ul class="list-disc list-inside text-gray-600 space-y-2">
+                    <li>"서비스"라 함은 구현되는 단말기(PC, TV, 휴대형단말기 등의 각종 유무선 장치를 포함)와 상관없이 "회원"이 이용할 수 있는 밥픽 및 밥픽 관련 제반 서비스를 의미합니다.</li>
+                    <li>"회원"이라 함은 회사의 "서비스"에 접속하여 본 약관에 따라 "회사"와 이용계약을 체결하고 "회사"가 제공하는 "서비스"를 이용하는 고객을 말합니다.</li>
+                </ul>
+
+                <h2 class="text-lg font-bold mt-6">제 3조 (약관의 게시와 개정)</h2>
+                <p class="text-gray-600">
+                    회사는 이 약관의 내용을 회원이 쉽게 알 수 있도록 서비스 초기 화면에 게시합니다. 회사는 "약관의규제에관한법률", "정보통신망이용촉진및정보보호등에관한법률(이하 "정보통신망법")" 등 관련법을 위배하지 않는 범위에서 이 약관을 개정할 수 있습니다.
+                </p>
+
+                 <h2 class="text-lg font-bold mt-6">제 4조 (서비스의 제공 및 변경)</h2>
+                <p class="text-gray-600">
+                    회사는 다음과 같은 업무를 수행합니다.
+                </p>
+                 <ul class="list-disc list-inside text-gray-600 space-y-2">
+                    <li>맛집 정보 제공</li>
+                    <li>예약 서비스</li>
+                    <li>회원간의 커뮤니티 서비스</li>
+                    <li>기타 회사가 정하는 업무</li>
+                </ul>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+        });
+    </script>
+</body>
+</html>
+
