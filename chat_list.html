@@ -70,22 +70,22 @@
             <nav>
                 <ul class="flex flex-col items-center space-y-2">
                     <li>
-                        <a href="#" class="flex items-center justify-center w-12 h-12 rounded-full bg-[#FDBF50] text-[#2A2C41]">
+                        <a href="chat_list.html" class="flex items-center justify-center w-12 h-12 rounded-full bg-[#FDBF50] text-[#2A2C41]">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="flex items-center justify-center w-12 h-12 rounded-full text-[#2A2C41] hover:bg-[#FDBF50]/60">
+                        <a href="calender.html" class="flex items-center justify-center w-12 h-12 rounded-full text-[#2A2C41] hover:bg-[#FDBF50]/60">
                              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="flex items-center justify-center w-12 h-12 rounded-full text-[#2A2C41] hover:bg-[#FDBF50]/60">
+                        <a href="scrap.index.html" class="flex items-center justify-center w-12 h-12 rounded-full text-[#2A2C41] hover:bg-[#FDBF50]/60">
                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="flex items-center justify-center w-12 h-12 rounded-full text-[#2A2C41] hover:bg-[#FDBF50]/60">
+                        <a href="mypage.index.html" class="flex items-center justify-center w-12 h-12 rounded-full text-[#2A2C41] hover:bg-[#FDBF50]/60">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                         </a>
                     </li>
@@ -93,28 +93,74 @@
             </nav>
         </aside>
 
+        <!-- 친구 추가 모달 -->
+        <div id="add-friend-modal" class="fixed inset-0 bg-black bg-opacity-40 z-50 hidden items-center justify-center p-4">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-sm">
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">친구 추가</h3>
+                    <p class="text-gray-500 mb-4">추가할 친구의 아이디를 검색하세요.</p>
+                    <div class="relative">
+                        <input id="friend-id-input" type="text" placeholder="친구 아이디" class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400">
+                        <button id="search-friend-btn" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        </button>
+                    </div>
+                    <!-- 프로필 목록 (검색 후 표시) -->
+                    <div id="profile-list-container" class="mt-4 hidden space-y-2">
+                        <!-- 예시 프로필 아이템 -->
+                        <div class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-100">
+                            <div class="flex items-center">
+                                <img class="h-10 w-10 rounded-full object-cover" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=1780&auto=format&fit=crop" alt="Profile picture">
+                                <span class="ml-3 font-medium text-gray-700">김민준</span>
+                            </div>
+                            <button class="text-sm text-white bg-orange-500 hover:bg-orange-600 px-3 py-1 rounded-md">추가</button>
+                        </div>
+                        <div class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-100">
+                            <div class="flex items-center">
+                                <img class="h-10 w-10 rounded-full object-cover" src="https://images.unsplash.com/photo-1580489944761-15a19d654956?q=80&w=1961&auto=format&fit=crop" alt="Profile picture">
+                                <span class="ml-3 font-medium text-gray-700">이서연</span>
+                            </div>
+                            <button class="text-sm text-white bg-orange-500 hover:bg-orange-600 px-3 py-1 rounded-md">추가</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-6 py-3 flex justify-end space-x-3 rounded-b-lg">
+                    <button id="cancel-add-friend-btn" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 font-medium">닫기</button>
+                </div>
+            </div>
+        </div>
+
         <!-- 채팅 목록 화면 -->
         <div id="chat-list-screen" class="h-full flex flex-col relative">
             <!-- 헤더 -->
-            <header class="grid grid-cols-3 items-center p-4 bg-white border-b border-gray-200">
-                <!-- 메뉴 아이콘 -->
-                <div>
-                    <button id="menu-btn" class="text-gray-500 hover:text-gray-800">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="3" y1="12" x2="21" y2="12"></line>
-                            <line x1="3" y1="6" x2="21" y2="6"></line>
-                            <line x1="3" y1="18" x2="21" y2="18"></line>
-                        </svg>
-                    </button>
+            <header class="h-16 bg-white border-b border-gray-200">
+                <!-- 기본 헤더 -->
+                <div id="header-main" class="grid grid-cols-3 items-center h-full px-4">
+                    <!-- 메뉴 아이콘 -->
+                    <div>
+                        <button id="menu-btn" class="text-gray-500 hover:text-gray-800">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="3" y1="12" x2="21" y2="12"></line>
+                                <line x1="3" y1="6" x2="21" y2="6"></line>
+                                <line x1="3" y1="18" x2="21" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                    <h1 class="text-xl font-bold text-gray-800 text-center">채팅</h1>
+                    <div class="flex items-center space-x-3 justify-self-end">
+                        <button id="search-btn" class="text-gray-500 hover:text-gray-800">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        </button>
+                        <button id="add-friend-btn" class="text-gray-500 hover:text-gray-800">
+                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" y1="8" x2="19" y2="14"></line><line x1="22" y1="11" x2="16" y2="11"></line></svg>
+                        </button>
+                    </div>
                 </div>
-                <h1 class="text-xl font-bold text-gray-800 text-center">채팅</h1>
-                <div class="flex items-center space-x-3 justify-self-end">
-                    <button class="text-gray-500 hover:text-gray-800">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                    </button>
-                    <button class="text-gray-500 hover:text-gray-800">
-                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" y1="8" x2="19" y2="14"></line><line x1="22" y1="11" x2="16" y2="11"></line></svg>
-                    </button>
+
+                <!-- 검색 헤더 (초기엔 숨김) -->
+                <div id="header-search" class="hidden flex items-center gap-2 h-full px-4">
+                    <input type="text" id="search-input" placeholder="검색" class="w-full px-3 py-1.5 border border-gray-200 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400">
+                    <button id="cancel-search-btn" class="text-gray-600 hover:text-gray-900 text-sm font-medium flex-shrink-0">취소</button>
                 </div>
             </header>
             
@@ -156,40 +202,58 @@
         // 공용 UI 요소
         const overlay = document.getElementById('overlay');
         
-        // 채팅방 개설 팝업 관련 요소 및 상태
+        // 채팅방 개설 팝업 관련 요소
         const addChatBtn = document.getElementById('add-chat-btn');
         const addChatPopup = document.getElementById('add-chat-popup');
 
-        // 사이드 메뉴 관련 요소 및 상태
+        // 사이드 메뉴 관련 요소
         const menuBtn = document.getElementById('menu-btn');
         const sideMenu = document.getElementById('side-menu');
+
+        // 검색 기능 관련 요소
+        const searchBtn = document.getElementById('search-btn');
+        const cancelSearchBtn = document.getElementById('cancel-search-btn');
+        const headerMain = document.getElementById('header-main');
+        const headerSearch = document.getElementById('header-search');
+        const searchInput = document.getElementById('search-input');
+        
+        // 친구 추가 모달 관련 요소
+        const addFriendBtn = document.getElementById('add-friend-btn');
+        const addFriendModal = document.getElementById('add-friend-modal');
+        const cancelAddFriendBtn = document.getElementById('cancel-add-friend-btn');
+        const searchFriendBtn = document.getElementById('search-friend-btn');
+        const profileListContainer = document.getElementById('profile-list-container');
+
 
         // 모든 팝업을 닫는 함수
         function closeAllPopups() {
             overlay.classList.add('hidden');
-            // 사이드 메뉴 닫기
             sideMenu.classList.remove('open');
-            // 채팅 추가 팝업 닫기
             addChatPopup.classList.remove('popup-visible');
             addChatPopup.classList.add('popup-hidden');
         }
+        
+        // 친구 추가 모달 닫기 함수
+        function closeAddFriendModal() {
+            addFriendModal.classList.add('hidden');
+            addFriendModal.classList.remove('flex');
+            profileListContainer.classList.add('hidden'); // 프로필 목록도 숨김
+        }
 
-        // 메뉴 버튼 클릭 이벤트
         menuBtn.addEventListener('click', (event) => {
             event.stopPropagation();
             const isMenuOpen = sideMenu.classList.contains('open');
-            closeAllPopups(); // 다른 팝업은 모두 닫기
+            closeAllPopups();
             if (!isMenuOpen) {
                 overlay.classList.remove('hidden');
                 sideMenu.classList.add('open');
             }
         });
 
-        // 채팅 추가 버튼 클릭 이벤트
         addChatBtn.addEventListener('click', (event) => {
             event.stopPropagation();
             const isAddChatOpen = addChatPopup.classList.contains('popup-visible');
-            closeAllPopups(); // 다른 팝업은 모두 닫기
+            closeAllPopups();
             if (!isAddChatOpen) {
                 overlay.classList.remove('hidden');
                 addChatPopup.classList.remove('popup-hidden');
@@ -197,8 +261,42 @@
             }
         });
 
-        // 오버레이 클릭 시 모든 팝업 닫기
         overlay.addEventListener('click', closeAllPopups);
+
+        // 검색 버튼 클릭 이벤트
+        searchBtn.addEventListener('click', () => {
+            headerMain.classList.add('hidden');
+            headerSearch.classList.remove('hidden');
+            searchInput.focus();
+        });
+
+        // 검색 취소 버튼 클릭 이벤트
+        cancelSearchBtn.addEventListener('click', () => {
+            headerSearch.classList.add('hidden');
+            headerMain.classList.remove('hidden');
+            searchInput.value = '';
+        });
+
+        // --- 친구 추가 모달 로직 ---
+        addFriendBtn.addEventListener('click', () => {
+            closeAllPopups();
+            addFriendModal.classList.remove('hidden');
+            addFriendModal.classList.add('flex');
+        });
+
+        cancelAddFriendBtn.addEventListener('click', closeAddFriendModal);
+        
+        addFriendModal.addEventListener('click', (event) => {
+            if (event.target === addFriendModal) {
+                closeAddFriendModal();
+            }
+        });
+        
+        searchFriendBtn.addEventListener('click', () => {
+            // 실제 앱에서는 여기에 AJAX/fetch로 서버에 검색 요청을 보냅니다.
+            // 지금은 예시 목록을 보여줍니다.
+            profileListContainer.classList.remove('hidden');
+        });
 
     </script>
 </body>

@@ -79,10 +79,6 @@
                 <input type="date" id="dob-input" class="mt-1 block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#FF7242] focus:border-[#FF7242]">
             </div>
             <div class="mb-4">
-                <label for="religion-input" class="block text-sm font-medium text-gray-700">종교적 식단</label>
-                <input type="text" id="religion-input" class="mt-1 block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#FF7242] focus:border-[#FF7242]" placeholder="예: 이슬람, 유대교">
-            </div>
-            <div class="mb-4">
                 <label for="vegetarian-checkbox" class="block text-sm font-medium text-gray-700">채식 여부</label>
                 <div class="mt-2 space-y-2">
                     <label class="inline-flex items-center">
@@ -224,7 +220,6 @@
 
         function handleUserInfoSubmit() {
             const dob = document.getElementById('dob-input').value;
-            const religion = document.getElementById('religion-input').value;
             const vegetarianType = document.querySelector('input[name="vegetarian-type"]:checked').value;
             
             // 태그에서 먹지 않는 음식 목록을 가져옵니다.
@@ -238,14 +233,12 @@
             // 모든 정보를 한 번에 저장하는 로직을 추가합니다.
             console.log('User information submitted:', {
                 dob,
-                religion,
                 vegetarianType,
                 dislikedFoods
             });
 
-            showMessage("모든 정보 입력이 완료되었습니다. 감사합니다!");
-            userInfoForm.classList.add('hidden'); // 폼 숨기기
-            // 이제 메인 페이지로 이동하는 로직을 추가할 수 있습니다.
+            // 모든 정보를 성공적으로 처리했으면 chat_list.html로 이동합니다.
+            window.location.href = 'chat_list.html';
         }
 
     </script>
