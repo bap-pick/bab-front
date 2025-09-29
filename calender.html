@@ -119,12 +119,12 @@
                     </a>
                 </li>
                 <li>
-                    <a href="scrap.index.html" class="flex items-center justify-center w-12 h-12 rounded-full text-[#2A2C41] hover:bg-[#FDBF50]/60">
+                    <a href="#" class="flex items-center justify-center w-12 h-12 rounded-full text-[#2A2C41] hover:bg-[#FDBF50]/60">
                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
                     </a>
                 </li>
                 <li>
-                    <a href="mypage.index.html" class="flex items-center justify-center w-12 h-12 rounded-full text-[#2A2C41] hover:bg-[#FDBF50]/60">
+                    <a href="#" class="flex items-center justify-center w-12 h-12 rounded-full text-[#2A2C41] hover:bg-[#FDBF50]/60">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                     </a>
                 </li>
@@ -280,7 +280,7 @@
 
             <!-- 예약 완료/수정 완료 버튼 -->
             <button id="confirm-reservation-btn" class="w-full bg-custom-point text-white font-bold py-4 rounded-xl hover:bg-orange-600 transition-colors duration-200">
-                저장
+                예약 완료
             </button>
         </div>
     </div>
@@ -312,14 +312,14 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            
+            // DOM Elements
             const currentMonthYearEl = document.getElementById('monthYearBtn');
             const calendarGridEl = document.getElementById('calendarGrid');
             const prevMonthBtn = document.getElementById('prevMonth');
             const nextMonthBtn = document.getElementById('nextMonth');
             const reservationsContainer = document.getElementById('reservationsContainer');
             
-            
+            // Modals and Overlays
             const monthYearModal = document.getElementById('monthYearModal');
             const monthSelector = document.getElementById('monthSelector');
             const prevYearBtn = document.getElementById('prevYear');
@@ -331,7 +331,7 @@
             const toast = document.getElementById('toast');
             const toastMessage = document.getElementById('toast-message');
 
-            
+            // Reservation Modal Elements
             const addReservationBtn = document.getElementById('add-reservation-btn');
             const reservationModal = document.getElementById('reservation-modal');
             const bottomSheet = document.getElementById('bottom-sheet');
@@ -340,14 +340,14 @@
             const peopleSelector = document.getElementById('people-selector');
             const confirmReservationBtn = document.getElementById('confirm-reservation-btn');
 
-            
+            // Search Modal Elements
             const restaurantSearchModal = document.getElementById('restaurant-search-modal');
             const closeSearchModalBtn = document.getElementById('close-search-modal-btn');
             const restaurantSearchInput = document.getElementById('restaurant-search-input');
             const searchResultsContainer = document.getElementById('search-results-container');
 
 
-        
+            // State
             let currentDate = new Date();
             let selectedDate = null;
             let selectedRestaurant = null;
@@ -362,7 +362,7 @@
                 { name: '을밀대', address: '서울 마포구' }
             ];
 
-            
+            // --- Calendar Functions ---
             const renderCalendar = () => {
                 const year = currentDate.getFullYear();
                 const month = currentDate.getMonth();
@@ -402,7 +402,7 @@
                 reservationsContainer.innerHTML = '';
                 if (!date) {
                     reservationsContainer.className = 'flex items-center justify-center min-h-[100px]';
-                    reservationsContainer.innerHTML = `<p class="text-center text-gray-500">선택한 날짜에 예약이 없습니다.</p>`;
+                    reservationsContainer.innerHTML = `<p class="text-center text-gray-500">날짜를 선택하여 예약 현황을 확인하세요.</p>`;
                     return;
                 }
                 const reservations = mockReservations.filter(r => new Date(r.date).toDateString() === date.toDateString());
@@ -445,7 +445,7 @@
                         reservationCard.className = 'swipe-content p-4 shadow-md flex items-center space-x-4';
                         
                         reservationCard.innerHTML = `
-                            <div class="w-12 h-12 flex items-center justify-center rounded-lg text-white font-bold text-xl" style="background-color: #FDBF50;">${new Date(reservation.date).getDate()}</div>
+                            <div class="rounded-lg w-12 h-12 flex items-center justify-center text-white font-bold text-xl" style="background-color: #FDBF50;">${new Date(reservation.date).getDate()}</div>
                             <div class="flex-1 text-gray-800">
                                 <p class="text-lg font-semibold">${reservation.restaurant}</p>
                                 <p class="text-sm font-medium mt-1">${reservation.time} / ${reservation.people}</p>
@@ -484,7 +484,7 @@
                 });
             };
             
-            
+            // --- UI Helper Functions ---
             const showToast = (message) => {
                 clearTimeout(toastTimeout);
                 toastMessage.textContent = message;
@@ -494,13 +494,13 @@
                 }, 2000);
             }
 
-            
+            // --- Side Menu Functions ---
             const closeSideMenu = () => {
                 sideMenu.classList.remove('open');
                 overlay.classList.add('hidden');
             };
 
-            
+            // --- Reservation Modal Functions ---
             const _openBottomSheetUI = () => {
                 const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
                 reservationDateTitle.textContent = selectedDate.toLocaleString('ko-KR', options);
@@ -518,7 +518,7 @@
                     return;
                 }
                 editingReservationIndex = null;
-                confirmReservationBtn.textContent = '저장';
+                confirmReservationBtn.textContent = '예약 완료';
 
                 selectedRestaurant = null;
                 openSearchModalBtn.textContent = '식당을 검색해주세요';
@@ -536,7 +536,7 @@
                 if (!reservation) return;
 
                 editingReservationIndex = index;
-                confirmReservationBtn.textContent = '저장';
+                confirmReservationBtn.textContent = '수정 완료';
 
                 selectedDate = new Date(reservation.date);
                 selectedRestaurant = { name: reservation.restaurant, address: '' }; 
@@ -574,7 +574,7 @@
                 }, 300);
             };
             
-            
+            // --- Search Modal Functions ---
             const openSearchModal = () => {
                 restaurantSearchModal.classList.remove('translate-y-full');
             };
@@ -610,7 +610,7 @@
                 });
             };
 
-            
+            // --- Swipe to Delete Functions ---
             let swipeState = {
                 startX: 0,
                 currentX: 0,
@@ -645,7 +645,7 @@
                 swipeState.currentX = e.pageX || e.touches[0].pageX;
                 let deltaX = swipeState.currentX - swipeState.startX;
                 if (deltaX > 0) deltaX = 0; 
-                if (deltaX < -170) deltaX = -170; 
+                if (deltaX < -170) deltaX = -170; // Max swipe distance
                 element.style.transform = `translateX(${deltaX}px)`;
             }
 
@@ -658,7 +658,7 @@
                 const threshold = -60;
 
                 if (deltaX < threshold) {
-                    element.style.transform = `translateX(-160px)`; 
+                    element.style.transform = `translateX(-160px)`; // Reveal width
                 } else {
                     element.style.transform = 'translateX(0)';
                     swipeState.swipedElement = null;
@@ -765,7 +765,7 @@
             };
 
 
-            
+            // --- Event Listeners ---
             menuBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 if (sideMenu.classList.contains('open')) {
@@ -840,8 +840,10 @@
 
                 if (editingReservationIndex !== null) {
                     mockReservations[editingReservationIndex] = reservationData;
+                    showToast(`'${selectedRestaurant.name}' 예약 수정 완료!`);
                 } else {
                     mockReservations.push(reservationData);
+                    showToast(`'${selectedRestaurant.name}' 예약 완료!`);
                 }
                 
                 editingReservationIndex = null;
@@ -849,13 +851,13 @@
                 closeReservationModal();
             });
             
-            
+            // Search Modal events
             closeSearchModalBtn.addEventListener('click', closeSearchModal);
             restaurantSearchInput.addEventListener('input', (e) => {
                 renderSearchResults(e.target.value);
             });
 
-            
+            // Initial Render
             renderCalendar();
             renderReservations(null);
         });
