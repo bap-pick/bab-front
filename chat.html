@@ -29,7 +29,7 @@
         }
         .header {
             background-color: #fff;
-            padding: 1rem; /* Updated to p-4, which is 1rem */
+            padding: 1rem; 
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -53,7 +53,7 @@
         }
         .message-box.system-message {
             justify-content: flex-start;
-            align-items: flex-end; /* Align to the bottom of the flex container */
+            align-items: flex-end; 
         }
         .message-box.user-message {
             justify-content: flex-end;
@@ -91,7 +91,7 @@
             background-color: #fff;
             padding: 1rem;
             display: flex;
-            align-items: center; /* Center the items vertically */
+            align-items: center; 
             gap: 0.75rem;
             border-top: 1px solid #e5e7eb;
         }
@@ -102,7 +102,7 @@
         .input-area input {
             width: 100%;
             padding: 0.75rem 1.25rem;
-            padding-right: 3rem; /* Make space for the button */
+            padding-right: 3rem; 
             border-radius: 2rem;
             background-color: #f0f2f5;
             border: none;
@@ -124,12 +124,12 @@
             right: 0.25rem;
             top: 50%;
             transform: translateY(-50%);
-            background-color: #d1d5db; /* Default gray color */
+            background-color: #d1d5db; 
             color: #fff;
             width: 2.5rem;
             height: 2.5rem;
             border-radius: 50%;
-            display: flex; /* Always show the button */
+            display: flex; 
             align-items: center;
             justify-content: center;
             font-size: 1.25rem;
@@ -138,7 +138,7 @@
             cursor: pointer;
         }
         .send-button.active {
-            background-color: #FF7242; /* Active color */
+            background-color: #FF7242; 
             box-shadow: 0 4px 8px rgba(255, 114, 66, 0.4);
         }
         .send-button .arrow-up {
@@ -148,7 +148,7 @@
 </head>
 <body>
     <div class="chat-container">
-        <!-- Header -->
+        
         <header class="header">
             <button class="text-gray-500 hover:text-gray-700" onclick="window.location.href='chat_list.html'">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -156,13 +156,13 @@
                 </svg>
             </button>
             <h1>밥픽</h1>
-            <!-- No settings button on the right -->
+            
             <div style="width: 24px; height: 24px;"></div>
         </header>
 
-        <!-- Chat Area -->
+        
         <main class="chat-area">
-            <!-- System Message -->
+    
             <div class="message-box system-message">
                 <div class="profile-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -175,16 +175,16 @@
             </div>
         </main>
 
-        <!-- Input Area -->
+        
         <div class="input-area">
-            <!-- Camera button -->
+        
             <button class="icon-button">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.808-1.212A2 2 0 0110.664 4h2.672a2 2 0 011.664.89l.808 1.212a2 2 0 001.664.89H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
             </button>
-            <!-- Image button -->
+            
             <button class="icon-button">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -205,7 +205,7 @@
         const messageInput = document.getElementById('messageInput');
         const chatArea = document.querySelector('.chat-area');
 
-        // Add event listener to show/hide the button
+        
         messageInput.addEventListener('input', () => {
             if (messageInput.value.trim() !== '') {
                 sendButton.classList.add('active');
@@ -222,7 +222,7 @@
                 return;
             }
 
-            // Create new user message element and append it
+            
             const userMessageDiv = document.createElement('div');
             userMessageDiv.className = 'message-box user-message';
             
@@ -233,16 +233,16 @@
             userMessageDiv.appendChild(userBubbleDiv);
             chatArea.appendChild(userMessageDiv);
 
-            // Clear the input field
+            
             messageInput.value = '';
 
-            // Hide the send button after sending the message
+            
             sendButton.classList.remove('active');
 
-            // Scroll to the bottom of the chat area
+            
             chatArea.scrollTop = chatArea.scrollHeight;
 
-            // Display a loading message from the bot
+            
             const botLoadingDiv = document.createElement('div');
             botLoadingDiv.className = 'message-box system-message';
             botLoadingDiv.innerHTML = `
@@ -258,23 +258,14 @@
             chatArea.appendChild(botLoadingDiv);
             chatArea.scrollTop = chatArea.scrollHeight;
 
-            // TODO: Call your backend API here
-            // const response = await fetch('/api/llm-endpoint', {
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type': 'application/json'
-            //     },
-            //     body: JSON.stringify({ message: messageText })
-            // });
+            
 
-            // const botResponseText = await response.json().message;
+            const botResponseText = ""; 
 
-            const botResponseText = ""; // 챗봇의 응답 내용을 비웁니다.
-
-            // Remove loading message
+            
             chatArea.removeChild(botLoadingDiv);
 
-            // Create new bot message element and append it
+            
             const botMessageDiv = document.createElement('div');
             botMessageDiv.className = 'message-box system-message';
             botMessageDiv.innerHTML = `

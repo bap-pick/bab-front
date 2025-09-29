@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>채팅 목록</title>
-    <!-- Tailwind CSS 링크 -->
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Inter 폰트 추가 */
+        
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         
-        /* 전체 레이아웃 */
+        
         html, body {
             height: 100%;
             margin: 0;
@@ -28,7 +28,7 @@
             background-color: #ffffff;
         }
 
-        /* 팝업 애니메이션 */
+        
         .popup-hidden {
             opacity: 0;
             transform: scale(0.95) translateY(10px);
@@ -42,7 +42,7 @@
             pointer-events: auto;
         }
 
-        /* 사이드 메뉴 애니메이션 */
+        
         #side-menu {
             opacity: 0;
             transform: scale(0.95) translateX(-10px);
@@ -61,12 +61,12 @@
 <body>
 
     <div class="container">
-        <!-- 모든 팝업을 위한 공용 배경 -->
+        
         <div id="overlay" class="fixed inset-0 bg-black bg-opacity-20 z-40 hidden transition-opacity duration-300"></div>
         
-        <!-- 타원형 사이드 메뉴 -->
+        
         <aside id="side-menu" class="fixed top-[72px] left-4 bg-[#F9E9CC] shadow-lg z-50 p-2 flex flex-col rounded-full">
-            <!-- 메뉴 목록 -->
+            
             <nav>
                 <ul class="flex flex-col items-center space-y-2">
                     <li>
@@ -93,7 +93,7 @@
             </nav>
         </aside>
 
-        <!-- 친구 추가 모달 -->
+        
         <div id="add-friend-modal" class="fixed inset-0 bg-black bg-opacity-40 z-50 hidden items-center justify-center p-4">
             <div class="bg-white rounded-lg shadow-xl w-full max-w-sm">
                 <div class="p-6">
@@ -105,9 +105,9 @@
                             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                         </button>
                     </div>
-                    <!-- 프로필 목록 (검색 후 표시) -->
+                    
                     <div id="profile-list-container" class="mt-4 hidden space-y-2">
-                        <!-- 예시 프로필 아이템 -->
+                        
                         <div class="flex items-center justify-between p-2 rounded-lg hover:bg-gray-100">
                             <div class="flex items-center">
                                 <img class="h-10 w-10 rounded-full object-cover" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=1780&auto=format&fit=crop" alt="Profile picture">
@@ -130,13 +130,13 @@
             </div>
         </div>
 
-        <!-- 채팅 목록 화면 -->
+        
         <div id="chat-list-screen" class="h-full flex flex-col relative">
-            <!-- 헤더 -->
+            
             <header class="h-16 bg-white border-b border-gray-200">
-                <!-- 기본 헤더 -->
+                
                 <div id="header-main" class="grid grid-cols-3 items-center h-full px-4">
-                    <!-- 메뉴 아이콘 -->
+                    
                     <div>
                         <button id="menu-btn" class="text-gray-500 hover:text-gray-800">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -157,14 +157,14 @@
                     </div>
                 </div>
 
-                <!-- 검색 헤더 (초기엔 숨김) -->
+                
                 <div id="header-search" class="hidden flex items-center gap-2 h-full px-4">
                     <input type="text" id="search-input" placeholder="검색" class="w-full px-3 py-1.5 border border-gray-200 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400">
                     <button id="cancel-search-btn" class="text-gray-600 hover:text-gray-900 text-sm font-medium flex-shrink-0">취소</button>
                 </div>
             </header>
             
-            <!-- 채팅 목록 -->
+            
             <main class="flex-1 overflow-y-auto bg-gray-50 flex flex-col items-center justify-center">
                 <div class="text-center">
                     <img src="logo.png" alt="Empty chat illustration" class="mx-auto h-24 w-24 text-gray-400  object-cover mb-4">
@@ -174,7 +174,7 @@
                 <ul id="chat-list" class="divide-y divide-gray-200 w-full"></ul>
             </main>
 
-            <!-- 채팅방 개설 아이콘 버튼 -->
+            
             <button id="add-chat-btn" class="fixed bottom-6 right-6 bg-[#FF7242] hover:bg-orange-600 text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-transform transform hover:scale-110 z-30">
                 <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -182,7 +182,7 @@
                 </svg>
             </button>
             
-            <!-- 채팅방 개설 팝업 메뉴 -->
+            
             <div id="add-chat-popup" class="absolute bottom-24 right-6 w-48 bg-white rounded-md shadow-xl z-50 popup-hidden">
                 <div class="py-2">
                     <a href="chat.html" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
@@ -199,25 +199,24 @@
     </div>
     
     <script>
-        // 공용 UI 요소
+    
         const overlay = document.getElementById('overlay');
         
-        // 채팅방 개설 팝업 관련 요소
+        
         const addChatBtn = document.getElementById('add-chat-btn');
         const addChatPopup = document.getElementById('add-chat-popup');
 
-        // 사이드 메뉴 관련 요소
+        
         const menuBtn = document.getElementById('menu-btn');
         const sideMenu = document.getElementById('side-menu');
 
-        // 검색 기능 관련 요소
+        
         const searchBtn = document.getElementById('search-btn');
         const cancelSearchBtn = document.getElementById('cancel-search-btn');
         const headerMain = document.getElementById('header-main');
         const headerSearch = document.getElementById('header-search');
         const searchInput = document.getElementById('search-input');
         
-        // 친구 추가 모달 관련 요소
         const addFriendBtn = document.getElementById('add-friend-btn');
         const addFriendModal = document.getElementById('add-friend-modal');
         const cancelAddFriendBtn = document.getElementById('cancel-add-friend-btn');
@@ -225,7 +224,7 @@
         const profileListContainer = document.getElementById('profile-list-container');
 
 
-        // 모든 팝업을 닫는 함수
+        
         function closeAllPopups() {
             overlay.classList.add('hidden');
             sideMenu.classList.remove('open');
@@ -233,11 +232,11 @@
             addChatPopup.classList.add('popup-hidden');
         }
         
-        // 친구 추가 모달 닫기 함수
+        
         function closeAddFriendModal() {
             addFriendModal.classList.add('hidden');
             addFriendModal.classList.remove('flex');
-            profileListContainer.classList.add('hidden'); // 프로필 목록도 숨김
+            profileListContainer.classList.add('hidden'); 
         }
 
         menuBtn.addEventListener('click', (event) => {
@@ -263,21 +262,21 @@
 
         overlay.addEventListener('click', closeAllPopups);
 
-        // 검색 버튼 클릭 이벤트
+        
         searchBtn.addEventListener('click', () => {
             headerMain.classList.add('hidden');
             headerSearch.classList.remove('hidden');
             searchInput.focus();
         });
 
-        // 검색 취소 버튼 클릭 이벤트
+        
         cancelSearchBtn.addEventListener('click', () => {
             headerSearch.classList.add('hidden');
             headerMain.classList.remove('hidden');
             searchInput.value = '';
         });
 
-        // --- 친구 추가 모달 로직 ---
+        
         addFriendBtn.addEventListener('click', () => {
             closeAllPopups();
             addFriendModal.classList.remove('hidden');
@@ -293,8 +292,7 @@
         });
         
         searchFriendBtn.addEventListener('click', () => {
-            // 실제 앱에서는 여기에 AJAX/fetch로 서버에 검색 요청을 보냅니다.
-            // 지금은 예시 목록을 보여줍니다.
+            
             profileListContainer.classList.remove('hidden');
         });
 

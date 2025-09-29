@@ -19,7 +19,7 @@
             <h1 class="text-3xl font-bold text-gray-800">Bapick!</h1>
         </div>
         
-        <!-- 로그인 폼 -->
+        
         <div id="login-form-container" class="space-y-4 transition-opacity duration-300">
             <div class="mb-4">
                 <label for="email-login" class="block text-sm font-medium text-gray-700">이메일</label>
@@ -42,7 +42,7 @@
             </p>
         </div>
 
-        <!-- 회원가입 폼 -->
+        
         <div id="register-form-container" class="space-y-4 hidden transition-opacity duration-300">
             <div class="mb-4">
                 <label for="email-register" class="block text-sm font-medium text-gray-700">이메일</label>
@@ -69,7 +69,7 @@
             </p>
         </div>
 
-        <!-- 생년월일 및 식단 정보 입력 폼 (통합) -->
+        
         <div id="user-info-form-container" class="space-y-4 hidden transition-opacity duration-300">
             <div class="flex justify-center mb-4">
                 <h2 class="text-2xl font-bold text-gray-800">사용자 정보를 입력해주세요</h2>
@@ -106,7 +106,7 @@
                     <button onclick="addDislikedFoodTag()" class="py-2 px-4 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 font-semibold text-sm">추가</button>
                 </div>
                 <div id="disliked-foods-tags" class="mt-2 flex flex-wrap gap-2">
-                    <!-- 태그가 여기에 추가됩니다 -->
+                    
                 </div>
             </div>
             <div>
@@ -116,7 +116,7 @@
             </div>
         </div>
 
-        <!-- 모달 창 (알림 대신 사용) -->
+        
         <div id="message-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden">
             <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm mx-auto">
                 <p id="message-text" class="text-center text-lg font-semibold text-gray-800"></p>
@@ -169,8 +169,7 @@
                 return;
             }
             
-            // 실제 로그인 로직을 추가합니다.
-            // 성공 시, showUserInfoForm()을 호출합니다.
+            
             console.log('Login attempt with:', { email, password });
             showMessage("로그인 성공!"); 
             showUserInfoForm();
@@ -196,7 +195,7 @@
                 return;
             }
 
-            // 실제 회원가입 로직을 추가합니다.
+            
             showMessage(`회원가입 성공! 이메일: ${email}`);
             console.log('Register attempt with:', { email, password });
             showLoginForm();
@@ -206,7 +205,7 @@
             const food = dislikedFoodInput.value.trim();
             if (food === '') return;
 
-            // 태그 엘리먼트 생성
+            
             const tag = document.createElement('div');
             tag.className = 'flex items-center space-x-2 bg-gray-200 text-gray-800 text-sm font-medium px-3 py-1 rounded-full';
             tag.innerHTML = `<span>${food}</span>
@@ -215,14 +214,14 @@
                              </button>`;
             
             dislikedFoodsTags.appendChild(tag);
-            dislikedFoodInput.value = ''; // 입력 필드 초기화
+            dislikedFoodInput.value = ''; 
         }
 
         function handleUserInfoSubmit() {
             const dob = document.getElementById('dob-input').value;
             const vegetarianType = document.querySelector('input[name="vegetarian-type"]:checked').value;
             
-            // 태그에서 먹지 않는 음식 목록을 가져옵니다.
+
             const dislikedFoods = Array.from(dislikedFoodsTags.children).map(tag => tag.querySelector('span').textContent);
             
             if (!dob) {
@@ -230,14 +229,14 @@
                 return;
             }
 
-            // 모든 정보를 한 번에 저장하는 로직을 추가합니다.
+            
             console.log('User information submitted:', {
                 dob,
                 vegetarianType,
                 dislikedFoods
             });
 
-            // 모든 정보를 성공적으로 처리했으면 chat_list.html로 이동합니다.
+            
             window.location.href = 'chat_list.html';
         }
 
