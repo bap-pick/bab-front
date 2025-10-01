@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+    <style>
+        /* Inter 폰트를 기본으로 사용합니다 */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF8; /* 이미지와 유사한 부드러운 배경색 */
+        }
+        /* 프로필 이미지 주변의 불꽃 효과를 위한 그라데이션 테두리 */
+        .profile-image-container {
+            padding: 5px;
+            background: linear-gradient(45deg, #FDBF8A, #E77A6C, #F0A05E);
+            border-radius: 9999px;
+        }
+        /* 각 스탯 바에 대한 커스텀 색상 (사주 오행 기준) */
+        .progress-bar-wood { background-color: #4CAF50; } /* 목 (木) */
+        .progress-bar-earth { background-color: #8D6E63; } /* 토 (土) */
+        .progress-bar-metal { background-color: #FFB300; } /* 금 (金) */
+        .progress-bar-fire { background-color: #EF5350; } /* 화 (火) */
+        .progress-bar-water { background-color: #42A5F5; } /* 수 (水) */
+    </style>
+</head>
+<body class="pt-16 px-4 pb-24"> <!-- 헤더 공간 확보를 위해 상단 패딩(pt-16) 추가 -->
+    
+    <!-- 헤더 -->
+    <header class="fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-200 z-20">
+        <!-- 기본 헤더 -->
+        <div id="header-main" class="flex items-center justify-start h-full px-4">
+            <div class="flex items-center gap-2">
+                <h1 class="text-xl font-bold text-gray-800">Bapick!</h1>
+            </div>
+        </div>
+    </header>
+
+    <div class="max-w-md w-full mx-auto mt-8 p-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg">
+        <!-- User Info Section: 사용자 이름과 생년월일 -->
+        <div class="text-center mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">홍길동님</h2>
+            <p class="text-sm text-gray-500">1990년 5월 15일</p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6">
+            <!-- Profile Image Section (복원됨) -->
+            <div class="profile-image-container flex-shrink-0">
+                <img class="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-white" 
+                     src="https://placehold.co/128x128/282828/FFFFFF?text=Panda&font=lora"
+                     alt="User Profile Image">
+            </div>
+
+            <!-- Stats Section: 사주 오행 스탯 -->
+            <div class="flex flex-col space-y-3 w-full">
+                <!-- Stat Item: Wood (목) -->
+                <div class="flex items-center space-x-2">
+                    <div class="w-6 h-6 flex items-center justify-center" title="목 (Wood)">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-800" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v4h-2V4a1 1 0 011-1zM6 8a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h4a1 1 0 100-2H7zm-3 4a1 1 0 011-1h8a1 1 0 110 2H5a1 1 0 01-1-1z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+                        <div class="h-full rounded-full progress-bar-wood" style="width: 0%;"></div>
+                    </div>
+                    <span class="font-bold text-gray-700 w-4 text-right">0</span>
+                </div>
+
+                <!-- Stat Item: Earth (토) -->
+                <div class="flex items-center space-x-2">
+                     <div class="w-6 h-6 flex items-center justify-center" title="토 (Earth)">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-900" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm4 0a1 1 0 011-1h4a1 1 0 110 2H8a1 1 0 01-1-1zm-1 4a1 1 0 100 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+                        <div class="h-full rounded-full progress-bar-earth" style="width: 20%;"></div>
+                    </div>
+                    <span class="font-bold text-gray-700 w-4 text-right">1</span>
+                </div>
+
+                <!-- Stat Item: Metal (금) -->
+                <div class="flex items-center space-x-2">
+                    <div class="w-6 h-6 flex items-center justify-center" title="금 (Metal)">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-amber-500" viewBox="0 0 20 20" fill="currentColor">
+                           <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                          <path fill-rule="evenodd" d="M.458 10C.732 5.943 5.522 3 10 3s9.268 2.943 9.542 7c.274 4.057-4.47 7-9.542 7S.184 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+                        <div class="h-full rounded-full progress-bar-metal" style="width: 20%;"></div>
+                    </div>
+                    <span class="font-bold text-gray-700 w-4 text-right">1</span>
+                </div>
+
+                <!-- Stat Item: Fire (화) -->
+                <div class="flex items-center space-x-2">
+                    <div class="w-6 h-6 flex items-center justify-center" title="화 (Fire)">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-600" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+                        <div class="h-full rounded-full progress-bar-fire" style="width: 80%;"></div>
+                    </div>
+                    <span class="font-bold text-gray-700 w-4 text-right">4</span>
+                </div>
+
+                <!-- Stat Item: Water (수) -->
+                <div class="flex items-center space-x-2">
+                    <div class="w-6 h-6 flex items-center justify-center" title="수 (Water)">
+                       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                          <path d="M10 3.5a1.5 1.5 0 01.293 2.95l-1.926.963a3.5 3.5 0 102.26 5.342l.963-1.926A1.5 1.5 0 1110 3.5zm-5.5 5a1.5 1.5 0 100 3 1.5 1.5 0 000-3zM10 12a1.5 1.5 0 100 3 1.5 1.5 0 000-3zm5.5-1.5a1.5 1.5 0 100 3 1.5 1.5 0 000-3z" />
+                        </svg>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+                        <div class="h-full rounded-full progress-bar-water" style="width: 40%;"></div>
+                    </div>
+                    <span class="font-bold text-gray-700 w-4 text-right">2</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 중앙 플로팅 버튼 -->
+    <button id="add-chat-btn" class="fixed bottom-6 left-1/2 -translate-x-1/2 w-16 h-16 bg-[#FF7242] hover:bg-orange-600 text-white rounded-full flex items-center justify-center shadow-lg transition-transform transform hover:scale-110 z-40">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+    </button>
+
+    <!-- 하단 내비게이션 바 -->
+    <footer class="fixed bottom-0 left-0 right-0 z-30">
+        <nav class="flex justify-around items-center h-16 bg-white rounded-t-2xl shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+            <!-- '홈' 아이콘에 활성화 색상 적용 -->
+            <a href="#" class="flex flex-col items-center justify-center w-1/5 h-full text-[#FF7242] text-xs">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                <span class="mt-1">홈</span>
+            </a>
+            <a href="calender.html" class="flex flex-col items-center justify-center w-1/5 h-full text-gray-500 hover:text-[#FF7242] text-xs">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                 <span class="mt-1">캘린더</span>
+            </a>
+            <!-- 중앙 버튼을 위한 공간 -->
+            <div class="w-1/5"></div>
+             <a href="scrap.index.html" class="flex flex-col items-center justify-center w-1/5 h-full text-gray-500 hover:text-[#FF7242] text-xs">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+                <span class="mt-1">스크랩</span>
+            </a>
+            <a href="mypage.index.html" class="flex flex-col items-center justify-center w-1/5 h-full text-gray-500 hover:text-[#FF7242] text-xs">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                 <span class="mt-1">마이</span>
+            </a>
+        </nav>
+    </footer>
+</body>
+</html>
+
