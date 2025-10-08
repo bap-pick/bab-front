@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>공지사항</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         html, body {
@@ -19,44 +17,31 @@
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
-        #overlay {
-            transition: opacity 0.3s ease-in-out;
+        /* 아코디언 화살표 커스텀 */
+        details > summary {
+            list-style: none;
         }
-        #side-menu {
-            opacity: 0;
-            transform: scale(0.95) translateX(-10px);
-            transform-origin: top left;
-            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
-            pointer-events: none;
+        details > summary::-webkit-details-marker {
+            display: none;
         }
-        #side-menu.open {
-            opacity: 1;
-            transform: scale(1) translateX(0);
-            pointer-events: auto;
+        details > summary::after {
+            content: '▼';
+            float: right;
+            transform: rotate(0);
+            transition: transform 0.2s;
+        }
+        details[open] > summary::after {
+            transform: rotate(180deg);
         }
     </style>
 </head>
 <body class="bg-white">
-    
-    <div id="overlay" class="fixed inset-0 bg-black bg-opacity-20 z-40 hidden"></div>
-
-   
-    <aside id="side-menu" class="fixed top-[72px] left-4 bg-[#FEF7E5] shadow-lg z-50 p-2 flex flex-col rounded-full">
-        <nav>
-            <ul class="flex flex-col items-center space-y-2">
-                <li><a href="#" class="flex items-center justify-center w-12 h-12 rounded-full text-[#2A2C41] hover:bg-[#FDBF50]/60"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg></a></li>
-                <li><a href="#" class="flex items-center justify-center w-12 h-12 rounded-full text-[#2A2C41] hover:bg-[#FDBF50]/60"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></a></li>
-                <li><a href="#" class="flex items-center justify-center w-12 h-12 rounded-full text-[#2A2C41] hover:bg-[#FDBF50]/60"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg></a></li>
-                <li><a href="#" class="flex items-center justify-center w-12 h-12 rounded-full bg-[#FDBF50] text-[#2A2C41]"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></a></li>
-            </ul>
-        </nav>
-    </aside>
-
+ 
     <div class="h-full flex flex-col">
         
         <header class="grid grid-cols-3 items-center p-4 border-b border-gray-200 flex-shrink-0">
             <div>
-                <a href="mypage.index.html" class="text-gray-600 hover:text-gray-900 transition-colors duration-200">
+                <a href="mypage.index.html" class="text-gray-600 hover:text-gray-900">
                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg>
                 </a>
             </div>
@@ -64,9 +49,12 @@
             <div class="justify-self-end"><div class="w-6 h-6"></div></div>
         </header>
 
-       
-        <main class="flex-1 overflow-y-auto bg-gray-50 flex items-center justify-center">
-            <div class="text-center">
+        
+        <main class="flex-1 overflow-y-auto bg-gray-50">
+            <div id="announcements-list" class="divide-y divide-gray-200">
+                </div>
+
+            <div id="empty-message" class="hidden h-full flex-col items-center justify-center text-center">
                 <div class="bg-gray-200 p-5 rounded-full mb-4 inline-block">
                     <svg class="w-12 h-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
@@ -77,11 +65,94 @@
         </main>
     </div>
     
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-           
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+        import { getFirestore, collection, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+
+        
+        const firebaseConfig = {
+          apiKey: "AIzaSyAlmVXljDPwkmi4rik69GLhBIHLskw7P2o",
+          authDomain: "bapick-front.firebaseapp.com",
+          projectId: "bapick-front",
+          storageBucket: "bapick-front.firebasestorage.app",
+          messagingSenderId: "883956844611",
+          appId: "1:883956844611:web:ac74a589aae30be9d0ecf6",
+          measurementId: "G-Z1WEHMPL7F"
+        };
+        
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const announcementsList = document.getElementById('announcements-list');
+        const emptyMessage = document.getElementById('empty-message');
+
+        // --- 로그인 상태 확인 ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                console.log("로그인된 사용자:", user.uid);
+                loadAnnouncements();
+            } else {
+                window.location.href = 'login.html';
+            }
         });
+
+        // --- 공지사항 불러오기 ---
+        async function loadAnnouncements() {
+            const announcementsRef = collection(db, "announcements");
+            const q = query(announcementsRef, orderBy("createdAt", "desc")); // 최신순으로 정렬
+
+            const querySnapshot = await getDocs(q);
+            
+            announcementsList.innerHTML = ''; // 목록 비우기
+
+            if (querySnapshot.empty) {
+                emptyMessage.classList.remove('hidden');
+                emptyMessage.classList.add('flex');
+            } else {
+                querySnapshot.forEach((doc) => {
+                    const announcement = doc.data();
+                    const item = createAnnouncementItem(announcement);
+                    announcementsList.appendChild(item);
+                });
+            }
+        }
+
+        // --- 공지사항 항목 HTML 생성 ---
+        function createAnnouncementItem(data) {
+            const detailElement = document.createElement('details');
+            detailElement.className = 'bg-white p-4';
+
+            const summaryElement = document.createElement('summary');
+            summaryElement.className = 'cursor-pointer flex justify-between items-center';
+            
+            const titleDiv = document.createElement('div');
+            const title = document.createElement('p');
+            title.className = 'font-semibold text-gray-800';
+            title.textContent = data.title;
+            
+            const date = document.createElement('p');
+            date.className = 'text-sm text-gray-500 mt-1';
+            // Firestore Timestamp를 날짜 형식으로 변환
+            date.textContent = data.createdAt.toDate().toLocaleDateString('ko-KR');
+            
+            titleDiv.appendChild(title);
+            titleDiv.appendChild(date);
+            
+            summaryElement.appendChild(titleDiv);
+
+            const content = document.createElement('div');
+            content.className = 'mt-4 pt-4 border-t text-gray-600';
+            content.innerHTML = data.content; // HTML 태그를 허용하려면 innerHTML 사용
+
+            detailElement.appendChild(summaryElement);
+            detailElement.appendChild(content);
+
+            return detailElement;
+        }
+
     </script>
 </body>
 </html>
-
