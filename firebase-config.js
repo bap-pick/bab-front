@@ -1,4 +1,4 @@
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: "AIzaSyAlmVXljDPwkmi4rik69GLhBIHLskw7P2o",
   authDomain: "bapick-front.firebaseapp.com",
   projectId: "bapick-front",

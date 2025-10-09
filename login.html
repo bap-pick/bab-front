@@ -19,6 +19,7 @@
             <h1 class="text-3xl font-bold text-gray-800">Bapick!</h1>
         </div>
         
+        <!-- 로그인 form -->
         <div id="login-form-container" class="space-y-4 transition-opacity duration-300">
             <div class="mb-4">
                 <label for="email-login" class="block text-sm font-medium text-gray-700">이메일</label>
@@ -41,6 +42,7 @@
             </p>
         </div>
 
+        <!-- 회원가입 form-->
         <div id="register-form-container" class="space-y-4 hidden transition-opacity duration-300">
             <div class="mb-4">
                 <label for="email-register" class="block text-sm font-medium text-gray-700">이메일</label>
@@ -68,8 +70,8 @@
                 </div>
             </div>
             <div class="mb-4">
-                <label for="dob-input" class="block text-sm font-medium text-gray-700">생년월일</label>
-                <input type="date" id="dob-input" class="mt-1 block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#FF7242] focus:border-[#FF7242]">
+                <label for="birthdate-input" class="block text-sm font-medium text-gray-700">생년월일</label>
+                <input type="date" id="birthdate-input" class="mt-1 block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#FF7242] focus:border-[#FF7242]">
             </div>
             <div class="mb-4">
                 <label for="disliked-food-input" class="block text-sm font-medium text-gray-700">먹지 않는 음식</label>
@@ -93,6 +95,7 @@
             </p>
         </div>
 
+        <!-- 안내 메시지 모달 -->
         <div id="message-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden">
             <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm mx-auto">
                 <p id="message-text" class="text-center text-lg font-semibold text-gray-800"></p>
@@ -104,31 +107,15 @@
     </div>
 
     <script type="module">
-        // Firebase SDK'dan kerakli funksiyalarni import qilish
+        // Firebase SDK import 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        import { firebaseConfig } from "./firebase-config.js";
 
-        // =================================================================================
-        // !!!! MUHIM !!!!
-        // BU YERGA FIREBASE KONSOLIDAN NUSXALAGAN O'ZINGIZNING `firebaseConfig` MA'LUMOTLARINGIZNI QO'YING!
-        const firebaseConfig = {
-            apiKey: "AIzaSyAlmVXljDPwkmi4rik69GLhBIHLskw7P2o",
-            authDomain: "bapick-front.firebaseapp.com",
-            projectId: "bapick-front",
-            storageBucket: "bapick-front.firebasestorage.app",
-            messagingSenderId: "883956844611",
-            appId: "1:883956844611:web:ac74a589aae30be9d0ecf6",
-            measurementId: "G-Z1WEHMPL7F"
-         };
-        // =================================================================================
-
-        // Firebase'ni ishga tushirish
+        // Firebase 앱 초기화
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
 
-        // --- Mavjud UI elementlari va funksiyalar ---
         const loginForm = document.getElementById('login-form-container');
         const registerForm = document.getElementById('register-form-container');
         const messageModal = document.getElementById('message-modal');
@@ -167,17 +154,16 @@
             dislikedFoodInput.value = ''; 
         }
 
-        // --- Firebase bilan ishlaydigan yangi funksiyalar ---
-
+        // 회원가입
         async function handleRegister() {
             const email = document.getElementById('email-register').value;
             const password = document.getElementById('password-register').value;
             const confirmPassword = document.getElementById('password-confirm').value;
             const gender = document.querySelector('input[name="gender"]:checked').value;
-            const dob = document.getElementById('dob-input').value;
+            const birthdate = document.getElementById('birthdate-input').value;
             const dislikedFoods = Array.from(dislikedFoodsTags.children).map(tag => tag.querySelector('span').textContent);
 
-            if (!email || !password || !confirmPassword || !dob) {
+            if (!email || !password || !confirmPassword || !birthdate) {
                 showMessage("이메일, 비밀번호, 생년월일을 모두 입력해주세요.");
                 return;
             }
@@ -191,25 +177,35 @@
             }
 
             try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                // firebase 계정 생성 -> id Token 발급
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password); 
                 const user = userCredential.user;
+                const idToken = await user.getIdToken();
 
-                await setDoc(doc(db, "users", user.uid), {
-                    email: user.email,
-                    gender: gender,
-                    dateOfBirth: dob,
-                    dislikedFoods: dislikedFoods,
-                    createdAt: new Date()
+                // 백엔드 register API: idToken 검증 -> DB에 회원 정보 저장
+                const response = await fetch("http://127.0.0.1:8000/auth/register", {
+                    method: "POST",
+                    headers: { 
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${idToken}` // idToken은 Authorization header로 전달
+                    },
+                    body: JSON.stringify({ email, gender, birthdate })
                 });
-                
-                showMessage(`회원가입 성공!`);
-                messageModal.querySelector('button').onclick = () => {
-                    closeModal();
-                    showLoginForm();
-                };
+
+                if (response.ok) {
+                    showMessage("회원가입 성공!"); 
+                    messageModal.querySelector('button').onclick = () => {
+                        closeModal();
+                        showLoginForm();
+                    };
+                } else {
+                    showMessage("서버 저장 중 오류가 발생했습니다.");
+                }
 
             } catch (error) {
                 console.error("회원가입 에러: ", error);
+                
+                // Firebase Auth에서 발생한 에러
                 if (error.code === 'auth/email-already-in-use') {
                     showMessage("이미 사용 중인 이메일입니다.");
                 } else {
@@ -218,6 +214,7 @@
             }
         }
 
+        // 로그인
         async function handleLogin() {
             const email = document.getElementById('email-login').value;
             const password = document.getElementById('password-login').value;
@@ -229,21 +226,37 @@
 
             try {
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                console.log('로그인 성공:', userCredential.user);
-                
-                // Modal orqali xabar ko'rsatish
-                showMessage("로그인 성공!");
-                messageModal.querySelector('button').onclick = () => {
-                    window.location.href = 'chat_list.html';
-                };
+                const user = userCredential.user;
+                const idToken = await user.getIdToken();
+
+                // 백엔드 login API: idToken 검증 -> 세션/쿠키 발급
+                const response = await fetch("http://127.0.0.1:8000/auth/login", {
+                    method: "POST",
+                    headers: { "Authorization": `Bearer ${idToken}` },
+                    credentials: "include" // 브라우저에 쿠키 자동 저장
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    showMessage("로그인 성공!");
+                    messageModal.querySelector('button').onclick = () => {
+                        window.location.href = 'home.html';
+                    };
+                } else {
+                    showMessage("서버 인증 실패");
+                }
 
             } catch (error) {
-                console.error("로그인 에러: ", error);
-                showMessage("이메일 또는 비밀번호가 올바르지 않습니다.");
+                // Firebase Auth 에러
+                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                    showMessage("이메일 또는 비밀번호가 올바르지 않습니다.");
+                } else {
+                    showMessage("오류가 발생했습니다: " + error.message);
+                }
             }
         }
-
-        // Funksiyalarni global qilish (onclick ishlashi uchun)
+        
+        // 전역 함수 (onclick 작동)
         window.handleLogin = handleLogin;
         window.handleRegister = handleRegister;
         window.showRegisterForm = showRegisterForm;
