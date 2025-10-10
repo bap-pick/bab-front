@@ -135,7 +135,7 @@
                 const idToken = await user.getIdToken();
 
                 // 필요한 필드만 가져오기
-                const fields = ['nickname', 'birthDate'];
+                const fields = ['nickname', 'birthDate', 'profileImage'];
                 const res = await fetch(`http://127.0.0.1:8000/users/me?fields=${fields.join(',')}`, {
                     headers: {
                         'Authorization': `Bearer ${idToken}`
@@ -148,7 +148,7 @@
                 // UI 업데이트
                 userNameEl.textContent = data.nickname ? `${data.nickname}님` : '사용자';
                 userbirthdateEl.textContent = data.birthDate || '생년월일 정보 없음';
-
+                userProfileImageEl.src = data.profileImage || 'https://bit.ly/3VZpUGD';
             } catch (err) {
                 console.error(err);
                 userNameEl.textContent = '정보를 불러오지 못했습니다';
