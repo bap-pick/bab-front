@@ -57,25 +57,10 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-storage.js";
+        import { firebaseConfig } from "./firebase-config.js";
 
-        
-         const firebaseConfig = {
-          apiKey: "AIzaSyAlmVXljDPwkmi4rik69GLhBIHLskw7P2o",
-          authDomain: "bapick-front.firebaseapp.com",
-          projectId: "bapick-front",
-          storageBucket: "bapick-front.firebasestorage.app",
-          messagingSenderId: "883956844611",
-          appId: "1:883956844611:web:ac74a589aae30be9d0ecf6",
-          measurementId: "G-Z1WEHMPL7F"
-        };
-       
-        
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
-        const storage = getStorage(app);
 
         const profileImageUpload = document.getElementById('profile-image-upload');
         const profileImagePreview = document.getElementById('profile-image-preview');
@@ -85,28 +70,40 @@
         let currentUser = null;
         let selectedFile = null;
 
+        // 로그인 확인
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
-                loadUserProfile(user.uid);
+                loadUserProfile(user);
             } else {
                 window.location.href = 'login.html';
             }
         });
 
-        async function loadUserProfile(uid) {
-            const userDocRef = doc(db, "users", uid);
-            const docSnap = await getDoc(userDocRef);
+        // 유저 정보 로드
+        async function loadUserProfile(user) {
+            try {
+                const idToken = await user.getIdToken();
 
-            if (docSnap.exists()) {
-                const userData = docSnap.data();
-                nicknameInput.value = userData.nickname || '';
-                profileImagePreview.src = userData.profileImageUrl || 'https://via.placeholder.com/128';
-            } else {
-                 profileImagePreview.src = 'https://via.placeholder.com/128';
+                const fields = ['nickname', 'profileImage'];
+                const res = await fetch(`http://127.0.0.1:8000/users/me?fields=${fields.join(',')}`, {
+                    headers: {
+                        'Authorization': `Bearer ${idToken}`
+                    }
+                });
+
+                if (!res.ok) throw new Error(`API error: ${res.status}`);
+                const data = await res.json();
+
+                // UI 업데이트
+                nicknameInput.value = data.nickname || '';
+                profileImagePreview.src = data.profileImage || 'https://bit.ly/3VZpUGD';
+            } catch (err) {
+                console.error('유저 정보 로드 실패:', err);
             }
         }
 
+        // 이미지 선택 시 미리보기
         profileImageUpload.addEventListener('change', (event) => {
             const file = event.target.files[0];
             if (file) {
@@ -119,41 +116,38 @@
             }
         });
 
+        // 저장 버튼 클릭 시 FastAPI로 PATCH 요청
         saveProfileBtn.addEventListener('click', async () => {
             if (!currentUser) return;
 
-            const newNickname = nicknameInput.value;
-            if (!newNickname.trim()) {
-                alert('닉네임을 입력해주세요.');
-                return;
-            }
+            const formData = new FormData();
+            const newNickname = nicknameInput.value.trim();
+
+            if (newNickname) formData.append('nickname', newNickname);
+            if (selectedFile) formData.append('profile_image', selectedFile);
 
             saveProfileBtn.disabled = true;
             saveProfileBtn.textContent = '저장 중...';
 
             try {
-                let profileImageUrl = profileImagePreview.src; // 현재 이미지 URL 유지
+                const idToken = await currentUser.getIdToken();
 
-                // 1. 새 이미지가 선택되었을 때만 Storage에 업로드
-                if (selectedFile) {
-                    const storageRef = ref(storage, `profile_images/${currentUser.uid}/${selectedFile.name}`);
-                    const snapshot = await uploadBytes(storageRef, selectedFile);
-                    profileImageUrl = await getDownloadURL(snapshot.ref);
-                    console.log('File uploaded, URL:', profileImageUrl);
-                }
+                const res = await fetch(`http://127.0.0.1:8000/users/me`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${idToken}`
+                    },
+                    body: formData
+                });
 
-                // 2. Firestore에 닉네임과 이미지 URL 업데이트
-                const userDocRef = doc(db, "users", currentUser.uid);
-                await setDoc(userDocRef, {
-                    nickname: newNickname,
-                    profileImageUrl: profileImageUrl
-                }, { merge: true }); // merge: true는 다른 필드(email, dob 등)는 유지하고 이 필드들만 업데이트/추가
+                if (!res.ok) throw new Error(`API error: ${res.status}`);
+                const data = await res.json();
 
-                alert('프로필이 성공적으로 저장되었습니다!');
-                window.location.href = 'mypage.index.html';
-
+                // 응답값으로 UI 갱신
+                if (data.profile_image) profileImagePreview.src = data.profile_image;
+                if (data.nickname) nicknameInput.value = data.nickname;
             } catch (error) {
-                console.error("프로필 저장 에러:", error);
+                console.error(error);
                 alert('오류가 발생했습니다: ' + error.message);
             } finally {
                 saveProfileBtn.disabled = false;
