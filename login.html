@@ -74,14 +74,63 @@
                 </div>
             </div>
             <div class="mb-4">
-                <label for="birthdate-input" class="block text-sm font-medium text-gray-700">생년월일</label>
-                <input type="date" id="birthdate-input" class="mt-1 block w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#FF7242] focus:border-[#FF7242]">
+                <label for="birthdate-input" class="block text-sm font-medium text-gray-700">생년월일시</label>
+                <div class="flex items-stretch mt-1 space-x-2 w-full">
+                    <!-- 양력/음력/음력(윤달) 드롭다운 -->
+                    <div class="relative">
+                        <!-- 실제 select -->
+                        <select id="calendar-type" class="appearance-none w-20 h-10 px-3 rounded-lg border border-gray-300 bg-gray-50 text-gray-700 focus:outline-none focus:ring-[#FF7242] focus:border-[#FF7242]">
+                            <option value="solar">양력</option>
+                            <option value="lunar">음력</option>
+                            <option value="lunar_leap">음력(윤달)</option>
+                        </select>
+                        <!-- 드롭다운 화살표 -->
+                        <div class="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-700">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <!-- 생년월일 -->
+                    <input type="date" id="birthdate-input" class="flex-1 min-w-0 h-10 px-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#FF7242] focus:border-[#FF7242]">
+                    <!-- 출생 시간 -->
+                    <div class="flex items-center justify-center w-20 border border-gray-300 rounded-lg bg-gray-50">
+                        <input type="text" id="birth-hour" maxlength="2" placeholder="19" class="w-7 text-center bg-transparent focus:outline-none" />
+                        <span class="text-gray-700 mx-0.5">:</span>
+                        <input type="text" id="birth-minute" maxlength="2" placeholder="00" class="w-7 text-center bg-transparent focus:outline-none" />
+                    </div>
+                </div>
             </div>
+            <!-- <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">출생 시간</label>
+                <div class="flex items-center mt-1 w-full">
+                    <div class="flex items-center space-x-2">
+                        <input type="number" id="birth-hour" min="0" max="23" class="w-20 px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#FF7242] focus:border-[#FF7242]" placeholder="19">
+                        <span class="text-gray-700 font-medium">시</span>
+                        <input type="number" id="birth-minute" min="0" max="59" class="w-20 px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#FF7242] focus:border-[#FF7242]" placeholder="00">
+                        <span class="text-gray-700 font-medium">분</span>
+                    </div>
+                    <label class="flex items-center space-x-1 text-gray-700 ml-auto">
+                        <input type="checkbox" id="unknown-time" class="rounded border-gray-300 focus:ring-[#FF7242]">
+                        <span class="text-sm">시간 모름</span>
+                    </label>
+                </div>
+            </div> -->
+            <!-- <div class="mb-4">
+                <label for="birthtime" class="block text-sm font-medium text-gray-700 mb-1">출생 시간</label>
+                <div class="flex items-center w-40 border border-gray-300 rounded-lg bg-gray-50">
+                    <input type="text" id="birth-hour" maxlength="2" placeholder="00" class="w-1/2 px-2 py-2 text-center bg-transparent focus:outline-none" />
+                    <span class="px-1 text-gray-700">:</span>
+                    <input type="text" id="birth-minute" maxlength="2" placeholder="00" class="w-1/2 px-2 py-2 text-center bg-transparent focus:outline-none" />
+                </div>
+            </div> -->
             <div class="mb-4">
                 <label for="disliked-food-input" class="block text-sm font-medium text-gray-700">먹지 않는 음식</label>
-                <div class="flex items-center mt-1 space-x-2">
-                    <input type="text" id="disliked-food-input" class="flex-1 px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#FF7242] focus:border-[#FF7242]" placeholder="예: 고수">
-                    <button onclick="addDislikedFoodTag()" class="py-2 px-4 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 font-semibold text-sm whitespace-nowrap">추가</button>
+                <div class="flex items-stretch mt-1 space-x-2 w-full">
+                    <input type="text" id="disliked-food-input" class="flex-1 min-w-0 px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-[#FF7242] focus:border-[#FF7242]" placeholder="예: 고수">
+                    <button onclick="addDislikedFoodTag()" class="flex-shrink px-4 py-2 rounded-lg bg-gray-200 text-gray-700 hover:bg-gray-300 font-semibold text-sm whitespace-nowrap">
+                        추가
+                    </button>
                 </div>
                 <div id="disliked-foods-tags" class="mt-2 flex flex-wrap gap-2"></div>
             </div>
@@ -123,6 +172,8 @@
         const registerForm = document.getElementById('register-form-container');
         const messageModal = document.getElementById('message-modal');
         const messageText = document.getElementById('message-text');
+        const hourInput = document.getElementById("birth-hour");
+        const minuteInput = document.getElementById("birth-minute");
         const dislikedFoodInput = document.getElementById('disliked-food-input');
         const dislikedFoodsTags = document.getElementById('disliked-foods-tags');
 
@@ -157,6 +208,16 @@
             dislikedFoodInput.value = ''; 
         }
 
+        // 시 입력 후 2자리 되면 분으로 자동 포커스
+        hourInput.addEventListener("input", (e) => {
+            if (e.target.value.length >= 2) {
+                minuteInput.focus();
+            }
+        });
+
+        // 숫자만 입력 가능
+        hourInput.addEventListener("input", (e) => { e.target.value = e.target.value.replace(/\D/g,''); });
+        minuteInput.addEventListener("input", (e) => { e.target.value = e.target.value.replace(/\D/g,''); });
         // 회원가입
         async function handleRegister() {
             const email = document.getElementById('email-register').value;
