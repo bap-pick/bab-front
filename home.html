@@ -169,20 +169,23 @@
         // 사주 오행 스탯 바를 업데이트하는 함수
         function updateSajuStats(stats) {
             // stats 객체 예시: { wood: 11.1, fire: 25.5, ... }
+
             for (const elementKey in stats) {
-                const percentage = stats[elementKey];
+                const percentage = stats[elementKey]; // 11.1, 25.5 등의 소수점 값
                 const element = statElements[elementKey];
 
                 if (element) {
-                    // 막대 바의 width를 비율(%)로 설정
-                    element.bar.style.width = `${percentage}%`;
+                    // 막대 바의 width를 오행 수치로 설정
+                    element.bar.style.width = `${percentage.toFixed(1)}%`;
                     
-                    // 텍스트 값을 소수점 첫째 자리까지 표시
-                    element.value.textContent = percentage.toFixed(1); 
+                    // 표시 값은 10의 배수로 반올림 (예: 46.9 -> 50, 11.1 -> 10)
+                    const roundedToTen = Math.round(percentage / 10) * 10;
+                    
+                    // 정수 형태의 값 텍스트로 표시
+                    element.value.textContent = roundedToTen; 
                 }
             }
         }
-
     </script>
 </body>
 </html>
