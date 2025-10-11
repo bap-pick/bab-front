@@ -134,8 +134,8 @@
             try {
                 const idToken = await user.getIdToken();
 
-                // 필요한 필드만 가져오기
-                const fields = ['nickname', 'birthDate', 'profileImage'];
+                const sajuFields = ['ohengWood', 'ohengFire', 'ohengEarth', 'ohengMetal', 'ohengWater'];
+                const fields = ['nickname', 'birthDate', 'profileImage', ...sajuFields];
                 const res = await fetch(`http://127.0.0.1:8000/users/me?fields=${fields.join(',')}`, {
                     headers: {
                         'Authorization': `Bearer ${idToken}`
@@ -149,6 +149,16 @@
                 userNameEl.textContent = data.nickname ? `${data.nickname}님` : '사용자';
                 userbirthdateEl.textContent = data.birthDate || '생년월일 정보 없음';
                 userProfileImageEl.src = data.profileImage || 'https://bit.ly/3VZpUGD';
+
+                // 오행 데이터를 updateSajuStats 함수에 전달
+                const sajuStats = {
+                    wood: data.ohengWood || 0.0,
+                    fire: data.ohengFire || 0.0,
+                    earth: data.ohengEarth || 0.0,
+                    metal: data.ohengMetal || 0.0,
+                    water: data.ohengWater || 0.0,
+                };
+                updateSajuStats(sajuStats);
             } catch (err) {
                 console.error(err);
                 userNameEl.textContent = '정보를 불러오지 못했습니다';
@@ -158,15 +168,17 @@
 
         // 사주 오행 스탯 바를 업데이트하는 함수
         function updateSajuStats(stats) {
-            // stats 객체 예시: { wood: 3, fire: 2, earth: 1, metal: 1, water: 0 }
-            const total = Object.values(stats).reduce((sum, value) => sum + value, 0);
-            if (total === 0) return;
+            // stats 객체 예시: { wood: 11.1, fire: 25.5, ... }
+            for (const elementKey in stats) {
+                const percentage = stats[elementKey];
+                const element = statElements[elementKey];
 
-            for (const [element, data] of Object.entries(stats)) {
-                if (statElements[element]) {
-                    const percentage = (data / total) * 100;
-                    statElements[element].bar.style.width = `${percentage}%`;
-                    statElements[element].value.textContent = data;
+                if (element) {
+                    // 막대 바의 width를 비율(%)로 설정
+                    element.bar.style.width = `${percentage}%`;
+                    
+                    // 텍스트 값을 소수점 첫째 자리까지 표시
+                    element.value.textContent = percentage.toFixed(1); 
                 }
             }
         }
