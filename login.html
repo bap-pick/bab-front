@@ -146,8 +146,6 @@
         const hourInput = document.getElementById("birth-hour");
         const minuteInput = document.getElementById("birth-minute");
         const unknownTimeCheckbox = document.getElementById("unknown-time");
-        const dislikedFoodInput = document.getElementById('disliked-food-input');
-        const dislikedFoodsTags = document.getElementById('disliked-foods-tags');
 
         function showMessage(message) {
             messageText.textContent = message;
@@ -217,7 +215,6 @@
             const birthHour = hourInput.value;
             const birthMinute = minuteInput.value;
             const timeUnknown = unknownTimeCheckbox.checked; // 출생시간 모름 체크 여부
-            const dislikedFoods = Array.from(dislikedFoodsTags.children).map(tag => tag.querySelector('span').textContent);
 
             if (!email || !password || !confirmPassword || !nickname || !birthDate) {
                 showMessage("이메일, 비밀번호, 닉네임, 생년월일을 모두 입력해주세요.");
@@ -236,7 +233,12 @@
                 // firebase 계정 생성 -> id Token 발급
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password); 
                 const user = userCredential.user;
-                const idToken = await user.getIdToken();
+    const idToken = await user.getIdToken(); 
+
+    // 🌟🌟 2초 지연 로직 유지 (시각 불일치 오류 우회)
+    console.log("Waiting 2 seconds to ensure clock synchronization...");
+    await new Promise(resolve => setTimeout(resolve, 1000)); 
+    console.log("Wait finished. Sending login request to server.");
 
                 // 서버로 전송할 JSON payload
                 const payload = {
@@ -295,7 +297,12 @@
             try {
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
-                const idToken = await user.getIdToken();
+                    const idToken = await user.getIdToken(); 
+
+    // 🌟🌟 2초 지연 로직 유지 (시각 불일치 오류 우회)
+    console.log("Waiting 2 seconds to ensure clock synchronization...");
+    await new Promise(resolve => setTimeout(resolve, 1000)); 
+    console.log("Wait finished. Sending login request to server.");
 
                 // 백엔드 login API: idToken 검증 -> 세션/쿠키 발급
                 const response = await fetch("http://127.0.0.1:8000/auth/login", {
