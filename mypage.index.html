@@ -49,10 +49,12 @@
         <main class="flex-1 overflow-y-auto bg-gray-50">
             <div class="w-full">
                 <section class="bg-white flex items-center p-5 border-b-8 border-gray-100">
-                    <div class="w-16 h-16 rounded-full bg-gray-200 mr-4 flex-shrink-0"></div>
+                    <div class="w-16 h-16 rounded-full mr-4 flex-shrink-0 overflow-hidden bg-gray-200">
+                        <img id="user-display-profile-image" class="w-full h-full object-cover" src="" alt="프로필 이미지">
+                    </div>
                     <div class="flex-1">
                         <a href="editmypage.index.html" class="text-lg font-bold text-gray-800 flex items-center">
-                            <span id="user-display-name">...</span>
+                            <span id="user-display-name"></span>
                             <svg class="w-5 h-5 ml-1 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                         </a>
                     </div>
@@ -178,6 +180,7 @@
         const addChatBtn = document.getElementById('add-chat-btn');
         const addChatPopup = document.getElementById('add-chat-popup');
         const userDisplayName = document.getElementById('user-display-name');
+        const userDisplayProfileImage = document.getElementById('user-display-profile-image');
 
         // 로그인 상태 확인 및 데이터 로딩
         onAuthStateChanged(auth, async (user) => {
@@ -189,7 +192,7 @@
                 const idToken = await user.getIdToken();
 
                 // 필요한 필드만 가져오기
-                const fields = ['nickname'];
+                const fields = ['nickname', 'profileImage'];
                 const res = await fetch(`http://127.0.0.1:8000/users/me?fields=${fields.join(',')}`, {
                     headers: {
                         'Authorization': `Bearer ${idToken}`
@@ -201,7 +204,7 @@
 
                 // UI 업데이트
                 userDisplayName.textContent = `${data.nickname}님`;
-
+                userDisplayProfileImage.src = data.profileImage || 'https://bit.ly/3VZpUGD';
             } catch (err) {
                 console.error(err);
                 userDisplayName.textContent = '정보를 불러오지 못했습니다';
