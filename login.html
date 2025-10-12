@@ -233,12 +233,10 @@
                 // firebase 계정 생성 -> id Token 발급
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password); 
                 const user = userCredential.user;
-    const idToken = await user.getIdToken(); 
+                const idToken = await user.getIdToken(); 
 
-    // 🌟🌟 2초 지연 로직 유지 (시각 불일치 오류 우회)
-    console.log("Waiting 2 seconds to ensure clock synchronization...");
-    await new Promise(resolve => setTimeout(resolve, 1000)); 
-    console.log("Wait finished. Sending login request to server.");
+                // 1초 지연
+                await new Promise(resolve => setTimeout(resolve, 1000)); 
 
                 // 서버로 전송할 JSON payload
                 const payload = {
@@ -297,12 +295,10 @@
             try {
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
-                    const idToken = await user.getIdToken(); 
+                const idToken = await user.getIdToken(); 
 
-    // 🌟🌟 2초 지연 로직 유지 (시각 불일치 오류 우회)
-    console.log("Waiting 2 seconds to ensure clock synchronization...");
-    await new Promise(resolve => setTimeout(resolve, 1000)); 
-    console.log("Wait finished. Sending login request to server.");
+                // 1초 지연
+                await new Promise(resolve => setTimeout(resolve, 1000)); 
 
                 // 백엔드 login API: idToken 검증 -> 세션/쿠키 발급
                 const response = await fetch("http://127.0.0.1:8000/auth/login", {
