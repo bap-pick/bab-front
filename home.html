@@ -21,6 +21,21 @@
         .progress-bar-metal { background-color: #FFB300; } /* 금 (金) */
         .progress-bar-fire { background-color: #EF5350; } /* 화 (火) */
         .progress-bar-water { background-color: #42A5F5; } /* 수 (水) */
+
+        .popup-hidden {
+            opacity: 0;
+            transform: translate(-50%, 10px) scale(0.9);
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s 0.2s;
+            visibility: hidden;
+        }
+        .popup-visible {
+            opacity: 1;
+            transform: translate(-50%, 0) scale(1);
+            pointer-events: auto;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            visibility: visible;
+        }
     </style>
 </head>
 <body class="pt-16 px-4 pb-24">
@@ -100,6 +115,21 @@
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
     </button>
     
+    <div id="overlay" class="fixed inset-0 bg-black bg-opacity-30 z-40 hidden"></div>
+    
+    <div id="add-chat-popup" class="absolute bottom-24 left-1/2 -translate-x-1/2 w-48 bg-white rounded-md shadow-xl z-50 popup-hidden">
+        <div class="py-2">
+            <a id="open-llm-chat-btn" href="chat.html" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                1:1 채팅방
+            </a>
+            <a href="chat_group.html" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M18 21v-2a4 4 0 0 0-4-4h-1"/><circle cx="9" cy="7" r="4"/><path d="M18 7h3a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-3"/><path d="m15.5 13.5-3-3 3-3"/></svg>
+                단체 채팅방
+            </a>
+        </div>
+    </div>
+
     <script type="module">
         // Firebase SDK import 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
@@ -110,12 +140,12 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // UI 요소
+        // 유저의 이름, 생년월일, 프로필 이미지
         const userNameEl = document.getElementById('user-nickname');
         const userbirthdateEl = document.getElementById('user-birthdate');
         const userProfileImageEl = document.getElementById('user-profile-image');
 
-        // 스탯 요소들
+        // 오행 스탯 요소들
         const statElements = {
             wood: { bar: document.getElementById('stat-wood'), value: document.getElementById('stat-wood-value') },
             earth: { bar: document.getElementById('stat-earth'), value: document.getElementById('stat-earth-value') },
@@ -186,6 +216,37 @@
                 }
             }
         }
+
+        // 채팅창 생성 팝업 관련 요소들
+        const addChatBtn = document.getElementById('add-chat-btn');
+        const addChatPopup = document.getElementById('add-chat-popup');
+        const overlay = document.getElementById('overlay');
+        
+        const closeAllPopups = () => {
+            overlay.classList.add('hidden');
+            addChatPopup.classList.remove('popup-visible');
+            addChatPopup.classList.add('popup-hidden');
+        };
+
+        // + 버튼('add-chat-btn') 이벤트 리스너 추가
+        addChatBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            const isAddChatOpen = addChatPopup.classList.contains('popup-visible');
+            
+            // 모든 팝업 닫기
+            closeAllPopups();
+            
+            // 팝업이 닫혀있는 상태면, 팝업 열기
+            if (!isAddChatOpen) {
+                overlay.classList.remove('hidden');
+                addChatPopup.classList.remove('popup-hidden');
+                addChatPopup.classList.add('popup-visible');
+            }
+        });
+        
+        // 오버레이 클릭 시 팝업 닫기
+        overlay.addEventListener('click', closeAllPopups);
+
     </script>
 </body>
 </html>
