@@ -59,6 +59,7 @@
                 <img id="user-profile-image" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-white" src="https://bit.ly/3VZpUGD" alt="User Profile Image">
             </div>
 
+            <!-- 오행 스탯 바 섹션 -->
             <div id="stats-container" class="flex flex-col space-y-3 w-full">
                 <div class="flex items-center space-x-2">
                     <div class="w-6 h-6 flex items-center justify-center" title="목 (Wood)"><svg class="h-5 w-5 text-green-800" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v4h-2V4a1 1 0 011-1zM6 8a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h4a1 1 0 100-2H7zm-3 4a1 1 0 011-1h8a1 1 0 110 2H5a1 1 0 01-1-1z" clip-rule="evenodd" /></svg></div>
@@ -87,6 +88,15 @@
                 </div>
             </div>
         </div>
+
+        <!-- 오행 분석 결과 및 추천 메시지 섹션 추가 -->
+        <div class="mt-8 p-4 bg-orange-100/50 border border-orange-200 rounded-xl shadow-inner">
+            <span id="recommendation-type" class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-[#FF7242] text-white"></span>
+            <h3 id="recommendation-headline" class="text-lg font-bold text-gray-800 mt-2"></h3>
+            <p id="recommendation-advice" class="text-sm text-gray-600 mt-2"></p>
+        </div>
+        <!-- /오행 분석 결과 및 추천 메시지 섹션 -->
+
     </div>
 
     <footer class="fixed bottom-0 left-0 right-0 z-30">
@@ -140,7 +150,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // 유저의 이름, 생년월일, 프로필 이미지
+        // 유저의 이름, 생년월일, 프로필 이미지 요소
         const userNameEl = document.getElementById('user-nickname');
         const userbirthdateEl = document.getElementById('user-birthdate');
         const userProfileImageEl = document.getElementById('user-profile-image');
@@ -148,58 +158,19 @@
         // 오행 스탯 요소들
         const statElements = {
             wood: { bar: document.getElementById('stat-wood'), value: document.getElementById('stat-wood-value') },
+            fire: { bar: document.getElementById('stat-fire'), value: document.getElementById('stat-fire-value') },
             earth: { bar: document.getElementById('stat-earth'), value: document.getElementById('stat-earth-value') },
             metal: { bar: document.getElementById('stat-metal'), value: document.getElementById('stat-metal-value') },
-            fire: { bar: document.getElementById('stat-fire'), value: document.getElementById('stat-fire-value') },
             water: { bar: document.getElementById('stat-water'), value: document.getElementById('stat-water-value') }
         };
-
-        // 로그인 상태 확인 및 데이터 로딩
-        onAuthStateChanged(auth, async (user) => {
-            if (!user) {
-                window.location.href = 'login.html';
-                return;
-            }
-
-            try {
-                const idToken = await user.getIdToken();
-
-                const sajuFields = ['ohengWood', 'ohengFire', 'ohengEarth', 'ohengMetal', 'ohengWater'];
-                const fields = ['nickname', 'birthDate', 'profileImage', ...sajuFields];
-                const res = await fetch(`http://127.0.0.1:8000/users/me?fields=${fields.join(',')}`, {
-                    headers: {
-                        'Authorization': `Bearer ${idToken}`
-                    }
-                });
-
-                if (!res.ok) throw new Error(`API error: ${res.status}`);
-                const data = await res.json();
-
-                // UI 업데이트
-                userNameEl.textContent = data.nickname ? `${data.nickname}님` : '사용자';
-                userbirthdateEl.textContent = data.birthDate || '생년월일 정보 없음';
-                userProfileImageEl.src = data.profileImage || 'https://bit.ly/3VZpUGD';
-
-                // 오행 데이터를 updateSajuStats 함수에 전달
-                const sajuStats = {
-                    wood: data.ohengWood || 0.0,
-                    fire: data.ohengFire || 0.0,
-                    earth: data.ohengEarth || 0.0,
-                    metal: data.ohengMetal || 0.0,
-                    water: data.ohengWater || 0.0,
-                };
-                updateSajuStats(sajuStats);
-            } catch (err) {
-                console.error(err);
-                userNameEl.textContent = '정보를 불러오지 못했습니다';
-                userbirthdateEl.textContent = '';
-            }
-        });
+        
+        // 추천 메시지 요소들
+        const recommendationTypeEl = document.getElementById('recommendation-type');
+        const recommendationHeadlineEl = document.getElementById('recommendation-headline');
+        const recommendationAdviceEl = document.getElementById('recommendation-advice');
 
         // 사주 오행 스탯 바를 업데이트하는 함수
         function updateSajuStats(stats) {
-            // stats 객체 예시: { wood: 11.1, fire: 25.5, ... }
-
             for (const elementKey in stats) {
                 const percentage = stats[elementKey]; // 11.1, 25.5 등의 소수점 값
                 const element = statElements[elementKey];
@@ -216,6 +187,85 @@
                 }
             }
         }
+        
+        // 오행 분석 결과를 가져옴
+        async function fetchRecommendation(idToken) {
+            const res = await fetch("http://127.0.0.1:8000/saju/analyze", {
+                headers: {
+                    'Authorization': `Bearer ${idToken}`
+                }
+            });
+
+            if (!res.ok) {
+                // HTTP 404: 데이터가 없거나 사주 계산이 안된 경우
+                if (res.status === 404) {
+                    throw new Error("오행 분석 데이터가 아직 준비되지 않았습니다. 마이페이지에서 사주 정보 입력 여부를 확인해 주세요.");
+                }
+                throw new Error(`추천 분석 API 오류: ${res.status} ${res.statusText}`);
+            }
+            return res.json();
+        }
+
+
+        // 로그인 상태 확인 및 데이터 로딩
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const idToken = await user.getIdToken();
+
+            // 1. 사용자 프로필 및 기본 오행 점수 로드
+            try {
+                const sajuFields = ['ohengWood', 'ohengFire', 'ohengEarth', 'ohengMetal', 'ohengWater'];
+                const fields = ['nickname', 'birthDate', 'profileImage', ...sajuFields];
+                const res = await fetch(`http://127.0.0.1:8000/users/me?fields=${fields.join(',')}`, {
+                    headers: {
+                        'Authorization': `Bearer ${idToken}`
+                    }
+                });
+
+                if (!res.ok) throw new Error(`API error: ${res.status}`);
+                const data = await res.json();
+
+                // UI 업데이트 (프로필)
+                userNameEl.textContent = data.nickname ? `${data.nickname}님` : '사용자';
+                userbirthdateEl.textContent = data.birthDate || '생년월일 정보 없음';
+                userProfileImageEl.src = data.profileImage || 'https://bit.ly/3VZpUGD';
+
+                // 오행 데이터를 updateSajuStats 함수에 전달
+                const sajuStats = {
+                    wood: data.ohengWood || 0.0,
+                    fire: data.ohengFire || 0.0,
+                    earth: data.ohengEarth || 0.0,
+                    metal: data.ohengMetal || 0.0,
+                    water: data.ohengWater || 0.0,
+                };
+                updateSajuStats(sajuStats);
+            } catch (err) {
+                console.error("User profile fetch failed:", err);
+                userNameEl.textContent = '정보를 불러오지 못했습니다';
+                userbirthdateEl.textContent = '';
+            }
+
+            // 2. 오행 분석 결과 및 추천 메시지 로드
+            try {
+                const analysisData = await fetchRecommendation(idToken);
+                
+                // UI 업데이트 (추천 메시지)
+                recommendationTypeEl.textContent = analysisData.user_type; // 예: 무水行형
+                recommendationHeadlineEl.textContent = analysisData.recommendation_headline;
+                recommendationAdviceEl.textContent = analysisData.recommendation_advice;
+
+            } catch (err) {
+                console.error("Recommendation fetch failed:", err);
+                // UI에 오류 메시지 표시
+                recommendationTypeEl.textContent = '정보 없음';
+                recommendationHeadlineEl.textContent = '추천 분석 정보를 불러올 수 없습니다.';
+                recommendationAdviceEl.textContent = err.message || '서버 오류가 발생했습니다.';
+            }
+        });
 
         // 채팅창 생성 팝업 관련 요소들
         const addChatBtn = document.getElementById('add-chat-btn');
