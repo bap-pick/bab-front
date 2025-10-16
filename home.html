@@ -51,7 +51,7 @@
 
     <div class="max-w-md w-full mx-auto mt-4">
         <div class="relative flex items-center w-full">
-            <input type="text" placeholder="서울시 도봉구 삼양로 144" class="w-full pl-5 pr-16 py-3 bg-white/80 backdrop-blur-sm border-none rounded-full shadow-lg focus:ring-2 focus:ring-[#FF7242] focus:outline-none text-gray-800 placeholder-gray-400">
+            <input type="text" id='location-text' placeholder="서울시 도봉구 삼양로 144" class="w-full pl-5 pr-16 py-3 bg-white/80 backdrop-blur-sm border-none rounded-full shadow-lg focus:ring-2 focus:ring-[#FF7242] focus:outline-none text-gray-800 placeholder-gray-400">
             <button class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#FF7242] hover:bg-orange-600 text-white rounded-full flex items-center justify-center transition-transform transform hover:scale-110">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -71,6 +71,7 @@
                 <img id="user-profile-image" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-white" src="https://bit.ly/3VZpUGD" alt="User Profile Image">
             </div>
 
+            <!-- 오행 스탯 바 섹션 -->
             <div id="stats-container" class="flex flex-col space-y-3 w-full">
                 <div class="flex items-center space-x-2">
                     <div class="w-6 h-6 flex items-center justify-center" title="목 (Wood)"><span class="material-symbols-outlined text-[#4CAF50]">nature</span></div>
@@ -99,6 +100,15 @@
                 </div>
             </div>
         </div>
+
+        <!-- 오행 분석 결과 및 추천 메시지 섹션 추가 -->
+        <div class="mt-8 p-4 bg-orange-100/50 border border-orange-200 rounded-xl shadow-inner">
+            <span id="recommendation-type" class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-[#FF7242] text-white"></span>
+            <h3 id="recommendation-headline" class="text-lg font-bold text-gray-800 mt-2"></h3>
+            <p id="recommendation-advice" class="text-sm text-gray-600 mt-2"></p>
+        </div>
+        <!-- /오행 분석 결과 및 추천 메시지 섹션 -->
+
     </div>
 
     <footer class="fixed bottom-0 left-0 right-0 z-30">
@@ -146,23 +156,15 @@
         // Firebase SDK import 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        // import { firebaseConfig } from "./firebase-config.js";
-        
-        // 임시 Firebase 설정
-        const firebaseConfig = {
-            apiKey: "AIza...",
-            authDomain: "...",
-            projectId: "...",
-            storageBucket: "...",
-            messagingSenderId: "...",
-            appId: "..."
-        };
+        import { firebaseConfig } from "./firebase-config.js";
 
-        // Firebase 앱 초기화
+        // Firebase 앱 초기
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // UI 요소
+        // fastapi 서버 url
+        const FASTAPI_BASE_URL = "https://bab-back.onrender.com"; 
+
         const userNameEl = document.getElementById('user-nickname');
         const userbirthdateEl = document.getElementById('user-birthdate');
         const userProfileImageEl = document.getElementById('user-profile-image');
@@ -170,9 +172,9 @@
 
         const statElements = {
             wood: { bar: document.getElementById('stat-wood'), value: document.getElementById('stat-wood-value') },
+            fire: { bar: document.getElementById('stat-fire'), value: document.getElementById('stat-fire-value') },
             earth: { bar: document.getElementById('stat-earth'), value: document.getElementById('stat-earth-value') },
             metal: { bar: document.getElementById('stat-metal'), value: document.getElementById('stat-metal-value') },
-            fire: { bar: document.getElementById('stat-fire'), value: document.getElementById('stat-fire-value') },
             water: { bar: document.getElementById('stat-water'), value: document.getElementById('stat-water-value') }
         };
 
@@ -197,16 +199,16 @@
                             const district = address.suburb || address.neighbourhood || address.borough || address.city_district || '';
                             
                             if (city && district) {
-                                locationTextEl.textContent = `${city} ${district}`;
+                                locationTextEl.value = `${city} ${district}`;
                             } else if (city) {
-                                locationTextEl.textContent = city;
+                                locationTextEl.value = city;
                             } else {
-                                locationTextEl.textContent = '주소 정보 없음';
+                                locationTextEl.value = '주소 정보 없음';
                             }
 
                         } catch (error) {
                             console.error("Reverse geocoding error:", error);
-                            locationTextEl.textContent = '주소를 변환할 수 없습니다.';
+                            locationTextEl.value = '주소를 변환할 수 없습니다.';
                         }
                     },
                     (error) => {
@@ -214,46 +216,30 @@
                         console.error(`Geolocation error: ${error.code} - ${error.message}`);
                         switch (error.code) {
                             case error.PERMISSION_DENIED:
-                                locationTextEl.textContent = "위치 권한이 거부되었습니다.";
+                                locationTextEl.value = "위치 권한이 거부되었습니다.";
                                 break;
                             case error.POSITION_UNAVAILABLE:
-                                locationTextEl.textContent = "위치 정보를 사용할 수 없습니다.";
+                                locationTextEl.value = "위치 정보를 사용할 수 없습니다.";
                                 break;
                             case error.TIMEOUT:
-                                locationTextEl.textContent = "위치 정보를 가져오는데 시간이 초과되었습니다.";
+                                locationTextEl.value = "위치 정보를 가져오는데 시간이 초과되었습니다.";
                                 break;
                             default:
-                                locationTextEl.textContent = "알 수 없는 오류로 위치를 가져올 수 없습니다.";
+                                locationTextEl.value = "알 수 없는 오류로 위치를 가져올 수 없습니다.";
                                 break;
                         }
                     }
                 );
             } else {
-                locationTextEl.textContent = 'Geolocation을 지원하지 않습니다.';
+                locationTextEl.value = 'Geolocation을 지원하지 않습니다.';
             }
         }
 
-        // 로그인 상태 확인 및 데이터 로딩
-        onAuthStateChanged(auth, async (user) => {
-            if (!user) {
-                // 로그인 페이지로 리디렉션 (실제 환경에서는 주석 해제)
-                // window.location.href = 'login.html';
-                console.log("Not logged in. Showing static data.");
-            }
-            
-            // --- 임시 정적 데이터 사용 ---
-            userNameEl.textContent = '바픽테스트님';
-            userbirthdateEl.textContent = '2000-01-01';
-            userProfileImageEl.src = 'https://bit.ly/3VZpUGD';
+        // 추천 메시지 요소들
+        const recommendationTypeEl = document.getElementById('recommendation-type');
+        const recommendationHeadlineEl = document.getElementById('recommendation-headline');
+        const recommendationAdviceEl = document.getElementById('recommendation-advice');
 
-            const sajuStats = {
-                wood: 11.1, fire: 25.5, earth: 46.9, metal: 5.5, water: 11.0,
-            };
-            updateSajuStats(sajuStats);
-            
-            // 실시간 위치 업데이트 함수 호출
-            updateLocation();
-        });
 
         // 사주 오행 스탯 바 업데이트 함수
         function updateSajuStats(stats) {
@@ -267,6 +253,89 @@
                 }
             }
         }
+        
+        // 오행 분석 결과를 가져옴
+        async function fetchRecommendation(idToken) {
+            const res = await fetch(`${FASTAPI_BASE_URL}/saju/analyze`, {
+                headers: {
+                    'Authorization': `Bearer ${idToken}`
+                }
+            });
+
+            if (!res.ok) {
+                // HTTP 404: 데이터가 없거나 사주 계산이 안된 경우
+                if (res.status === 404) {
+                    throw new Error("오행 분석 데이터가 아직 준비되지 않았습니다. 마이페이지에서 사주 정보 입력 여부를 확인해 주세요.");
+                }
+                throw new Error(`추천 분석 API 오류: ${res.status} ${res.statusText}`);
+            }
+            return res.json();
+        }
+
+
+        // 로그인 상태 확인 및 데이터 로딩
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const idToken = await user.getIdToken();
+
+            // 1. 사용자 프로필 및 기본 오행 점수 로드
+            try {
+                const sajuFields = ['ohengWood', 'ohengFire', 'ohengEarth', 'ohengMetal', 'ohengWater'];
+                const fields = ['nickname', 'birthDate', 'profileImage', ...sajuFields];
+                const res = await fetch(`${FASTAPI_BASE_URL}/users/me?fields=${fields.join(',')}`, {
+                    headers: {
+                        'Authorization': `Bearer ${idToken}`
+                    }
+                });
+
+                if (!res.ok) throw new Error(`API error: ${res.status}`);
+                const data = await res.json();
+
+                // UI 업데이트 (프로필)
+                userNameEl.textContent = data.nickname ? `${data.nickname}님` : '사용자';
+                userbirthdateEl.textContent = data.birthDate || '생년월일 정보 없음';
+                userProfileImageEl.src = data.profileImage || 'https://bit.ly/3VZpUGD';
+
+                // 오행 데이터를 updateSajuStats 함수에 전달
+                const sajuStats = {
+                    wood: data.ohengWood || 0.0,
+                    fire: data.ohengFire || 0.0,
+                    earth: data.ohengEarth || 0.0,
+                    metal: data.ohengMetal || 0.0,
+                    water: data.ohengWater || 0.0,
+                };
+                updateSajuStats(sajuStats);
+
+                            
+                // 실시간 위치 업데이트 함수 호출
+                updateLocation();
+            } catch (err) {
+                console.error("User profile fetch failed:", err);
+                userNameEl.textContent = '정보를 불러오지 못했습니다';
+                userbirthdateEl.textContent = '';
+            }
+
+            // 2. 오행 분석 결과 및 추천 메시지 로드
+            try {
+                const analysisData = await fetchRecommendation(idToken);
+                
+                // UI 업데이트 (추천 메시지)
+                recommendationTypeEl.textContent = analysisData.user_type; // 예: 무水行형
+                recommendationHeadlineEl.textContent = analysisData.recommendation_headline;
+                recommendationAdviceEl.textContent = analysisData.recommendation_advice;
+
+            } catch (err) {
+                console.error("Recommendation fetch failed:", err);
+                // UI에 오류 메시지 표시
+                recommendationTypeEl.textContent = '정보 없음';
+                recommendationHeadlineEl.textContent = '추천 분석 정보를 불러올 수 없습니다.';
+                recommendationAdviceEl.textContent = err.message || '서버 오류가 발생했습니다.';
+            }
+        });
 
         // 채팅창 생성 팝업 관련 요소들
         const addChatBtn = document.getElementById('add-chat-btn');
@@ -295,4 +364,3 @@
     </script>
 </body>
 </html>
-
