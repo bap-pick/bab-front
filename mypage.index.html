@@ -185,16 +185,24 @@
         const userDisplayName = document.getElementById('user-display-name');
         const userDisplayProfileImage = document.getElementById('user-display-profile-image');
 
-        // 로그인 상태 확인 및 데이터 로딩
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
                 userDisplayName.textContent = "로그인이 필요합니다";
+            }
+            loadUserProfile(user); 
+        })
+
+
+        // (1) 유저 정보를 로드하는 비동기 함수를 별도로 정의
+        async function loadUserProfile(user) {
+            if (!user) {
+                userDisplayName.textContent = "로그인이 필요합니다";
+                return;
             }
 
             try {
                 const idToken = await user.getIdToken();
 
-                // 필요한 필드만 가져오기
                 const fields = ['nickname', 'profileImage'];
                 const res = await fetch(`${FASTAPI_BASE_URL}/users/me?fields=${fields.join(',')}`, {
                     headers: {
@@ -208,11 +216,12 @@
                 // UI 업데이트
                 userDisplayName.textContent = `${data.nickname}님`;
                 userDisplayProfileImage.src = data.profileImage || 'https://bit.ly/3VZpUGD';
+
             } catch (err) {
-                console.error(err);
+                console.error('마이페이지 유저 정보 로드 실패:', err);
                 userDisplayName.textContent = '정보를 불러오지 못했습니다';
             }
-        });
+        }
 
         function closeAllPopups() {
             overlay.classList.add('hidden');
