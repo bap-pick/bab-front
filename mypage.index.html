@@ -169,6 +169,9 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
+        // fastapi 서버 url
+        const FASTAPI_BASE_URL = "https://bab-back.onrender.com"; 
+        
         const overlay = document.getElementById('overlay');
         const logoutBtn = document.getElementById('logout-btn');
         const logoutModal = document.getElementById('logout-modal');
@@ -193,7 +196,7 @@
 
                 // 필요한 필드만 가져오기
                 const fields = ['nickname', 'profileImage'];
-                const res = await fetch(`http://127.0.0.1:8000/users/me?fields=${fields.join(',')}`, {
+                const res = await fetch(`${FASTAPI_BASE_URL}/users/me?fields=${fields.join(',')}`, {
                     headers: {
                         'Authorization': `Bearer ${idToken}`
                     }

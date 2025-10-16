@@ -139,6 +139,10 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
+        
+        // fastapi 서버 url
+        const FASTAPI_BASE_URL = "https://bab-back.onrender.com"; 
+
         const loginForm = document.getElementById('login-form-container');
         const registerForm = document.getElementById('register-form-container');
         const messageModal = document.getElementById('message-modal');
@@ -251,7 +255,7 @@
                 };
 
                 // 백엔드 register API: idToken 검증 -> DB에 회원 정보 저장
-                const response = await fetch("http://127.0.0.1:8000/auth/register", {
+                const response = await fetch(`${FASTAPI_BASE_URL}/auth/register`, {
                     method: "POST",
                     headers: { 
                         "Content-Type": "application/json",
@@ -301,7 +305,7 @@
                 await new Promise(resolve => setTimeout(resolve, 1000)); 
 
                 // 백엔드 login API: idToken 검증 -> 세션/쿠키 발급
-                const response = await fetch("http://127.0.0.1:8000/auth/login", {
+                const response = await fetch(`${FASTAPI_BASE_URL}/auth/login`, {
                     method: "POST",
                     headers: { "Authorization": `Bearer ${idToken}` },
                     credentials: "include" // 브라우저에 쿠키 자동 저장
