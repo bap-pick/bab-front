@@ -51,6 +51,10 @@
     
     <div class="relative flex items-center w-full bg-[#FF7242] px-4 py-4">
         <input type="text" id='location-text' class="w-full pl-5 pr-16 py-3 bg-white/80 backdrop-blur-sm border-none rounded-full shadow-lg focus:ring-2 focus:ring-[#FF7242] focus:outline-none text-gray-800 placeholder-gray-400">
+    
+        <button class="absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#FF7242] hover:bg-orange-600 text-white rounded-full flex items-center justify-center shadow-md transition-transform transform hover:scale-110">
+            <span class="material-symbols-outlined fill=0">location_on</span>
+        </button>
     </div>
     
     
@@ -97,10 +101,11 @@
         </div>
 
         <!-- 오행 분석 결과 및 추천 메시지 섹션 추가 -->
-        <div class="mt-8 p-4 bg-orange-100/50 border border-orange-200 rounded-xl shadow-inner">
+        <div class="mt-8 p-4 bg-[#FFEDC5]/50 border border-orange-200 rounded-xl shadow-inner">
             <span id="recommendation-type" class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-[#FF7242] text-white"></span>
             <h3 id="recommendation-headline" class="text-lg font-bold text-gray-800 mt-2"></h3>
             <p id="recommendation-advice" class="text-sm text-gray-600 mt-2"></p>
+        </div>
         </div>
         <!-- /오행 분석 결과 및 추천 메시지 섹션 -->
 
@@ -320,7 +325,7 @@
                 
                 // UI 업데이트 (추천 메시지)
                 recommendationTypeEl.textContent = analysisData.user_type; // 예: 무水行형
-                recommendationHeadlineEl.textContent = analysisData.recommendation_headline;
+                recommendationHeadlineEl.textContent = `"${analysisData.recommendation_headline}"`;
                 recommendationAdviceEl.textContent = analysisData.recommendation_advice;
 
             } catch (err) {
