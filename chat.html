@@ -28,6 +28,13 @@
             overflow: hidden;
         }
         .header {
+            position: fixed; /* 화면에 고정 */
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100; /* 다른 요소 위에 보이도록 설정 */
+    
+            /* 기존 스타일 유지 */
             background-color: #fff;
             padding: 1rem; 
             display: flex;
@@ -35,18 +42,25 @@
             align-items: center;
             border-bottom: 1px solid #e5e7eb;
         }
+
         .header h1 {
             font-size: 1.25rem;
             font-weight: 700;
             color: #333;
         }
         .chat-area {
+            /* 고정된 헤더와 입력창에 내용이 가려지지 않도록 위아래에 여백(padding)을 추가 */
+            padding-top: 80px;  /* 헤더의 높이만큼 조절 */
+            padding-bottom: 90px; /* 입력창의 높이만큼 조절 */
+    
+            /* 기존 스타일 유지 */
             flex-grow: 1;
-            padding: 1rem;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
             gap: 1rem;
+            padding-left: 1rem; /* 좌우 패딩은 그대로 유지 */
+            padding-right: 1rem;
         }
         .message-box {
             display: flex;
@@ -88,6 +102,13 @@
             border-bottom-right-radius: 0.25rem;
         }
         .input-area {
+            position: fixed; /* 화면에 고정 */
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100; /* 다른 요소 위에 보이도록 설정 */
+
+            /* 기존 스타일 유지 */
             background-color: #fff;
             padding: 1rem;
             display: flex;
