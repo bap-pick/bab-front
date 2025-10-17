@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" />
+    <link rel="icon" href="logo_bapick copy.png">
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -39,9 +40,8 @@
         }
     </style>
 </head>
-<body class="pt-16 px-4 pb-24 bg-white">
-    
-    <header class="fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-200 z-20">
+<body class="pt-16 pb-24 bg-[#FF7242]">
+    <header class="fixed top-0 left-0 right-0 h-16 bg-[#FF7242] z-20">
         <div id="header-main" class="flex items-center justify-start h-full px-4">
             <div class="flex items-center gap-2">
                 <h1 class="text-xl font-bold text-gray-800">Bapick!</h1>
@@ -49,18 +49,14 @@
         </div>
     </header>
 
-    <div class="max-w-md w-full mx-auto mt-4">
-        <div class="relative flex items-center w-full">
-            <input type="text" id='location-text' placeholder="서울시 도봉구 삼양로 144" class="w-full pl-5 pr-16 py-3 bg-white/80 backdrop-blur-sm border-none rounded-full shadow-lg focus:ring-2 focus:ring-[#FF7242] focus:outline-none text-gray-800 placeholder-gray-400">
-            <button class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#FF7242] hover:bg-orange-600 text-white rounded-full flex items-center justify-center transition-transform transform hover:scale-110">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-            </button>
-        </div>
+    
+    <div class="relative flex items-center w-full bg-[#FF7242] px-4 py-4">
+        <input type="text" id='location-text' class="w-full pl-5 pr-16 py-3 bg-white/80 backdrop-blur-sm border-none rounded-full shadow-lg focus:ring-2 focus:ring-[#FF7242] focus:outline-none text-gray-800 placeholder-gray-400">
     </div>
+    
+    
 
-    <div class="max-w-md w-full mx-auto mt-4 p-6 bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg">
+    <div class="max-w-md w-full mx-auto mt-4 p-6 bg-white backdrop-blur-sm rounded-t-2xl shadow-lg">
         <div class="text-center mb-6">
             <h2 id="user-nickname" class="text-2xl font-bold text-gray-800"></h2>
             <p id="user-birthdate" class="text-sm text-gray-500"></p>
