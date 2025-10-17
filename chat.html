@@ -222,7 +222,7 @@
                 return;
             }
 
-            
+            // 사용자 메세지
             const userMessageDiv = document.createElement('div');
             userMessageDiv.className = 'message-box user-message';
             
@@ -234,15 +234,11 @@
             chatArea.appendChild(userMessageDiv);
 
             
-            messageInput.value = '';
-
-            
+            messageInput.value = '';     
             sendButton.classList.remove('active');
-
-            
             chatArea.scrollTop = chatArea.scrollHeight;
 
-            
+            //ai 로딩 메세지
             const botLoadingDiv = document.createElement('div');
             botLoadingDiv.className = 'message-box system-message';
             botLoadingDiv.innerHTML = `
@@ -259,13 +255,30 @@
             chatArea.scrollTop = chatArea.scrollHeight;
 
             
+            // API 호출
+            let botResponseText = ""; 
+            try {
+                const res = await fetch("http://127.0.0.1:8000/chat/send", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "FIREBASE_TOKEN"   // 여기에 토큰 넣기!!   
+                        },
+                    body: JSON.stringify({
+                        room_id: 2,             //  테스트용
+                        message: messageText
+                    })
+                });
 
-            const botResponseText = ""; 
+                const data = await res.json();
+                botResponseText = data.reply.content;
+            } catch (err) {
+                botResponseText = "AI 응답 불가;;;";
+                console.error(err);
+            }
 
-            
             chatArea.removeChild(botLoadingDiv);
-
-            
+         
             const botMessageDiv = document.createElement('div');
             botMessageDiv.className = 'message-box system-message';
             botMessageDiv.innerHTML = `
@@ -274,9 +287,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                 </div>
-                <div class="message-bubble system-bubble">
-                    ${botResponseText}
-                </div>
+                <div class="message-bubble system-bubble">${botResponseText}</div>
             `;
             chatArea.appendChild(botMessageDiv);
             chatArea.scrollTop = chatArea.scrollHeight;
