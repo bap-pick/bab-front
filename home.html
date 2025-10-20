@@ -213,14 +213,25 @@
 
     <div id="overlay" class="fixed inset-0 bg-black bg-opacity-30 z-40 hidden"></div>
 
-    <div id="add-chat-popup" class="fixed bottom-24 left-1/2 -translate-x-1/2 w-48 bg-white rounded-md shadow-xl z-50 popup-hidden">
+    <div id="add-chat-popup" class="absolute bottom-24 left-1/2 -translate-x-1/2 w-48 bg-white rounded-md shadow-xl z-50 popup-hidden">
         <div class="py-2">
-            <a id="open-llm-chat-btn" href="chat.html" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /></svg>
+            <a href="chat_list.html" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="8" y1="6" x2="21" y2="6"></line>
+                    <line x1="8" y1="12" x2="21" y2="12"></line>
+                    <line x1="8" y1="18" x2="21" y2="18"></line>
+                    <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                    <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                    <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                </svg>
+                채팅 목록
+            </a>
+            <a href="chat.html" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
                 1:1 채팅방
             </a>
             <a href="chat_group.html" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><path d="M18 21v-2a4 4 0 0 0-4-4h-1" /><circle cx="9" cy="7" r="4" /><path d="M18 7h3a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-3" /><path d="m15.5 13.5-3-3 3-3" /></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M18 21v-2a4 4 0 0 0-4-4h-1"/><circle cx="9" cy="7" r="4"/><path d="M18 7h3a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-3"/><path d="m15.5 13.5-3-3 3-3"/></svg>
                 단체 채팅방
             </a>
         </div>
