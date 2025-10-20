@@ -233,7 +233,7 @@
         const chatArea = document.querySelector('.chat-area');
         const ROOM_ID = 1;
 
-        let idToken = null; await user.getIdToken();
+        let idToken = null;
 
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
