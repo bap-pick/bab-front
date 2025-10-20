@@ -1,27 +1,44 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" />
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,1,0" />
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #e5e7eb;
         }
+
         .profile-image-container {
             padding: 5px;
             background: linear-gradient(45deg, #FDBF8A, #E77A6C, #F0A05E);
             border-radius: 9999px;
         }
-        .progress-bar-wood { background-color: #4CAF50; } /* 목 (木) */
-        .progress-bar-earth { background-color: #8D6E63; } /* 토 (土) */
-        .progress-bar-metal { background-color: #FFB300; } /* 금 (金) */
-        .progress-bar-fire { background-color: #EF5350; } /* 화 (火) */
-        .progress-bar-water { background-color: #42A5F5; } /* 수 (水) */
+
+        .progress-bar-wood {
+            background-color: #4CAF50;
+        }
+
+        .progress-bar-earth {
+            background-color: #8D6E63;
+        }
+
+        .progress-bar-metal {
+            background-color: #FFB300;
+        }
+
+        .progress-bar-fire {
+            background-color: #EF5350;
+        }
+
+        .progress-bar-water {
+            background-color: #42A5F5;
+        }
 
         .popup-hidden {
             opacity: 0;
@@ -30,6 +47,7 @@
             transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s 0.2s;
             visibility: hidden;
         }
+
         .popup-visible {
             opacity: 1;
             transform: translate(-50%, 0) scale(1);
@@ -37,9 +55,19 @@
             transition: opacity 0.2s ease, transform 0.2s ease;
             visibility: visible;
         }
+
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
     </style>
 </head>
-<body class="pt-16 pb-24 bg-[#FF7242]">
+
+<body class="min-h-screen pt-16 bg-[#FF7242]">
     <header class="fixed top-0 left-0 right-0 h-16 bg-[#FF7242] z-20">
         <div id="header-main" class="flex items-center justify-start h-full px-4">
             <div class="flex items-center gap-2">
@@ -48,68 +76,114 @@
         </div>
     </header>
 
-    
     <div class="relative flex items-center w-full bg-[#FF7242] px-4 py-4">
-        <input type="text" id='location-text' class="w-full pl-5 pr-16 py-3 bg-white/80 backdrop-blur-sm border-none rounded-full shadow-lg focus:ring-2 focus:ring-[#FF7242] focus:outline-none text-gray-800 placeholder-gray-400">
-    
-        <button class="absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#FF7242] hover:bg-orange-600 text-white rounded-full flex items-center justify-center shadow-md transition-transform transform hover:scale-110">
+        <input type="text" id='location-text'
+            class="w-full pl-5 pr-16 py-3 bg-white/80 backdrop-blur-sm border-none rounded-full shadow-lg focus:ring-2 focus:ring-[#FF7242] focus:outline-none text-gray-800 placeholder-gray-400">
+
+        <button
+            class="absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#FF7242] hover:bg-orange-600 text-white rounded-full flex items-center justify-center shadow-md transition-transform transform hover:scale-110">
             <span class="material-symbols-outlined fill=0">location_on</span>
         </button>
     </div>
-    
-    
 
-    <div class="max-w-md w-full mx-auto mt-4 p-6 bg-white backdrop-blur-sm rounded-t-2xl shadow-lg">
-        <div class="text-center mb-6">
-            <h2 id="user-nickname" class="text-2xl font-bold text-gray-800"></h2>
-            <p id="user-birthdate" class="text-sm text-gray-500"></p>
-        </div>
-
-        <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6">
-            <div class="profile-image-container flex-shrink-0">
-                <img id="user-profile-image" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-white" src="https://bit.ly/3VZpUGD" alt="User Profile Image">
+    <main class="max-w-md w-full mx-auto bg-slate-100 rounded-t-3xl pb-24 p-4">
+        
+        <div class="p-6 bg-white backdrop-blur-sm rounded-2xl shadow-lg">
+            <div class="text-center mb-6">
+                <h2 id="user-nickname" class="text-2xl font-bold text-gray-800"></h2>
+                <p id="user-birthdate" class="text-sm text-gray-500"></p>
             </div>
 
-            <!-- 오행 스탯 바 섹션 -->
-            <div id="stats-container" class="flex flex-col space-y-3 w-full">
-                <div class="flex items-center space-x-2">
-                    <div class="w-6 h-6 flex items-center justify-center" title="목 (Wood)"><span class="material-symbols-outlined text-[#4CAF50]">nature</span></div>
-                    <div class="w-full bg-gray-200 rounded-full h-4"><div id="stat-wood" class="h-full rounded-full progress-bar-wood" style="width: 0%;"></div></div>
-                    <span id="stat-wood-value" class="font-bold text-gray-700 w-4 text-right">0</span>
+            <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6">
+                <div class="profile-image-container flex-shrink-0">
+                    <img id="user-profile-image"
+                        class="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-white"
+                        src="https://bit.ly/3VZpUGD" alt="User Profile Image">
                 </div>
-                <div class="flex items-center space-x-2">
-                    <div class="w-6 h-6 flex items-center justify-center" title="화 (Fire)"><span class="material-symbols-outlined text-[#EF5350]">local_fire_department</span></div>
-                    <div class="w-full bg-gray-200 rounded-full h-4"><div id="stat-fire" class="h-full rounded-full progress-bar-fire" style="width: 0%;"></div></div>
-                    <span id="stat-fire-value" class="font-bold text-gray-700 w-4 text-right">0</span>
+                <div id="stats-container" class="flex flex-col space-y-3 w-full">
+                    <div class="flex items-center space-x-2">
+                        <div class="w-6 h-6 flex items-center justify-center" title="목 (Wood)"><span class="material-symbols-outlined text-[#4CAF50]">nature</span></div>
+                        <div class="w-full bg-gray-200 rounded-full h-4"><div id="stat-wood" class="h-full rounded-full progress-bar-wood" style="width: 0%;"></div></div>
+                        <span id="stat-wood-value" class="font-bold text-gray-700 w-8 text-right">0</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-6 h-6 flex items-center justify-center" title="화 (Fire)"><span class="material-symbols-outlined text-[#EF5350]">local_fire_department</span></div>
+                        <div class="w-full bg-gray-200 rounded-full h-4"><div id="stat-fire" class="h-full rounded-full progress-bar-fire" style="width: 0%;"></div></div>
+                        <span id="stat-fire-value" class="font-bold text-gray-700 w-8 text-right">0</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-6 h-6 flex items-center justify-center" title="토 (Earth)"><span class="material-symbols-outlined text-[#8D6E63]">landscape</span></div>
+                        <div class="w-full bg-gray-200 rounded-full h-4"><div id="stat-earth" class="h-full rounded-full progress-bar-earth" style="width: 0%;"></div></div>
+                        <span id="stat-earth-value" class="font-bold text-gray-700 w-8 text-right">0</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-6 h-6 flex items-center justify-center" title="금 (Metal)"><span class="material-symbols-outlined text-[#FFB300]">paid</span></div>
+                        <div class="w-full bg-gray-200 rounded-full h-4"><div id="stat-metal" class="h-full rounded-full progress-bar-metal" style="width: 0%;"></div></div>
+                        <span id="stat-metal-value" class="font-bold text-gray-700 w-8 text-right">0</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-6 h-6 flex items-center justify-center" title="수 (Water)"><span class="material-symbols-outlined text-[#42A5F5]">water_drop</span></div>
+                        <div class="w-full bg-gray-200 rounded-full h-4"><div id="stat-water" class="h-full rounded-full progress-bar-water" style="width: 0%;"></div></div>
+                        <span id="stat-water-value" class="font-bold text-gray-700 w-8 text-right">0</span>
+                    </div>
                 </div>
-                <div class="flex items-center space-x-2">
-                    <div class="w-6 h-6 flex items-center justify-center" title="토 (Earth)"><span class="material-symbols-outlined text-[#8D6E63]">landscape</span></div>
-                    <div class="w-full bg-gray-200 rounded-full h-4"><div id="stat-earth" class="h-full rounded-full progress-bar-earth" style="width: 0%;"></div></div>
-                    <span id="stat-earth-value" class="font-bold text-gray-700 w-4 text-right">0</span>
-                </div>
-                <div class="flex items-center space-x-2">
-                    <div class="w-6 h-6 flex items-center justify-center" title="금 (Metal)"><span class="material-symbols-outlined text-[#FFB300]">paid</span></div>
-                    <div class="w-full bg-gray-200 rounded-full h-4"><div id="stat-metal" class="h-full rounded-full progress-bar-metal" style="width: 0%;"></div></div>
-                    <span id="stat-metal-value" class="font-bold text-gray-700 w-4 text-right">0</span>
-                </div>
-                <div class="flex items-center space-x-2">
-                    <div class="w-6 h-6 flex items-center justify-center" title="수 (Water)"><span class="material-symbols-outlined text-[#42A5F5]">water_drop</span></div>
-                    <div class="w-full bg-gray-200 rounded-full h-4"><div id="stat-water" class="h-full rounded-full progress-bar-water" style="width: 0%;"></div></div>
-                    <span id="stat-water-value" class="font-bold text-gray-700 w-4 text-right">0</span>
-                </div>
+            </div>
+
+            <div class="mt-8 p-4 bg-[#FFEDC5]/50 border border-orange-200 rounded-xl shadow-inner">
+                <span id="recommendation-type" class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-[#FF7242] text-white"></span>
+                <h3 id="recommendation-headline" class="text-lg font-bold text-gray-800 mt-2"></h3>
+                <p id="recommendation-advice" class="text-sm text-gray-600 mt-2"></p>
             </div>
         </div>
 
-        <!-- 오행 분석 결과 및 추천 메시지 섹션 추가 -->
-        <div class="mt-8 p-4 bg-[#FFEDC5]/50 border border-orange-200 rounded-xl shadow-inner">
-            <span id="recommendation-type" class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-[#FF7242] text-white"></span>
-            <h3 id="recommendation-headline" class="text-lg font-bold text-gray-800 mt-2"></h3>
-            <p id="recommendation-advice" class="text-sm text-gray-600 mt-2"></p>
-        </div>
-        </div>
-        <!-- /오행 분석 결과 및 추천 메시지 섹션 -->
+        <div class="mt-4 p-6 bg-white backdrop-blur-sm rounded-2xl shadow-lg">
+            <div class="mt-2">
+                <div class="flex justify-between items-center">
+        <h3 id="nearby-restaurants-heading" class="text-xl font-bold text-gray-800">나의 주변 맛집 🍚</h3>
 
+        <a href="restaurant_list.html" class="text-sm font-semibold text-gray-500 hover:text-[#FF7242]">
+            전체보기 &gt;
+        </a>
     </div>
+                <div class="relative mt-4">
+                    <div id="restaurant-carousel" class="flex overflow-x-auto scroll-smooth scrollbar-hide space-x-4 py-2">
+                        <div class="flex-shrink-0 w-52 bg-white rounded-lg shadow-md overflow-hidden transform transition-transform hover:scale-105">
+                            <img class="w-full h-28 object-cover" src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDR8fHJlc3RhdXJhbnR8ZW58MHx8fHwxNjM4OTc1MjU0&ixlib=rb-1.2.1&q=80&w=400" alt="식당 이미지">
+                            <div class="p-3">
+                                <h4 class="font-bold text-gray-800">강남면옥</h4>
+                                <p class="text-sm text-gray-500">한식 • 냉면</p>
+                                <p class="text-xs text-gray-400 mt-1">강남구 • 1.2km</p>
+                            </div>
+                        </div>
+                        <div class="flex-shrink-0 w-52 bg-white rounded-lg shadow-md overflow-hidden transform transition-transform hover:scale-105">
+                            <img class="w-full h-28 object-cover" src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDEyfHxyZXN0YXVyYW50fGVufDB8fHx8MTYzODk3NTI1NA&ixlib=rb-1.2.1&q=80&w=400" alt="식당 이미지">
+                            <div class="p-3">
+                                <h4 class="font-bold text-gray-800">파파이스 키친</h4>
+                                <p class="text-sm text-gray-500">이탈리안 • 파스타</p>
+                                <p class="text-xs text-gray-400 mt-1">서초구 • 2.5km</p>
+                            </div>
+                        </div>
+                        <div class="flex-shrink-0 w-52 bg-white rounded-lg shadow-md overflow-hidden transform transition-transform hover:scale-105">
+                            <img class="w-full h-28 object-cover" src="https://images.unsplash.com/photo-1590846406792-044253a8064f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDI3fHxyZXN0YXVyYW50fGVufDB8fHx8MTYzODk3NTI5NQ&ixlib=rb-1.2.1&q=80&w=400" alt="식당 이미지">
+                            <div class="p-3">
+                                <h4 class="font-bold text-gray-800">오스테리아 오르조</h4>
+                                <p class="text-sm text-gray-500">양식 • 와인바</p>
+                                <p class="text-xs text-gray-400 mt-1">용산구 • 4.1km</p>
+                            </div>
+                        </div>
+                        <div class="flex-shrink-0 w-52 bg-white rounded-lg shadow-md overflow-hidden transform transition-transform hover:scale-105">
+                            <img class="w-full h-28 object-cover" src="https://images.unsplash.com/photo-1578474846511-04ba529f0b88?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDE3fHxyZXN0YXVyYW50fGVufDB8fHx8MTYzODk3NTI1NA&ixlib=rb-1.2.1&q=80&w=400" alt="식당 이미지">
+                            <div class="p-3">
+                                <h4 class="font-bold text-gray-800">스시쇼우</h4>
+                                <p class="text-sm text-gray-500">일식 • 오마카세</p>
+                                <p class="text-xs text-gray-400 mt-1">송파구 • 8.3km</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
 
     <footer class="fixed bottom-0 left-0 right-0 z-30">
         <nav class="flex justify-around items-center h-16 bg-white rounded-t-2xl shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
@@ -136,34 +210,31 @@
     <button id="add-chat-btn" class="fixed bottom-6 left-1/2 -translate-x-1/2 w-16 h-16 bg-[#FF7242] hover:bg-orange-600 text-white rounded-full flex items-center justify-center shadow-lg transition-transform transform hover:scale-110 z-40">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
     </button>
-    
+
     <div id="overlay" class="fixed inset-0 bg-black bg-opacity-30 z-40 hidden"></div>
-    
-    <div id="add-chat-popup" class="absolute bottom-24 left-1/2 -translate-x-1/2 w-48 bg-white rounded-md shadow-xl z-50 popup-hidden">
+
+    <div id="add-chat-popup" class="fixed bottom-24 left-1/2 -translate-x-1/2 w-48 bg-white rounded-md shadow-xl z-50 popup-hidden">
         <div class="py-2">
             <a id="open-llm-chat-btn" href="chat.html" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /></svg>
                 1:1 채팅방
             </a>
             <a href="chat_group.html" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M18 21v-2a4 4 0 0 0-4-4h-1"/><circle cx="9" cy="7" r="4"/><path d="M18 7h3a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-3"/><path d="m15.5 13.5-3-3 3-3"/></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><path d="M18 21v-2a4 4 0 0 0-4-4h-1" /><circle cx="9" cy="7" r="4" /><path d="M18 7h3a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-3" /><path d="m15.5 13.5-3-3 3-3" /></svg>
                 단체 채팅방
             </a>
         </div>
     </div>
 
     <script type="module">
-        // Firebase SDK import 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
         import { firebaseConfig } from "./firebase-config.js";
 
-        // Firebase 앱 초기
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // fastapi 서버 url
-        const FASTAPI_BASE_URL = "https://bab-back.onrender.com"; 
+        const FASTAPI_BASE_URL = "https://bab-back.onrender.com";
 
         const userNameEl = document.getElementById('user-nickname');
         const userbirthdateEl = document.getElementById('user-birthdate');
@@ -178,26 +249,23 @@
             water: { bar: document.getElementById('stat-water'), value: document.getElementById('stat-water-value') }
         };
 
-        // 실시간 위치 가져오기 및 주소 변환 함수
         async function updateLocation() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     async (position) => {
                         const lat = position.coords.latitude;
                         const lng = position.coords.longitude;
-                        
+
                         try {
-                            // OpenStreetMap Nominatim API를 사용하여 역지오코딩
                             const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=ko`);
                             if (!response.ok) {
                                 throw new Error('Reverse geocoding API request failed');
                             }
                             const data = await response.json();
                             const address = data.address;
-
                             const city = address.city || address.province || '';
                             const district = address.suburb || address.neighbourhood || address.borough || address.city_district || '';
-                            
+
                             if (city && district) {
                                 locationTextEl.value = `${city} ${district}`;
                             } else if (city) {
@@ -205,14 +273,12 @@
                             } else {
                                 locationTextEl.value = '주소 정보 없음';
                             }
-
                         } catch (error) {
                             console.error("Reverse geocoding error:", error);
                             locationTextEl.value = '주소를 변환할 수 없습니다.';
                         }
                     },
                     (error) => {
-                        // Geolocation 오류 처리 개선
                         console.error(`Geolocation error: ${error.code} - ${error.message}`);
                         switch (error.code) {
                             case error.PERMISSION_DENIED:
@@ -235,35 +301,27 @@
             }
         }
 
-        // 추천 메시지 요소들
         const recommendationTypeEl = document.getElementById('recommendation-type');
         const recommendationHeadlineEl = document.getElementById('recommendation-headline');
         const recommendationAdviceEl = document.getElementById('recommendation-advice');
 
-
-        // 사주 오행 스탯 바 업데이트 함수
         function updateSajuStats(stats) {
             for (const elementKey in stats) {
                 const percentage = stats[elementKey];
                 const element = statElements[elementKey];
                 if (element) {
                     element.bar.style.width = `${percentage.toFixed(1)}%`;
-                    const roundedToTen = Math.round(percentage / 10) * 10;
-                    element.value.textContent = roundedToTen; 
+                    element.value.textContent = Math.round(percentage);
                 }
             }
         }
-        
-        // 오행 분석 결과를 가져옴
+
         async function fetchRecommendation(idToken) {
             const res = await fetch(`${FASTAPI_BASE_URL}/saju/analyze`, {
-                headers: {
-                    'Authorization': `Bearer ${idToken}`
-                }
+                headers: { 'Authorization': `Bearer ${idToken}` }
             });
 
             if (!res.ok) {
-                // HTTP 404: 데이터가 없거나 사주 계산이 안된 경우
                 if (res.status === 404) {
                     throw new Error("오행 분석 데이터가 아직 준비되지 않았습니다. 마이페이지에서 사주 정보 입력 여부를 확인해 주세요.");
                 }
@@ -272,8 +330,6 @@
             return res.json();
         }
 
-
-        // 로그인 상태 확인 및 데이터 로딩
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
                 window.location.href = 'index.html';
@@ -282,25 +338,25 @@
 
             const idToken = await user.getIdToken();
 
-            // 1. 사용자 프로필 및 기본 오행 점수 로드
             try {
                 const sajuFields = ['ohengWood', 'ohengFire', 'ohengEarth', 'ohengMetal', 'ohengWater'];
                 const fields = ['nickname', 'birthDate', 'profileImage', ...sajuFields];
                 const res = await fetch(`${FASTAPI_BASE_URL}/users/me?fields=${fields.join(',')}`, {
-                    headers: {
-                        'Authorization': `Bearer ${idToken}`
-                    }
+                    headers: { 'Authorization': `Bearer ${idToken}` }
                 });
 
                 if (!res.ok) throw new Error(`API error: ${res.status}`);
                 const data = await res.json();
 
-                // UI 업데이트 (프로필)
                 userNameEl.textContent = data.nickname ? `${data.nickname}님` : '사용자';
                 userbirthdateEl.textContent = data.birthDate || '생년월일 정보 없음';
                 userProfileImageEl.src = data.profileImage || 'https://bit.ly/3VZpUGD';
 
-                // 오행 데이터를 updateSajuStats 함수에 전달
+                const nearbyRestaurantsHeading = document.getElementById('nearby-restaurants-heading');
+                if (data.nickname) {
+                    nearbyRestaurantsHeading.textContent = `${data.nickname}님 주변 맛집 🍚`;
+                }
+
                 const sajuStats = {
                     wood: data.ohengWood || 0.0,
                     fire: data.ohengFire || 0.0,
@@ -309,9 +365,6 @@
                     water: data.ohengWater || 0.0,
                 };
                 updateSajuStats(sajuStats);
-
-                            
-                // 실시간 위치 업데이트 함수 호출
                 updateLocation();
             } catch (err) {
                 console.error("User profile fetch failed:", err);
@@ -319,29 +372,23 @@
                 userbirthdateEl.textContent = '';
             }
 
-            // 2. 오행 분석 결과 및 추천 메시지 로드
             try {
                 const analysisData = await fetchRecommendation(idToken);
-                
-                // UI 업데이트 (추천 메시지)
-                recommendationTypeEl.textContent = analysisData.user_type; // 예: 무水行형
+                recommendationTypeEl.textContent = analysisData.user_type;
                 recommendationHeadlineEl.textContent = `"${analysisData.recommendation_headline}"`;
                 recommendationAdviceEl.textContent = analysisData.recommendation_advice;
-
             } catch (err) {
                 console.error("Recommendation fetch failed:", err);
-                // UI에 오류 메시지 표시
                 recommendationTypeEl.textContent = '정보 없음';
                 recommendationHeadlineEl.textContent = '추천 분석 정보를 불러올 수 없습니다.';
                 recommendationAdviceEl.textContent = err.message || '서버 오류가 발생했습니다.';
             }
         });
 
-        // 채팅창 생성 팝업 관련 요소들
         const addChatBtn = document.getElementById('add-chat-btn');
         const addChatPopup = document.getElementById('add-chat-popup');
         const overlay = document.getElementById('overlay');
-        
+
         const closeAllPopups = () => {
             overlay.classList.add('hidden');
             addChatPopup.classList.remove('popup-visible');
@@ -358,9 +405,9 @@
                 addChatPopup.classList.add('popup-visible');
             }
         });
-        
-        overlay.addEventListener('click', closeAllPopups);
 
+        overlay.addEventListener('click', closeAllPopups);
     </script>
 </body>
+
 </html>
