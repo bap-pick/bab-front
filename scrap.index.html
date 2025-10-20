@@ -100,76 +100,102 @@
     </button>
     
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const mainContent = document.getElementById('main-content');
+    document.addEventListener('DOMContentLoaded', () => {
+        const mainContent = document.getElementById('main-content');
+        const addChatBtn = document.getElementById('add-chat-btn');
+        const addChatPopup = document.getElementById('add-chat-popup');
+        const overlay = document.getElementById('overlay');
 
-            // --- 🍝 예시 식당 데이터 (3개) ---
-            const mockRestaurants = [
-                {
-                    id: 'resto1',
-                    name: '전설의치킨 방학홈플러스점',
-                    category: '치킨,닭강정',
-                    imageUrl: ''
-                },
-                {
-                    id: 'resto2',
-                    name: '든든한 국밥',
-                    category: '한식',
-                    imageUrl: ''
-                },
-                {
-                    id: 'resto3',
-                    name: '신선한 초밥',
-                    category: '일식',
-                    imageUrl: 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=500'
-                }
-            ];
+        // --- 🍝 예시 식당 데이터 (3개) ---
+        const mockRestaurants = [
+            {
+                id: 'resto1',
+                name: '전설의치킨 방학홈플러스점',
+                category: '치킨,닭강정',
+                imageUrl: ''
+            },
+            {
+                id: 'resto2',
+                name: '든든한 국밥',
+                category: '한식',
+                imageUrl: ''
+            },
+            {
+                id: 'resto3',
+                name: '신선한 초밥',
+                category: '일식',
+                imageUrl: 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=500'
+            }
+        ];
 
-            // --- 예시 데이터를 화면에 그려주는 함수 ---
-            function renderMockResults(restaurants) {
-                mainContent.innerHTML = '';
-                
-                const grid = document.createElement('div');
-                grid.className = 'grid grid-cols-2 gap-4';
-                
-                let cardsHTML = '';
-                restaurants.forEach(restaurant => {
-                    // 모든 카드를 스크랩된 상태(주황색 아이콘)로 표시
-                    cardsHTML += `
-                        <div class="bg-white rounded-xl shadow-md overflow-hidden cursor-pointer" data-id="${restaurant.id}">
-                            <div class="relative pointer-events-none">
-                                <img class="w-full h-32 object-cover" src="${restaurant.imageUrl}" alt="${restaurant.name}">
-                                <div class="absolute top-2 right-2 bg-white/70 p-1.5 rounded-full text-[#FF7A5A]">
-                                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                        <path d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.5 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
-                                    </svg>
-                                </div>
-                            </div>
-                            <div class="p-3 pointer-events-none">
-                                <h3 class="font-bold text-gray-800 text-base truncate">${restaurant.name}</h3>
-                                <p class="text-sm text-gray-500 truncate">${restaurant.category}</p>
+        // --- 예시 데이터를 화면에 그려주는 함수 ---
+        function renderMockResults(restaurants) {
+            mainContent.innerHTML = '';
+            
+            const grid = document.createElement('div');
+            grid.className = 'grid grid-cols-2 gap-4';
+            
+            let cardsHTML = '';
+            restaurants.forEach(restaurant => {
+                // 모든 카드를 스크랩된 상태(주황색 아이콘)로 표시
+                cardsHTML += `
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden cursor-pointer" data-id="${restaurant.id}">
+                        <div class="relative pointer-events-none">
+                            <img class="w-full h-32 object-cover" src="${restaurant.imageUrl || 'https://via.placeholder.com/150'}" alt="${restaurant.name}" onerror="this.onerror=null; this.src='https://via.placeholder.com/150';">
+                            <div class="absolute top-2 right-2 bg-white/70 p-1.5 rounded-full text-[#FF7A5A]">
+                                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.5 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
+                                </svg>
                             </div>
                         </div>
-                    `;
-                });
-
-                grid.innerHTML = cardsHTML;
-                mainContent.appendChild(grid);
-            }
-
-            // --- 카드 클릭 시 상세 페이지로 이동하는 이벤트 ---
-            mainContent.addEventListener('click', (e) => {
-                const card = e.target.closest('.cursor-pointer');
-                if (card) {
-                    const restaurantId = card.dataset.id;
-                    // 클릭한 카드의 ID를 가지고 detail.html로 이동
-                    window.location.href = `detail.html?id=${restaurantId}`;
-                }
+                        <div class="p-3 pointer-events-none">
+                            <h3 class="font-bold text-gray-800 text-base truncate">${restaurant.name}</h3>
+                            <p class="text-sm text-gray-500 truncate">${restaurant.category}</p>
+                        </div>
+                    </div>
+                `;
             });
 
-            // 페이지가 로드되면 예시 데이터로 목록을 채움
-            renderMockResults(mockRestaurants);
+            grid.innerHTML = cardsHTML;
+            mainContent.appendChild(grid);
+        }
+
+        // --- 카드 클릭 시 상세 페이지로 이동하는 이벤트 ---
+        mainContent.addEventListener('click', (e) => {
+            const card = e.target.closest('.cursor-pointer');
+            if (card) {
+                const restaurantId = card.dataset.id;
+                // 클릭한 카드의 ID를 가지고 detail.html로 이동
+                window.location.href = `detail.html?id=${restaurantId}`;
+            }
         });
-    </script>
+
+        // 👇 --- [추가된 부분] 팝업 열기/닫기 로직 --- 👇
+        function togglePopup() {
+            addChatPopup.classList.toggle('popup-hidden');
+            addChatPopup.classList.toggle('popup-visible');
+            overlay.classList.toggle('hidden');
+        }
+
+        // '+' 버튼 클릭 시 팝업 토글
+        addChatBtn.addEventListener('click', (event) => {
+            event.stopPropagation(); // 이벤트 버블링 방지
+            togglePopup();
+        });
+
+        // 오버레이 클릭 시 팝업 닫기
+        overlay.addEventListener('click', () => {
+            // 팝업이 보이는 상태일 때만 닫기 함수 실행
+            if (addChatPopup.classList.contains('popup-visible')) {
+                togglePopup();
+            }
+        });
+        // 👆 --- [추가된 부분] 여기까지 --- 👆
+
+        // 페이지가 로드되면 예시 데이터로 목록을 채움
+        renderMockResults(mockRestaurants);
+        
+    });
+</script>
 </body>
 </html>
