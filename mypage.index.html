@@ -162,7 +162,8 @@
     <script type="module">
         // Firebase SDK import 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+        // ▼▼▼ [수정] signOut 함수를 import 목록에 추가합니다. ▼▼▼
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
         import { firebaseConfig } from "./firebase-config.js";
         
         // Firebase 앱 초기화
@@ -176,7 +177,8 @@
         const logoutBtn = document.getElementById('logout-btn');
         const logoutModal = document.getElementById('logout-modal');
         const cancelLogoutBtn = document.getElementById('cancel-logout-btn');
-        const confirmLogoutBtn = logoutModal.querySelector('.bg-gray-700');
+        // ▼▼▼ [수정] 버튼을 ID로 선택하도록 변경합니다. ▼▼▼
+        const confirmLogoutBtn = document.getElementById('confirm-logout-btn');
         const withdrawBtn = document.getElementById('withdraw-btn');
         const withdrawalModal = document.getElementById('withdrawal-modal');
         const cancelWithdrawBtn = document.getElementById('cancel-withdraw-btn');
@@ -191,7 +193,6 @@
             }
             loadUserProfile(user); 
         })
-
 
         // (1) 유저 정보를 로드하는 비동기 함수를 별도로 정의
         async function loadUserProfile(user) {
@@ -244,17 +245,22 @@
         
         overlay.addEventListener('click', closeAllPopups);
         
+        // 로그아웃 확인 버튼 클릭 시
         confirmLogoutBtn.addEventListener('click', () => {
             signOut(auth).then(() => {
+                // 로그아웃 성공 후 로그인 페이지로 이동
                 window.location.href = 'index.html';
             }).catch((error) => {
                 console.error('로그아웃 에러:', error);
+                alert('로그아웃에 실패했습니다.');
             });
         });
         
+        // 로그아웃 버튼 클릭 시 모달 열기
         logoutBtn.addEventListener('click', (e) => { e.preventDefault(); logoutModal.classList.remove('hidden'); overlay.classList.remove('hidden'); });
         cancelLogoutBtn.addEventListener('click', () => { logoutModal.classList.add('hidden'); overlay.classList.add('hidden'); });
         
+        // 탈퇴하기 버튼 클릭 시 모달 열기
         withdrawBtn.addEventListener('click', (e) => { e.preventDefault(); withdrawalModal.classList.remove('hidden'); overlay.classList.remove('hidden'); });
         cancelWithdrawBtn.addEventListener('click', () => { withdrawalModal.classList.add('hidden'); overlay.classList.add('hidden'); });
 

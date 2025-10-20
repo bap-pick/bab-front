@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>식당 상세 정보</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=YOUR_KAKAO_APP_KEY&libraries=services"></script>
+    <style>
+        html, body { height: 100%; margin: 0; scroll-behavior: smooth; }
+        body { font-family: 'Noto Sans KR', 'Inter', sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        #scrap-btn.scrapped { background-color: #FF7A5A; color: white; border-color: #FF7A5A; }
+        #scrap-btn.scrapped svg { fill: white; }
+        header.scrolled { box-shadow: 0 4px_6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07); }
+        /* 탭 버튼 활성화 스타일 */
+        .tab-btn.active { color: #FF7A5A; border-color: #FF7A5A; }
+    </style>
+</head>
+<body class="bg-gray-100">
+    
+    <div class="max-w-md mx-auto h-full flex flex-col bg-white shadow-lg">
+        
+        <header id="page-header" class="grid grid-cols-3 items-center p-4 bg-white sticky top-0 z-20 transition-shadow duration-300">
+            <div class="justify-self-start">
+                <button id="back-button" class="p-2 text-gray-600 hover:bg-gray-100 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg>
+                </button>
+            </div>
+            <h1 id="header-title" class="text-lg font-bold text-center text-gray-800 truncate">식당 정보</h1>
+            <div class="justify-self-end w-8"></div>
+        </header>
+
+        <main id="main-content" class="flex-1 overflow-y-auto">
+            <div class="relative w-full h-56">
+                <img id="restaurant-image" src="https://via.placeholder.com/400x240" alt="식당 대표 이미지" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+            </div>
+
+            <div class="p-5 -mt-10 relative z-10">
+                <div class="bg-white rounded-xl shadow-lg p-5">
+                    <p id="restaurant-category" class="inline-block bg-orange-100 text-[#FF7A5A] text-sm font-semibold px-3 py-1 rounded-full mb-2">카테고리</p>
+                    <h2 id="restaurant-name" class="text-3xl font-bold text-gray-900 leading-tight">식당 이름</h2>
+                    
+                    <div id="review-info" class="flex items-center gap-4 text-sm text-gray-600 mt-3">
+                        </div>
+
+                    <div class="mt-6">
+                        <button id="scrap-btn" class="w-full flex items-center justify-center gap-2 py-3 border-2 border-gray-200 bg-white text-gray-700 rounded-lg font-semibold transition-all duration-300 ease-in-out hover:shadow-md transform hover:-translate-y-0.5">
+                            <svg class="w-5 h-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.5 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" /></svg>
+                            <span>스크랩</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="px-5 border-b border-gray-200">
+                <nav class="flex -mb-px">
+                    <button class="tab-btn active py-4 px-1 text-center border-b-2 font-medium text-sm flex-1" data-tab="info">상세정보</button>
+                    <button class="tab-btn py-4 px-1 text-center border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm flex-1" data-tab="menu">메뉴</button>
+                    <button class="tab-btn py-4 px-1 text-center border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm flex-1" data-tab="facilities">편의시설</button>
+                </nav>
+            </div>
+            
+            <div class="p-5">
+                <div id="info-panel" class="tab-panel space-y-5">
+                    <div class="flex items-start"><div class="flex-shrink-0 w-8 text-center"><svg class="w-6 h-6 text-gray-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg></div><div><p class="font-semibold text-gray-700">주소</p><p id="restaurant-address" class="text-gray-600"></p></div></div>
+                    <div class="flex items-start"><div class="flex-shrink-0 w-8 text-center"><svg class="w-6 h-6 text-gray-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" /></svg></div><div><p class="font-semibold text-gray-700">전화번호</p><p id="restaurant-call" class="text-gray-600"></p></div></div>
+                    <div class="flex items-start"><div class="flex-shrink-0 w-8 text-center"><svg class="w-6 h-6 text-gray-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div><div><p class="font-semibold text-gray-700">영업시간</p><div id="restaurant-time" class="text-gray-600 space-y-1"></div></div></div>
+                    <div id="map" class="w-full h-56 rounded-lg border border-gray-200 overflow-hidden mt-4"></div>
+                </div>
+                <div id="menu-panel" class="tab-panel hidden"><ul id="menu-list" class="space-y-3"></ul></div>
+                <div id="facilities-panel" class="tab-panel hidden"><ul id="facilities-list" class="grid grid-cols-2 gap-3"></ul></div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // --- 예시 데이터: 일부러 정보가 몇 개 없는 식당(resto2)을 포함하여 테스트 ---
+        const allRestaurants = {
+            'resto1': { id: 'resto1', name: '전설의치킨 방학홈플러스점', category: '치킨,닭강정', rating: 4.31, visitor_reviews: 243, blog_reviews: 37, address: '서울 도봉구 도봉로145길 7', call: '02-954-6568', facilities: ['테이크아웃 할인', '단체 이용 가능', '포장', '남/녀 화장실 구분', '무선 인터넷', '배달'], time: { '월': '16:00 - 24:00', '화': '16:00 - 24:00', '수': '16:00 - 24:00', '목': '16:00 - 24:00', '금': '16:00 - 24:00', '토': '16:00 - 24:00', '일': '정기휴무 (매주 일요일)' }, menu: ['전설의치킨(포장가)', '고추양념치킨(포장가)', '크리스피치킨(포장가)', '양념치킨(포장가)', '치킨떡볶이', '닭똥집튀김(포장가)'], latitude: 37.6661, longitude: 127.0343 },
+            'resto2': { id: 'resto2', name: '든든한 국밥', category: '한식', rating: 4.8, visitor_reviews: 512, blog_reviews: null, address: '부산광역시 해운대구 우동 456', call: null, facilities: ['포장', '배달'], time: { '매일': '08:00 - 21:00' }, menu: ['돼지국밥', '순대국밥', '섞어국밥'], latitude: 35.163, longitude: 129.160 },
+            'resto3': { id: 'resto3', name: '신선한 초밥', category: '일식', rating: 4.5, visitor_reviews: 330, blog_reviews: 102, address: '서울특별시 강남구 테헤란로 789', call: '02-555-1234', facilities: [], menu: [], latitude: 37.502, longitude: 127.041 }
+        };
+
+        const backButton = document.getElementById('back-button');
+        const scrapBtn = document.getElementById('scrap-btn');
+        const mainContent = document.getElementById('main-content');
+        const pageHeader = document.getElementById('page-header');
+        let currentRestaurant = null;
+
+        // --- 페이지 로드 및 데이터 채우기 ---
+        function loadRestaurantDetails() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const restaurantId = urlParams.get('id') || 'resto1'; // 기본값으로 resto1 표시
+            currentRestaurant = allRestaurants[restaurantId];
+
+            if (!currentRestaurant) { alert("식당 정보가 없습니다."); window.location.href = 'scrap.html'; return; }
+            
+            // 기본 정보
+            document.getElementById('header-title').textContent = currentRestaurant.name;
+            document.getElementById('restaurant-image').src = currentRestaurant.imageUrl || `https://via.placeholder.com/400x240?text=${currentRestaurant.name}`;
+            document.getElementById('restaurant-category').textContent = currentRestaurant.category || '정보 없음';
+            document.getElementById('restaurant-name').textContent = currentRestaurant.name;
+            document.getElementById('restaurant-address').textContent = currentRestaurant.address || '정보 없음';
+            document.getElementById('restaurant-call').textContent = currentRestaurant.call || '정보 없음';
+            
+            // 리뷰 정보
+            const reviewInfo = document.getElementById('review-info');
+            reviewInfo.innerHTML = '';
+            if (currentRestaurant.rating) reviewInfo.innerHTML += `<div class="flex items-center gap-1">⭐<span class="font-bold">${currentRestaurant.rating}</span></div>`;
+            if (currentRestaurant.visitor_reviews) reviewInfo.innerHTML += `<div>방문자 리뷰 <span class="font-semibold">${currentRestaurant.visitor_reviews.toLocaleString()}</span></div>`;
+            if (currentRestaurant.blog_reviews) reviewInfo.innerHTML += `<div>블로그 리뷰 <span class="font-semibold">${currentRestaurant.blog_reviews.toLocaleString()}</span></div>`;
+
+            // 영업 시간
+            const timeEl = document.getElementById('restaurant-time');
+            timeEl.innerHTML = '';
+            if (currentRestaurant.time && Object.keys(currentRestaurant.time).length > 0) {
+                Object.entries(currentRestaurant.time).forEach(([day, hours]) => {
+                    const p = document.createElement('p');
+                    p.innerHTML = `<span class="font-semibold w-8 inline-block">${day}</span> ${hours.replace(/\n/g, '<br>')}`;
+                    timeEl.appendChild(p);
+                });
+            } else { timeEl.textContent = '정보 없음'; }
+
+            // 메뉴
+            const menuList = document.getElementById('menu-list');
+            menuList.innerHTML = '';
+            if (currentRestaurant.menu && currentRestaurant.menu.length > 0) {
+                currentRestaurant.menu.forEach(item => {
+                    const li = document.createElement('li');
+                    li.className = "flex justify-between items-center py-2 border-b border-gray-100";
+                    li.textContent = item;
+                    menuList.appendChild(li);
+                });
+            } else { menuList.innerHTML = '<p class="text-gray-500">등록된 메뉴가 없습니다.</p>'; }
+
+            // 편의 시설
+            const facilitiesList = document.getElementById('facilities-list');
+            facilitiesList.innerHTML = '';
+            if (currentRestaurant.facilities && currentRestaurant.facilities.length > 0) {
+                currentRestaurant.facilities.forEach(item => {
+                    const li = document.createElement('li');
+                    li.className = "flex items-center gap-2 text-gray-700";
+                    li.innerHTML = `<svg class="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> ${item}`;
+                    facilitiesList.appendChild(li);
+                });
+            } else { facilitiesList.innerHTML = '<p class="text-gray-500">등록된 편의시설 정보가 없습니다.</p>'; }
+            
+            checkScrapStatus();
+            initMap(currentRestaurant.latitude, currentRestaurant.longitude, currentRestaurant.name);
+        }
+
+        // --- 탭(Tab) 메뉴 기능 ---
+        const tabs = document.querySelectorAll('.tab-btn');
+        const panels = document.querySelectorAll('.tab-panel');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                panels.forEach(p => p.classList.add('hidden'));
+                
+                tab.classList.add('active');
+                document.getElementById(`${tab.dataset.tab}-panel`).classList.remove('hidden');
+            });
+        });
+        
+        // --- 스크롤 감지 및 기타 이벤트 핸들러 (이전과 동일) ---
+        mainContent.addEventListener('scroll', () => { pageHeader.classList.toggle('scrolled', mainContent.scrollTop > 10); });
+        document.addEventListener('DOMContentLoaded', loadRestaurantDetails);
+        backButton.addEventListener('click', () => { window.history.back(); });
+        
+        function initMap(lat, lng, name) { /* ... 이전과 동일 ... */ }
+        function checkScrapStatus() { /* ... 이전과 동일 ... */ }
+        scrapBtn.addEventListener('click', () => { /* ... 이전과 동일 ... */ });
+
+        // --- 이 아래 함수들은 이전 코드와 내용이 동일합니다 ---
+        function initMap(lat, lng, name) {
+            const mapContainer = document.getElementById('map');
+            const mapOption = { center: new kakao.maps.LatLng(lat, lng), level: 3 };
+            const map = new kakao.maps.Map(mapContainer, mapOption); 
+            const markerPosition  = new kakao.maps.LatLng(lat, lng); 
+            const marker = new kakao.maps.Marker({ position: markerPosition });
+            marker.setMap(map);
+            const infowindow = new kakao.maps.InfoWindow({ content: `<div style="padding:5px;font-size:12px;">${name}</div>` });
+            infowindow.open(map, marker);
+        }
+        function checkScrapStatus() {
+            if (!currentRestaurant) return;
+            const scraps = localStorage.getItem('bapickScraps');
+            const scrappedIds = scraps ? JSON.parse(scraps) : [];
+            if (scrappedIds.includes(currentRestaurant.id)) {
+                scrapBtn.classList.add('scrapped');
+                scrapBtn.querySelector('span').textContent = '스크랩 완료';
+            } else {
+                scrapBtn.classList.remove('scrapped');
+                scrapBtn.querySelector('span').textContent = '스크랩';
+            }
+        }
+        scrapBtn.addEventListener('click', () => {
+            if (!currentRestaurant) return;
+            const scraps = localStorage.getItem('bapickScraps');
+            let scrappedIds = scraps ? JSON.parse(scraps) : [];
+            const isScrapped = scrappedIds.includes(currentRestaurant.id);
+            if (isScrapped) {
+                scrappedIds = scrappedIds.filter(id => id !== currentRestaurant.id);
+            } else {
+                scrappedIds.push(currentRestaurant.id);
+            }
+            localStorage.setItem('bapickScraps', JSON.stringify(scrappedIds));
+            checkScrapStatus();
+        });
+    </script>
+</body>
+</html>

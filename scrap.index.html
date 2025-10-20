@@ -51,8 +51,8 @@
                         <svg class="w-5 h-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                     </div>
                 </div>
-                <button class="p-2 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-100">
-                    <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 12h9.75M10.5 18h9.75M3.75 6H7.5M3.75 12H7.5M3.75 18H7.5" /></svg>
+                <button id="search-button" class="px-4 py-2 bg-[#FF7A5A] text-white font-semibold rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-400 transition-colors">
+                    검색
                 </button>
             </div>
         </div>
@@ -98,179 +98,78 @@
     <button id="add-chat-btn" class="fixed bottom-6 left-1/2 -translate-x-1/2 w-16 h-16 bg-[#FF7242] hover:bg-orange-600 text-white rounded-full flex items-center justify-center shadow-lg z-40">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
     </button>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mainContent = document.getElementById('main-content');
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc, onSnapshot, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
-
-        
-          const firebaseConfig = {
-          apiKey: "AIzaSyAlmVXljDPwkmi4rik69GLhBIHLskw7P2o",
-          authDomain: "bapick-front.firebaseapp.com",
-          projectId: "bapick-front",
-          storageBucket: "bapick-front.firebasestorage.app",
-          messagingSenderId: "883956844611",
-          appId: "1:883956844611:web:ac74a589aae30be9d0ecf6",
-          measurementId: "G-Z1WEHMPL7F"
-        };
-       
-        
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        const mainContent = document.getElementById('main-content');
-        const searchInput = document.querySelector('input[type="search"]');
-        const overlay = document.getElementById('overlay');
-        const addChatBtn = document.getElementById('add-chat-btn');
-        const addChatPopup = document.getElementById('add-chat-popup');
-        
-        let currentUser = null;
-        let userScraps = new Set();
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUser = user;
-                listenToScraps();
-                performSearch("");
-            } else {
-                window.location.href = 'index.html';
-            }
-        });
-        
-        function listenToScraps() {
-            if (!currentUser) return;
-            const scrapsRef = collection(db, "users", currentUser.uid, "scraps");
-            onSnapshot(scrapsRef, (snapshot) => {
-                userScraps.clear();
-                snapshot.forEach(doc => userScraps.add(doc.id));
-                performSearch(searchInput.value); 
-            });
-        }
-
-        async function performSearch(searchTerm) {
-            const restaurantsRef = collection(db, "restaurants");
-            let q;
-
-            if (searchTerm) {
-                // 검색어가 있을 경우, 해당 검색어로 시작하는 맛집 검색
-                 q = query(restaurantsRef, 
-                    where("name", ">=", searchTerm), 
-                    where("name", "<=", searchTerm + '\uf8ff')
-                );
-            } else {
-                // 검색어가 없을 경우, 전체 맛집 목록 표시
-                q = query(restaurantsRef, orderBy("name"), limit(20)); // 예시로 20개만
-            }
-            
-            const querySnapshot = await getDocs(q);
-            
-            const results = [];
-            querySnapshot.forEach(doc => {
-                results.push({ id: doc.id, ...doc.data() });
-            });
-
-            renderResults(results);
-        }
-        
-        let searchTimeout;
-        searchInput.addEventListener('input', (e) => {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                performSearch(e.target.value);
-            }, 300); // 300ms 지연시간 후 검색
-        });
-
-        function renderResults(restaurants) {
-            mainContent.innerHTML = '';
-            
-            if (restaurants.length === 0) {
-                mainContent.innerHTML = `
-                    <div class="flex-1 flex flex-col items-center justify-center text-center h-full">
-                        <div class="bg-gray-100 p-5 rounded-full mb-4">
-                             <svg class="w-12 h-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                        </div>
-                        <h2 class="text-lg font-semibold text-gray-700">스크랩한 식당이 없습니다</h2>
-                        <p class="text-gray-500 mt-1">밥픽과 함께 행운의 맛집을 찾아보세요!</p>
-                    </div>`;
-                return;
-            }
-
-            const grid = document.createElement('div');
-            grid.className = 'grid grid-cols-2 gap-4';
-            
-            restaurants.forEach(restaurant => {
-                const isScrapped = userScraps.has(restaurant.id);
-
-                const card = document.createElement('div');
-                card.className = 'bg-white rounded-xl shadow-md overflow-hidden';
-                card.innerHTML = `
-                    <div class="relative">
-                        <img class="w-full h-32 object-cover" src="${restaurant.imageUrl || 'https://via.placeholder.com/150'}" alt="${restaurant.name}">
-                        <button data-id="${restaurant.id}" class="scrap-btn absolute top-2 right-2 bg-white/70 p-1.5 rounded-full ${isScrapped ? 'text-[#FF7A5A]' : 'text-gray-600'} hover:scale-110 transition-transform">
-                             <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.5 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
-                             </svg>
-                        </button>
-                    </div>
-                    <div class="p-3">
-                        <h3 class="font-bold text-gray-800 text-base truncate">${restaurant.name}</h3>
-                        <p class="text-sm text-gray-500 truncate">${restaurant.category || '정보 없음'}</p>
-                    </div>`;
-                grid.appendChild(card);
-            });
-            mainContent.appendChild(grid);
-        }
-
-        mainContent.addEventListener('click', async (e) => {
-            const scrapButton = e.target.closest('.scrap-btn');
-            if (scrapButton) {
-                if (!currentUser) return;
-                const restaurantId = scrapButton.dataset.id;
-                const isScrapped = userScraps.has(restaurantId);
-                const scrapRef = doc(db, "users", currentUser.uid, "scraps", restaurantId);
-
-                try {
-                    if (isScrapped) {
-                        await deleteDoc(scrapRef);
-                    } else {
-                        // 스크랩할 때 식당 정보를 함께 저장하면 나중에 목록을 보여주기 편리합니다.
-                        const restDoc = await getDoc(doc(db, "restaurants", restaurantId));
-                        if(restDoc.exists()){
-                            const restData = restDoc.data();
-                            await setDoc(scrapRef, {
-                                name: restData.name,
-                                category: restData.category || "",
-                                imageUrl: restData.imageUrl || "",
-                                scrappedAt: new Date()
-                            });
-                        }
-                    }
-                } catch (error) {
-                    console.error("Scrap error: ", error);
+            // --- 🍝 예시 식당 데이터 (3개) ---
+            const mockRestaurants = [
+                {
+                    id: 'resto1',
+                    name: '전설의치킨 방학홈플러스점',
+                    category: '치킨,닭강정',
+                    imageUrl: ''
+                },
+                {
+                    id: 'resto2',
+                    name: '든든한 국밥',
+                    category: '한식',
+                    imageUrl: ''
+                },
+                {
+                    id: 'resto3',
+                    name: '신선한 초밥',
+                    category: '일식',
+                    imageUrl: 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=500'
                 }
+            ];
+
+            // --- 예시 데이터를 화면에 그려주는 함수 ---
+            function renderMockResults(restaurants) {
+                mainContent.innerHTML = '';
+                
+                const grid = document.createElement('div');
+                grid.className = 'grid grid-cols-2 gap-4';
+                
+                let cardsHTML = '';
+                restaurants.forEach(restaurant => {
+                    // 모든 카드를 스크랩된 상태(주황색 아이콘)로 표시
+                    cardsHTML += `
+                        <div class="bg-white rounded-xl shadow-md overflow-hidden cursor-pointer" data-id="${restaurant.id}">
+                            <div class="relative pointer-events-none">
+                                <img class="w-full h-32 object-cover" src="${restaurant.imageUrl}" alt="${restaurant.name}">
+                                <div class="absolute top-2 right-2 bg-white/70 p-1.5 rounded-full text-[#FF7A5A]">
+                                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.5 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="p-3 pointer-events-none">
+                                <h3 class="font-bold text-gray-800 text-base truncate">${restaurant.name}</h3>
+                                <p class="text-sm text-gray-500 truncate">${restaurant.category}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                grid.innerHTML = cardsHTML;
+                mainContent.appendChild(grid);
             }
+
+            // --- 카드 클릭 시 상세 페이지로 이동하는 이벤트 ---
+            mainContent.addEventListener('click', (e) => {
+                const card = e.target.closest('.cursor-pointer');
+                if (card) {
+                    const restaurantId = card.dataset.id;
+                    // 클릭한 카드의 ID를 가지고 detail.html로 이동
+                    window.location.href = `detail.html?id=${restaurantId}`;
+                }
+            });
+
+            // 페이지가 로드되면 예시 데이터로 목록을 채움
+            renderMockResults(mockRestaurants);
         });
-
-        function closeAllPopups() {
-            overlay.classList.add('hidden');
-            addChatPopup.classList.remove('popup-visible');
-            addChatPopup.classList.add('popup-hidden');
-        }
-
-        addChatBtn.addEventListener('click', (event) => {
-            event.stopPropagation();
-            const isAddChatOpen = addChatPopup.classList.contains('popup-visible');
-            closeAllPopups();
-            if (!isAddChatOpen) {
-                overlay.classList.remove('hidden');
-                addChatPopup.classList.remove('popup-hidden');
-                addChatPopup.classList.add('popup-visible');
-            }
-        });
-
-        overlay.addEventListener('click', closeAllPopups);
     </script>
 </body>
 </html>
