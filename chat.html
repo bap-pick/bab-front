@@ -33,7 +33,7 @@
             left: 0;
             width: 100%;
             z-index: 100; /* 다른 요소 위에 보이도록 설정 */
-    
+        
             /* 기존 스타일 유지 */
             background-color: #fff;
             padding: 1rem; 
@@ -52,7 +52,7 @@
             /* 고정된 헤더와 입력창에 내용이 가려지지 않도록 위아래에 여백(padding)을 추가 */
             padding-top: 80px;  /* 헤더의 높이만큼 조절 */
             padding-bottom: 90px; /* 입력창의 높이만큼 조절 */
-    
+        
             /* 기존 스타일 유지 */
             flex-grow: 1;
             overflow-y: auto;
@@ -237,6 +237,16 @@
 
         sendButton.addEventListener('click', sendMessage);
 
+        // --- [수정된 부분] Enter 키로 메시지를 전송하는 이벤트 리스너 추가 ---
+        messageInput.addEventListener('keydown', (event) => {
+            // 눌린 키가 'Enter'이고, 한/영 변환 중이 아닐 때
+            if (event.key === 'Enter' && !event.isComposing) {
+                event.preventDefault(); // form 태그가 있을 경우 기본 동작(새로고침) 방지
+                sendMessage();          // 메시지 전송 함수 호출
+            }
+        });
+        // ----------------------------------------------------------------
+
         async function sendMessage() {
             const messageText = messageInput.value.trim();
             if (messageText === '') {
@@ -255,7 +265,7 @@
             chatArea.appendChild(userMessageDiv);
 
             
-            messageInput.value = '';     
+            messageInput.value = '';   
             sendButton.classList.remove('active');
             chatArea.scrollTop = chatArea.scrollHeight;
 
@@ -286,7 +296,7 @@
                         "Authorization": "FIREBASE_TOKEN"   // 여기에 토큰 넣기!!   
                         },
                     body: JSON.stringify({
-                        room_id: 2,             //  테스트용
+                        room_id: 2,         //  테스트용
                         message: messageText
                     })
                 });
@@ -299,7 +309,7 @@
             }
 
             chatArea.removeChild(botLoadingDiv);
-         
+           
             const botMessageDiv = document.createElement('div');
             botMessageDiv.className = 'message-box system-message';
             botMessageDiv.innerHTML = `
