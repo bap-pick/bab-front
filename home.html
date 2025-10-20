@@ -80,10 +80,10 @@
         <input type="text" id='location-text'
             class="w-full pl-5 pr-16 py-3 bg-white/80 backdrop-blur-sm border-none rounded-full shadow-lg focus:ring-2 focus:ring-[#FF7242] focus:outline-none text-gray-800 placeholder-gray-400">
 
-        <button
+        <a href="map.html"
             class="absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#FF7242] hover:bg-orange-600 text-white rounded-full flex items-center justify-center shadow-md transition-transform transform hover:scale-110">
             <span class="material-symbols-outlined fill=0">location_on</span>
-        </button>
+        </a>
     </div>
 
     <main class="max-w-md w-full mx-auto bg-slate-100 rounded-t-3xl pb-24 p-4">
@@ -269,10 +269,12 @@
     </a>
     <div id="overlay" class="fixed inset-0 bg-black bg-opacity-30 z-40 hidden"></div>
 
-    <div id="add-chat-popup" class="absolute bottom-24 left-1/2 -translate-x-1/2 w-48 bg-white rounded-md shadow-xl z-50 popup-hidden">
+    <div id="add-chat-popup"
+        class="absolute bottom-24 left-1/2 -translate-x-1/2 w-48 bg-white rounded-md shadow-xl z-50 popup-hidden">
         <div class="py-2">
             <a href="chat_list.html" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
                     <line x1="8" y1="6" x2="21" y2="6"></line>
                     <line x1="8" y1="12" x2="21" y2="12"></line>
                     <line x1="8" y1="18" x2="21" y2="18"></line>
@@ -283,11 +285,20 @@
                 채팅 목록
             </a>
             <a href="chat.html" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                </svg>
                 1:1 채팅방
             </a>
             <a href="chat_group.html" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><path d="M18 21v-2a4 4 0 0 0-4-4h-1"/><circle cx="9" cy="7" r="4"/><path d="M18 7h3a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-3"/><path d="m15.5 13.5-3-3 3-3"/></svg>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <path d="M18 21v-2a4 4 0 0 0-4-4h-1" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M18 7h3a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-3" />
+                    <path d="m15.5 13.5-3-3 3-3" />
+                </svg>
                 단체 채팅방
             </a>
         </div>
@@ -315,6 +326,19 @@
             metal: { bar: document.getElementById('stat-metal'), value: document.getElementById('stat-metal-value') },
             water: { bar: document.getElementById('stat-water'), value: document.getElementById('stat-water-value') }
         };
+
+        // 👇 1. 저장된 위치를 불러오는 새로운 함수
+        function loadSavedLocation() {
+            const savedLocation = localStorage.getItem('savedBapickLocation');
+            if (savedLocation) {
+                const locationData = JSON.parse(savedLocation);
+                // 주소와 장소 이름 중 더 적절한 값을 표시 (주소가 있으면 주소를 우선)
+                locationTextEl.value = locationData.address || locationData.name;
+            } else {
+                // 저장된 위치가 없으면, 기존의 GPS 기반 위치 찾기 실행
+                updateLocation(); 
+            }
+        }
 
         async function updateLocation() {
             if (navigator.geolocation) {
@@ -432,7 +456,10 @@
                     water: data.ohengWater || 0.0,
                 };
                 updateSajuStats(sajuStats);
-                updateLocation();
+                
+                // 👇 2. 기존 updateLocation() 대신 loadSavedLocation()을 호출합니다.
+                loadSavedLocation();
+
             } catch (err) {
                 console.error("User profile fetch failed:", err);
                 userNameEl.textContent = '정보를 불러오지 못했습니다';
