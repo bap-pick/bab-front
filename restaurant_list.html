@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>주변 맛집 전체보기</title>
+    <title>주변 맛집 전체보기 (UI 확인용)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
     <link rel="stylesheet"
@@ -29,98 +29,47 @@
     </header>
 
     <main class="max-w-md mx-auto p-4 pb-24">
-        <div id="loading-spinner" class="text-center py-10">
-            <div class="w-8 h-8 border-4 border-t-[#FF7242] border-gray-200 rounded-full animate-spin mx-auto"></div>
-            <p class="mt-2 text-gray-500">맛집을 불러오는 중...</p>
-        </div>
-
         <div id="restaurant-list-container" class="space-y-4">
-            </div>
+        </div>
     </main>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { firebaseConfig } from "./firebase-config.js";
+    <script>
+        // 즉시 실행 함수 (IIFE) 사용
+        // 파일: nearby-restaurants.html (UI 확인용)
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const FASTAPI_BASE_URL = "https://bab-back.onrender.com";
+        // 즉시 실행 함수 (IIFE) 사용
+        (function () {
+            const listContainer = document.getElementById('restaurant-list-container');
 
-        const listContainer = document.getElementById('restaurant-list-container');
-        const loadingSpinner = document.getElementById('loading-spinner');
+            // [수정] 각 식당에 고유 id 추가
+            const fakeRestaurants = [
+                { id: 1, name: "강남면옥", category: "한식 • 냉면", location: "강남구", distance: "1.2", image_url: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDR8fHJlc3RhdXJhbnR8ZW58MHx8fHwxNjM4OTc1MjU0&ixlib=rb-1.2.1&q=80&w=400" },
+                { id: 2, name: "파파이스 키친", category: "이탈리안 • 파스타", location: "서초구", distance: "2.5", image_url: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDEyfHxyZXN0YXVyYW50fGVufDB8fHx8MTYzODk3NTI1NA&ixlib=rb-1.2.1&q=80&w=400" },
+                { id: 3, name: "오스테리아 오르조", category: "양식 • 와인바", location: "용산구", distance: "4.1", image_url: "https://images.unsplash.com/photo-1590846406792-044253a8064f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDI3fHxyZXN0YXVyYW50fGVufDB8fHx8MTYzODk3NTI5NQ&ixlib=rb-1.2.1&q=80&w=400" },
+                { id: 4, name: "스시쇼우", category: "일식 • 오마카세", location: "송파구", distance: "8.3", image_url: "https://images.unsplash.com/photo-1578474846511-04ba529f0b88?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDE3fHxyZXN0YXVyYW50fGVufDB8fHx8MTYzODk3NTI1NA&ixlib=rb-1.2.1&q=80&w=400" },
+                { id: 5, name: "브루클린 더 버거 조인트", category: "수제버거", location: "강남구", distance: "2.1", image_url: "https://images.unsplash.com/photo-1561758033-d89a9ad46330?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDEwfHxyZXN0YXVyYW50fGVufDB8fHx8MTYzODk3NTI1NA&ixlib-rb-1.2.1&q=80&w=400" },
+                { id: 6, name: "도스타코스", category: "멕시칸 • 타코", location: "종로구", distance: "5.5", image_url: "https://images.unsplash.com/photo-1552332386-f8dd00dc2f85?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDEwfHxyZXN0YXVyYW50fGVufDB8fHx8MTYzODk3NTI1NA&ixlib-rb-1.2.1&q=80&w=400" }
+            ];
 
-        /**
-         * 맛집 데이터를 받아와 HTML 카드로 만들어 화면에 렌더링하는 함수
-         */
-        function renderRestaurantList(restaurants) {
-            listContainer.innerHTML = ''; // 기존 목록 초기화
+            listContainer.innerHTML = '';
 
-            if (!restaurants || restaurants.length === 0) {
-                listContainer.innerHTML = `<p class="text-center text-gray-500 py-10">주변에 추천할 맛집이 없어요.</p>`;
-                return;
-            }
-
-            restaurants.forEach(restaurant => {
+            fakeRestaurants.forEach(restaurant => {
+                // [수정] 카드 전체를 a 태그로 감싸고, 주소에 식당 id를 파라미터로 넘겨줍니다.
                 const cardHTML = `
-                    <div class="flex items-center bg-white p-3 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                        <img class="w-24 h-24 rounded-lg object-cover" src="${restaurant.image_url || 'https://via.placeholder.com/150'}" alt="${restaurant.name}">
-                        <div class="ml-4 flex-1">
-                            <h4 class="font-bold text-gray-800">${restaurant.name}</h4>
-                            <p class="text-sm text-gray-500">${restaurant.category}</p>
-                            <p class="text-xs text-gray-400 mt-1">${restaurant.location} • ${restaurant.distance}km</p>
-                        </div>
+            <a href="detail.html?id=${restaurant.id}" class="block bg-white p-3 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex items-center">
+                    <img class="w-24 h-24 rounded-lg object-cover" src="${restaurant.image_url || 'https://via.placeholder.com/150'}" alt="${restaurant.name}">
+                    <div class="ml-4 flex-1">
+                        <h4 class="font-bold text-gray-800">${restaurant.name}</h4>
+                        <p class="text-sm text-gray-500">${restaurant.category}</p>
+                        <p class="text-xs text-gray-400 mt-1">${restaurant.location} • ${restaurant.distance}km</p>
                     </div>
-                `;
+                </div>
+            </a>
+        `;
                 listContainer.innerHTML += cardHTML;
             });
-        }
-
-        /**
-         * 백엔드에서 주변 맛집 목록을 가져오는 함수
-         */
-        async function fetchNearbyRestaurants(idToken) {
-            // ※ 중요: 이 주소는 밥픽님의 백엔드 API 엔드포인트로 변경해야 합니다!
-            const res = await fetch(`${FASTAPI_BASE_URL}/restaurants/nearby/all`, {
-                headers: { 'Authorization': `Bearer ${idToken}` }
-            });
-
-            if (!res.ok) {
-                throw new Error('맛집 목록을 불러오는데 실패했습니다.');
-            }
-            return res.json();
-        }
-
-        // 로그인 상태 확인 후 데이터 로딩 시작
-        onAuthStateChanged(auth, async (user) => {
-            if (!user) {
-                window.location.href = 'index.html';
-                return;
-            }
-
-            try {
-                const idToken = await user.getIdToken();
-                // ※ 백엔드 API가 준비될 때까지 테스트용 가짜 데이터
-                const fakeRestaurants = [
-                    { name: "강남면옥", category: "한식 • 냉면", location: "강남구", distance: "1.2", image_url: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDR8fHJlc3RhdXJhbnR8ZW58MHx8fHwxNjM4OTc1MjU0&ixlib=rb-1.2.1&q=80&w=400" },
-                    { name: "파파이스 키친", category: "이탈리안 • 파스타", location: "서초구", distance: "2.5", image_url: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDEyfHxyZXN0YXVyYW50fGVufDB8fHx8MTYzODk3NTI1NA&ixlib=rb-1.2.1&q=80&w=400" },
-                    { name: "오스테리아 오르조", category: "양식 • 와인바", location: "용산구", distance: "4.1", image_url: "https://images.unsplash.com/photo-1590846406792-044253a8064f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDI3fHxyZXN0YXVyYW50fGVufDB8fHx8MTYzODk3NTI5NQ&ixlib=rb-1.2.1&q=80&w=400" },
-                    { name: "스시쇼우", category: "일식 • 오마카세", location: "송파구", distance: "8.3", image_url: "https://images.unsplash.com/photo-1578474846511-04ba529f0b88?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDE3fHxyZXN0YXVyYW50fGVufDB8fHx8MTYzODk3NTI1NA&ixlib=rb-1.2.1&q=80&w=400" },
-                    { name: "브루클린 더 버거 조인트", category: "수제버거", location: "강남구", distance: "2.1", image_url: "https://images.unsplash.com/photo-1561758033-d89a9ad46330?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDEwfHxyZXN0YXVyYW50fGVufDB8fHx8MTYzODk3NTI1NA&ixlib=rb-1.2.1&q=80&w=400" }
-                ];
-                // renderRestaurantList(fakeRestaurants); // 테스트 시 이 코드를 활성화하세요
-                
-                // 실제 API 호출
-                const restaurants = await fetchNearbyRestaurants(idToken);
-                renderRestaurantList(restaurants);
-
-            } catch (error) {
-                console.error(error);
-                listContainer.innerHTML = `<p class="text-center text-red-500 py-10">${error.message}</p>`;
-            } finally {
-                loadingSpinner.style.display = 'none';
-            }
-        });
+        })();
     </script>
 </body>
 

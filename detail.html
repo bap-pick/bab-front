@@ -13,7 +13,6 @@
         #scrap-btn.scrapped { background-color: #FF7A5A; color: white; border-color: #FF7A5A; }
         #scrap-btn.scrapped svg { fill: white; }
         header.scrolled { box-shadow: 0 4px_6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07); }
-        /* 탭 버튼 활성화 스타일 */
         .tab-btn.active { color: #FF7A5A; border-color: #FF7A5A; }
     </style>
 </head>
@@ -42,8 +41,7 @@
                     <p id="restaurant-category" class="inline-block bg-orange-100 text-[#FF7A5A] text-sm font-semibold px-3 py-1 rounded-full mb-2">카테고리</p>
                     <h2 id="restaurant-name" class="text-3xl font-bold text-gray-900 leading-tight">식당 이름</h2>
                     
-                    <div id="review-info" class="flex items-center gap-4 text-sm text-gray-600 mt-3">
-                        </div>
+                    <div id="review-info" class="flex items-center gap-4 text-sm text-gray-600 mt-3"></div>
 
                     <div class="mt-6">
                         <button id="scrap-btn" class="w-full flex items-center justify-center gap-2 py-3 border-2 border-gray-200 bg-white text-gray-700 rounded-lg font-semibold transition-all duration-300 ease-in-out hover:shadow-md transform hover:-translate-y-0.5">
@@ -76,12 +74,23 @@
     </div>
 
     <script>
-        // --- 예시 데이터: 일부러 정보가 몇 개 없는 식당(resto2)을 포함하여 테스트 ---
-        const allRestaurants = {
-            'resto1': { id: 'resto1', name: '전설의치킨 방학홈플러스점', category: '치킨,닭강정', rating: 4.31, visitor_reviews: 243, blog_reviews: 37, address: '서울 도봉구 도봉로145길 7', call: '02-954-6568', facilities: ['테이크아웃 할인', '단체 이용 가능', '포장', '남/녀 화장실 구분', '무선 인터넷', '배달'], time: { '월': '16:00 - 24:00', '화': '16:00 - 24:00', '수': '16:00 - 24:00', '목': '16:00 - 24:00', '금': '16:00 - 24:00', '토': '16:00 - 24:00', '일': '정기휴무 (매주 일요일)' }, menu: ['전설의치킨(포장가)', '고추양념치킨(포장가)', '크리스피치킨(포장가)', '양념치킨(포장가)', '치킨떡볶이', '닭똥집튀김(포장가)'], latitude: 37.6661, longitude: 127.0343 },
-            'resto2': { id: 'resto2', name: '든든한 국밥', category: '한식', rating: 4.8, visitor_reviews: 512, blog_reviews: null, address: '부산광역시 해운대구 우동 456', call: null, facilities: ['포장', '배달'], time: { '매일': '08:00 - 21:00' }, menu: ['돼지국밥', '순대국밥', '섞어국밥'], latitude: 35.163, longitude: 129.160 },
-            'resto3': { id: 'resto3', name: '신선한 초밥', category: '일식', rating: 4.5, visitor_reviews: 330, blog_reviews: 102, address: '서울특별시 강남구 테헤란로 789', call: '02-555-1234', facilities: [], menu: [], latitude: 37.502, longitude: 127.041 }
+        // --- 가짜 데이터: 백엔드 API 대신 사용할 데이터입니다 ---
+        const fakeRestaurantDatabase = {
+            'resto1': { id: 'resto1', name: '전설의치킨 방학홈플러스점', category: '치킨,닭강정', rating: 4.31, visitor_reviews: 243, blog_reviews: 37, address: '서울 도봉구 도봉로145길 7', call: '02-954-6568', facilities: ['테이크아웃 할인', '단체 이용 가능', '포장', '남/녀 화장실 구분', '무선 인터넷', '배달'], time: { '월': '16:00 - 24:00', '화': '16:00 - 24:00', '수': '16:00 - 24:00', '목': '16:00 - 24:00', '금': '16:00 - 24:00', '토': '16:00 - 24:00', '일': '정기휴무 (매주 일요일)' }, menu: ['전설의치킨(포장가)', '고추양념치킨(포장가)', '크리스피치킨(포장가)', '양념치킨(포장가)', '치킨떡볶이', '닭똥집튀김(포장가)'], latitude: 37.6661, longitude: 127.0343, image_url: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=500' },
+            'resto2': { id: 'resto2', name: '든든한 국밥', category: '한식', rating: 4.8, visitor_reviews: 512, blog_reviews: null, address: '부산광역시 해운대구 우동 456', call: null, facilities: ['포장', '배달'], time: { '매일': '08:00 - 21:00' }, menu: ['돼지국밥', '순대국밥', '섞어국밥'], latitude: 35.163, longitude: 129.160, image_url: 'https://images.unsplash.com/photo-1599253428311-681a4d46a8d6?w=500' },
+            'resto3': { id: 'resto3', name: '신선한 초밥', category: '일식', rating: 4.5, visitor_reviews: 330, blog_reviews: 102, address: '서울특별시 강남구 테헤란로 789', call: '02-555-1234', facilities: [], menu: [], latitude: 37.502, longitude: 127.041, image_url: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=500' }
         };
+        const nearbyRestaurantDatabase = {
+            '1': { id: '1', name: '강남면옥', category: '한식 • 냉면', rating: 4.5, visitor_reviews: 874, blog_reviews: 102, address: '서울 강남구 학동로 343', call: '02-3446-5539', facilities: ['주차', '발렛파킹', '포장', '예약'], time: { '매일': '11:00 - 22:00' }, menu: ['냉면', '갈비찜', '만두'], latitude: 37.515, longitude: 127.042, image_url: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500' },
+            '2': { id: '2', name: '파파이스 키친', category: '이탈리안 • 파스타', rating: 4.8, visitor_reviews: 1203, blog_reviews: 256, address: '서울 서초구 서초대로 123', call: '02-555-1234', facilities: ['예약', '무선 인터넷', '남/녀 화장실 구분'], time: { '평일': '11:30 - 22:00', '주말': '12:00 - 21:00' }, menu: ['알리오 올리오', '까르보나라', '마르게리따 피자'], latitude: 37.498, longitude: 127.027, image_url: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500' },
+            '3': { id: '3', name: '오스테리아 오르조', category: '양식 • 와인바', rating: null, visitor_reviews: 450, blog_reviews: null, address: '서울 용산구 이태원로55가길 34', call: null, facilities: ['예약'], time: { '화-토': '18:00 - 23:00', '일,월': '정기휴무' }, menu: [], latitude: 37.534, longitude: 126.994, image_url: 'https://images.unsplash.com/photo-1590846406792-044253a8064f?w=500' },
+            '4': { id: '4', name: '스시쇼우', category: '일식 • 오마카세', rating: 4.9, visitor_reviews: 102, blog_reviews: 55, address: '서울 송파구 백제고분로7길 8-16', call: '02-123-4567', facilities: ['예약 필수'], time: { '런치': '12:00 - 14:30', '디너': '18:00 - 22:00', '월': '정기휴무' }, menu: ['런치 오마카세', '디너 오마카세'], latitude: 37.512, longitude: 127.102, image_url: 'https://images.unsplash.com/photo-1578474846511-04ba529f0b88?w=500' },
+            '5': { id: '5', name: '브루클린 더 버거 조인트', category: '수제버거', rating: 4.6, visitor_reviews: 2048, blog_reviews: 890, address: '서울 강남구 봉은사로4길 39', call: '02-555-7660', facilities: ['포장', '배달'], time: {}, menu: ['치즈버거', '브루클린 웍스', '칠리 치즈 프라이'], latitude: 37.505, longitude: 127.025, image_url: 'https://images.unsplash.com/photo-1561758033-d89a9ad46330?w=500' },
+            '6': { id: '6', name: '도스타코스', category: '멕시칸 • 타코', rating: 4.2, visitor_reviews: 765, blog_reviews: 150, address: '서울 종로구 대학로 101', call: '02-745-3211', facilities: ['혼밥 가능'], time: { '매일': '11:00 - 21:30' }, menu: ['타코', '브리또', '퀘사디아'], latitude: 37.583, longitude: 127.002, image_url: 'https://images.unsplash.com/photo-1552332386-f8dd00dc2f85?w=500' }
+        };
+        
+        // [수정] 두 개의 데이터베이스를 하나로 합칩니다.
+        const allRestaurants = { ...fakeRestaurantDatabase, ...nearbyRestaurantDatabase };
 
         const backButton = document.getElementById('back-button');
         const scrapBtn = document.getElementById('scrap-btn');
@@ -89,17 +98,22 @@
         const pageHeader = document.getElementById('page-header');
         let currentRestaurant = null;
 
-        // --- 페이지 로드 및 데이터 채우기 ---
         function loadRestaurantDetails() {
             const urlParams = new URLSearchParams(window.location.search);
-            const restaurantId = urlParams.get('id') || 'resto1'; // 기본값으로 resto1 표시
+            const restaurantId = urlParams.get('id') || 'resto1';
+            
+            // [수정] 합쳐진 'allRestaurants'에서 식당 정보를 찾습니다.
             currentRestaurant = allRestaurants[restaurantId];
 
-            if (!currentRestaurant) { alert("식당 정보가 없습니다."); window.location.href = 'scrap.html'; return; }
+            if (!currentRestaurant) {
+                alert("식당 정보가 없습니다.");
+                window.location.href = 'nearby-restaurants.html'; 
+                return;
+            }
             
             // 기본 정보
             document.getElementById('header-title').textContent = currentRestaurant.name;
-            document.getElementById('restaurant-image').src = currentRestaurant.imageUrl || `https://via.placeholder.com/400x240?text=${currentRestaurant.name}`;
+            document.getElementById('restaurant-image').src = currentRestaurant.image_url || `https://via.placeholder.com/400x240?text=${currentRestaurant.name}`;
             document.getElementById('restaurant-category').textContent = currentRestaurant.category || '정보 없음';
             document.getElementById('restaurant-name').textContent = currentRestaurant.name;
             document.getElementById('restaurant-address').textContent = currentRestaurant.address || '정보 없음';
@@ -151,7 +165,6 @@
             initMap(currentRestaurant.latitude, currentRestaurant.longitude, currentRestaurant.name);
         }
 
-        // --- 탭(Tab) 메뉴 기능 ---
         const tabs = document.querySelectorAll('.tab-btn');
         const panels = document.querySelectorAll('.tab-panel');
         tabs.forEach(tab => {
@@ -164,17 +177,16 @@
             });
         });
         
-        // --- 스크롤 감지 및 기타 이벤트 핸들러 (이전과 동일) ---
         mainContent.addEventListener('scroll', () => { pageHeader.classList.toggle('scrolled', mainContent.scrollTop > 10); });
         document.addEventListener('DOMContentLoaded', loadRestaurantDetails);
         backButton.addEventListener('click', () => { window.history.back(); });
         
-        function initMap(lat, lng, name) { /* ... 이전과 동일 ... */ }
-        function checkScrapStatus() { /* ... 이전과 동일 ... */ }
-        scrapBtn.addEventListener('click', () => { /* ... 이전과 동일 ... */ });
-
-        // --- 이 아래 함수들은 이전 코드와 내용이 동일합니다 ---
         function initMap(lat, lng, name) {
+            if (typeof kakao === 'undefined' || typeof kakao.maps === 'undefined') {
+                console.error("카카오 지도 API가 로드되지 않았습니다. API 키를 확인해주세요.");
+                document.getElementById('map').innerHTML = '<p class="text-center text-red-500 p-4">지도를 불러올 수 없습니다. API 키를 확인해주세요.</p>';
+                return;
+            }
             const mapContainer = document.getElementById('map');
             const mapOption = { center: new kakao.maps.LatLng(lat, lng), level: 3 };
             const map = new kakao.maps.Map(mapContainer, mapOption); 
@@ -184,6 +196,7 @@
             const infowindow = new kakao.maps.InfoWindow({ content: `<div style="padding:5px;font-size:12px;">${name}</div>` });
             infowindow.open(map, marker);
         }
+
         function checkScrapStatus() {
             if (!currentRestaurant) return;
             const scraps = localStorage.getItem('bapickScraps');
@@ -196,6 +209,7 @@
                 scrapBtn.querySelector('span').textContent = '스크랩';
             }
         }
+
         scrapBtn.addEventListener('click', () => {
             if (!currentRestaurant) return;
             const scraps = localStorage.getItem('bapickScraps');
