@@ -217,7 +217,6 @@
                 </button>
             </div>
         </div>
-    
     <script type="module">
         // Firebase SDK import 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
@@ -228,13 +227,53 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
+        // fastapi 서버 url
+        const FASTAPI_BASE_URL = "https://bab-back.onrender.com"; 
+        
         const sendButton = document.getElementById('sendButton');
         const messageInput = document.getElementById('messageInput');
         const chatArea = document.querySelector('.chat-area');
-        const ROOM_ID = 1;
 
+        // 채팅방 ID와 상태 관리 변수
         let idToken = null;
+        let currentRoomId = null;
+        let isCreatingRoom = false;
 
+        // 채팅방 생성
+        async function createChatRoom() {
+            if (isCreatingRoom || currentRoomId !== null || !idToken) return;
+            isCreatingRoom = true;
+            sendButton.disabled = true; // 채팅방 생성 중 버튼 비활성화
+
+            try {
+                const res = await fetch(`${FASTAPI_BASE_URL}/chat/create`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${idToken}`
+                    },
+                    body: JSON.stringify({}) // 빈 모델(name과 is_group이 자동으로 기본값 처리되므로)
+                });
+
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    throw new Error(errorData.detail || `[${res.status}] API 요청 실패`);
+                }
+
+                const data = await res.json();
+                currentRoomId = data.chatroom_id;
+                console.log(`채팅방 ID가 설정되었습니다: ${currentRoomId}`);
+                
+                
+            } catch (err) {
+                console.error("채팅방 생성 오류:", err);
+            } finally {
+                isCreatingRoom = false;
+                sendButton.disabled = false;
+            }
+        }
+        
+        // 인증 및 초기화
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
                 // 로그인되지 않은 경우, 로그인 페이지로 리디렉션
@@ -243,8 +282,8 @@
             }
 
             idToken = await user.getIdToken();
+            await createChatRoom(); // 인증 후 채팅방 생성 시작
         });
-
 
         messageInput.addEventListener('keydown', (event) => {
             if (event.key === 'Enter' && !event.isComposing) {
@@ -263,10 +302,17 @@
 
         sendButton.addEventListener('click', sendMessage);
 
-
+        // 메시지 전송 로직
         async function sendMessage() {
             const messageText = messageInput.value.trim();
-            if (!messageText) return;
+
+            if (!messageText || currentRoomId === null) {
+                if (currentRoomId === null) {
+                    console.error("채팅방 초기화 대기 중");
+                    await createChatRoom(); // 채팅방 생성 재시도
+                }
+                return;
+            }
 
             // 사용자 메시지 표시
             const userMessageDiv = document.createElement('div');
@@ -291,7 +337,7 @@
         // 사용자의 메시지를 LLM에 보냄
         async function sendMessageToLLM(messageText) {
             try {
-                const res = await fetch("http://127.0.0.1:8000/chat/send", {
+                const res = await fetch(`${FASTAPI_BASE_URL}/chat/send`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -299,7 +345,7 @@
                     },
                     
                     body: JSON.stringify({ 
-                        room_id: ROOM_ID,
+                        room_id: currentRoomId, // 동적으로 할당된 ID 사용
                         message: messageText
                     })
                 });
