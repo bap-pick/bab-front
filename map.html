@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>위치 찾기</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=85cfe1eb44a56817dcedc87a46b5070b&libraries=services,places"></script>
+
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen">
+
+    <header class="grid grid-cols-3 items-center bg-white p-4 shadow-md z-10">
+        <div class="justify-self-start">
+            <a href="home.html" class="p-2 text-gray-600 hover:bg-gray-100 rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+            </a>
+        </div>
+        <h1 class="text-xl font-bold text-gray-800 text-center">위치 찾기</h1>
+        <div class="justify-self-end w-10"></div> </header>
+
+    <div class="bg-white p-4 border-b z-10">
+        <div class="flex gap-2">
+            <input type="text" id="address-input" placeholder="장소, 주소 검색"
+                   class="flex-grow p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#FF7242] focus:outline-none">
+            <button id="search-btn"
+                    class="bg-[#FF7242] text-white font-bold py-2 px-4 rounded-md hover:bg-orange-600">검색</button>
+        </div>
+    </div>
+
+    <main class="flex-grow">
+        <div id="map"></div>
+    </main>
+    
+    <div class="fixed bottom-0 left-0 right-0 p-4 bg-white bg-opacity-80 backdrop-blur-sm shadow-[0_-2px_10px_rgba(0,0,0,0.1)] z-10">
+        <button id="save-location-btn" class="w-full bg-[#FF7242] text-white font-bold py-3 px-4 rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-400 transition-colors">
+            위치 저장
+        </button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mapContainer = document.getElementById('map');
+            let map, marker;
+            let currentLocationData = null; 
+
+            function initMapWithGPS() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(onSuccessGPS, onErrorGPS);
+                } else {
+                    initializeMap(37.566826, 126.9786567);
+                }
+            }
+
+            function onSuccessGPS(position) {
+                initializeMap(position.coords.latitude, position.coords.longitude);
+            }
+
+            function onErrorGPS(error) {
+                alert("현재 위치를 가져올 수 없습니다. 기본 위치로 지도를 표시합니다.");
+                initializeMap(37.566826, 126.9786567);
+            }
+
+            function initializeMap(lat, lng) {
+                const mapOption = {
+                    center: new kakao.maps.LatLng(lat, lng),
+                    level: 3
+                };
+                map = new kakao.maps.Map(mapContainer, mapOption);
+                marker = new kakao.maps.Marker({
+                    position: map.getCenter()
+                });
+                marker.setMap(map);
+            }
+
+            function searchPlaces() {
+                const keyword = document.getElementById('address-input').value;
+                if (!keyword.trim()) {
+                    alert('키워드를 입력해주세요.');
+                    return;
+                }
+
+                const ps = new kakao.maps.services.Places();
+                ps.keywordSearch(keyword, (data, status) => {
+                    if (status === kakao.maps.services.Status.OK) {
+                        const firstPlace = data[0];
+                        const coords = new kakao.maps.LatLng(firstPlace.y, firstPlace.x);
+                        
+                        map.setCenter(coords);
+                        marker.setPosition(coords);
+                        
+                        currentLocationData = {
+                            name: firstPlace.place_name,
+                            address: firstPlace.road_address_name || firstPlace.address_name,
+                            lat: firstPlace.y,
+                            lng: firstPlace.x
+                        };
+                        
+                    } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
+                        alert('검색 결과가 존재하지 않습니다.');
+                        currentLocationData = null;
+                    } else {
+                        alert('검색 중 오류가 발생했습니다.');
+                        currentLocationData = null;
+                    }
+                });
+            }
+
+            document.getElementById('save-location-btn').addEventListener('click', () => {
+                if (currentLocationData) {
+                    localStorage.setItem('savedBapickLocation', JSON.stringify(currentLocationData));
+                    alert(`'${currentLocationData.name}' 위치가 저장되었습니다!`);
+                    window.location.href = 'home.html';
+                } else {
+                    alert('먼저 위치를 검색해주세요.');
+                }
+            });
+
+            document.getElementById('search-btn').addEventListener('click', searchPlaces);
+            document.getElementById('address-input').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    searchPlaces();
+                }
+            });
+
+            initMapWithGPS();
+        });
+    </script>
+</body>
+</html>

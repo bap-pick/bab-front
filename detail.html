@@ -6,7 +6,7 @@
     <title>식당 상세 정보</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=YOUR_KAKAO_APP_KEY&libraries=services"></script>
+    <script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=jkpav5xenu"></script>
     <style>
         html, body { height: 100%; margin: 0; scroll-behavior: smooth; }
         body { font-family: 'Noto Sans KR', 'Inter', sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
@@ -182,20 +182,42 @@
         backButton.addEventListener('click', () => { window.history.back(); });
         
         function initMap(lat, lng, name) {
-            if (typeof kakao === 'undefined' || typeof kakao.maps === 'undefined') {
-                console.error("카카오 지도 API가 로드되지 않았습니다. API 키를 확인해주세요.");
-                document.getElementById('map').innerHTML = '<p class="text-center text-red-500 p-4">지도를 불러올 수 없습니다. API 키를 확인해주세요.</p>';
-                return;
-            }
-            const mapContainer = document.getElementById('map');
-            const mapOption = { center: new kakao.maps.LatLng(lat, lng), level: 3 };
-            const map = new kakao.maps.Map(mapContainer, mapOption); 
-            const markerPosition  = new kakao.maps.LatLng(lat, lng); 
-            const marker = new kakao.maps.Marker({ position: markerPosition });
-            marker.setMap(map);
-            const infowindow = new kakao.maps.InfoWindow({ content: `<div style="padding:5px;font-size:12px;">${name}</div>` });
-            infowindow.open(map, marker);
-        }
+    // 네이버 지도 API 로드 확인
+    if (typeof naver === 'undefined' || typeof naver.maps === 'undefined') {
+        console.error("네이버 지도 API가 로드되지 않았습니다. 클라이언트 ID를 확인해주세요.");
+        document.getElementById('map').innerHTML = '<p class="text-center text-red-500 p-4">지도를 불러올 수 없습니다. 클라이언트 ID를 확인해주세요.</p>';
+        return;
+    }
+
+    // 지도가 표시될 위치(위도, 경도) 설정
+    const mapLocation = new naver.maps.LatLng(lat, lng);
+
+    // 지도 옵션 설정
+    const mapOptions = {
+        center: mapLocation,
+        level: 11, // 카카오 지도의 level 3과 비슷한 확대 수준
+        mapTypeId: naver.maps.MapTypeId.NORMAL
+    };
+
+    // 지도 생성 (HTML의 'map' div에 지도를 생성)
+    const map = new naver.maps.Map('map', mapOptions);
+
+    // 마커 생성
+    const marker = new naver.maps.Marker({
+        position: mapLocation,
+        map: map
+    });
+
+    // 정보창(인포윈도우) 생성
+    const infowindow = new naver.maps.InfoWindow({
+        content: `<div style="padding:5px 10px; border:1px solid #ccc; border-radius: 5px; background-color: white; font-size:12px;">${name}</div>`,
+        // 네이버 지도는 기본 스타일이 없어서 직접 꾸며줘야 합니다.
+        anchorSkew: true
+    });
+
+    // 마커 위에 정보창 열기
+    infowindow.open(map, marker);
+}
 
         function checkScrapStatus() {
             if (!currentRestaurant) return;
