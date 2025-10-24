@@ -312,7 +312,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        const FASTAPI_BASE_URL = "https://bab-back.onrender.com";
+        const FASTAPI_BASE_URL = "https://bab-back.onrender.com"; 
 
         const userNameEl = document.getElementById('user-nickname');
         const userbirthdateEl = document.getElementById('user-birthdate');
@@ -471,6 +471,17 @@
                 recommendationTypeEl.textContent = analysisData.user_type;
                 recommendationHeadlineEl.textContent = `"${analysisData.recommendation_headline}"`;
                 recommendationAdviceEl.textContent = analysisData.recommendation_advice;
+
+                // 최종 보정 오행 비율
+                const finalOheng = analysisData.oheng_analysis_scores; 
+                const mappedStats = {
+                    wood: finalOheng['목(木)'] || 0,
+                    fire: finalOheng['화(火)'] || 0,
+                    earth: finalOheng['토(土)'] || 0,
+                    metal: finalOheng['금(金)'] || 0,
+                    water: finalOheng['수(水)'] || 0
+                };
+                updateSajuStats(mappedStats);
             } catch (err) {
                 console.error("Recommendation fetch failed:", err);
                 recommendationTypeEl.textContent = '정보 없음';
