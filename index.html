@@ -241,9 +241,6 @@
                 const user = userCredential.user;
                 const idToken = await user.getIdToken(); 
 
-                // 1초 지연
-                await new Promise(resolve => setTimeout(resolve, 1000)); 
-
                 // 서버로 전송할 JSON payload
                 const payload = {
                     email,
@@ -302,9 +299,6 @@
                 const userCredential = await signInWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
                 const idToken = await user.getIdToken(); 
-
-                // 1초 지연
-                await new Promise(resolve => setTimeout(resolve, 1000)); 
 
                 // 백엔드 login API: idToken 검증 -> 세션/쿠키 발급
                 const response = await fetch(`${FASTAPI_BASE_URL}/auth/login`, {
