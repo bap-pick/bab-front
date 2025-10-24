@@ -68,6 +68,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
         import { firebaseConfig } from "./firebase-config.js";
+        import Compressor from 'https://cdn.jsdelivr.net/npm/compressorjs@1.2.1/dist/compressor.esm.js';
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -143,44 +144,79 @@
             }
         });
         
-        // 저장 버튼 클릭 시 FastAPI로 PATCH 요청
         saveProfileBtn.addEventListener('click', async () => {
             if (!currentUser) return;
 
-            const formData = new FormData();
-            const newNickname = nicknameInput.value.trim();
-
-            if (newNickname) formData.append('nickname', newNickname);
-            if (selectedFile) formData.append('profile_image', selectedFile);
-
             saveProfileBtn.disabled = true;
+            saveProfileBtn.textContent = '저장 중...';
+
+            let profile_image_s3_key = null;
 
             try {
                 const idToken = await currentUser.getIdToken();
 
-                const res = await fetch(`${FASTAPI_BASE_URL}/users/me`, {
+                // Compressor로 압축 후 Pre-signed URL 업로드
+                if (selectedFile) {
+                    const compressedFile = await new Promise((resolve, reject) => {
+                        new Compressor(selectedFile, {
+                            quality: 0.1,
+                            maxWidth: 1024,
+                            maxHeight: 1024,
+                            success(result) { resolve(result); },
+                            error(err) { reject(err); }
+                        });
+                    });
+
+                    // Pre-signed URL 요청
+                    const presignRes = await fetch(`${FASTAPI_BASE_URL}/users/generate-presigned-url`, {
+                        method: 'POST',
+                        headers: { 'Authorization': `Bearer ${idToken}` },
+                        body: new URLSearchParams({
+                            filename: compressedFile.name,
+                            content_type: compressedFile.type
+                        })
+                    });
+                    if (!presignRes.ok) throw new Error('Presigned URL 생성 실패');
+                    const { presigned_url, s3_key } = await presignRes.json();
+                    profile_image_s3_key = s3_key;
+
+                    // 브라우저에서 S3 직접 업로드
+                    const uploadRes = await fetch(presigned_url, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': compressedFile.type },
+                        body: compressedFile
+                    });
+                    if (!uploadRes.ok) throw new Error('S3 업로드 실패');
+                }
+
+                // PATCH로 닉네임/이미지 key 전송
+                const patchData = new URLSearchParams();
+                const newNickname = nicknameInput.value.trim();
+                if (newNickname) patchData.append('nickname', newNickname);
+                if (profile_image_s3_key) patchData.append('profile_image_s3_key', profile_image_s3_key);
+
+                const patchRes = await fetch(`${FASTAPI_BASE_URL}/users/me`, {
                     method: 'PATCH',
-                    headers: {
-                        'Authorization': `Bearer ${idToken}`
-                    },
-                    body: formData
+                    headers: { 'Authorization': `Bearer ${idToken}` },
+                    body: patchData
                 });
+                if (!patchRes.ok) throw new Error('회원 정보 수정 실패');
+                const patchResult = await patchRes.json();
 
-                if (!res.ok) throw new Error(`API error: ${res.status}`);
-                const data = await res.json();
+                // UI 갱신
+                if (patchResult.profile_image) profileImagePreview.src = patchResult.profile_image;
+                if (patchResult.nickname) nicknameInput.value = patchResult.nickname;
 
-                // 응답값으로 UI 갱신
-                if (data.profile_image) profileImagePreview.src = data.profile_image;
-                if (data.nickname) nicknameInput.value = data.nickname;
-            } catch (error) {
-                console.error(error);
-                alert('오류가 발생했습니다: ' + error.message);
+                showMessage('프로필 편집이 완료됐습니다.');
+                selectedFile = null; // 완료 후 초기화
+            } catch (err) {
+                console.error(err);
+                alert(err.message);
             } finally {
                 saveProfileBtn.disabled = false;
                 saveProfileBtn.textContent = '저장';
-                showMessage("프로필 편집이 완료됐습니다.");
             }
-        });
+});
     </script>
 </body>
 </html>
