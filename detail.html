@@ -62,9 +62,40 @@
             
             <div class="p-5">
                 <div id="info-panel" class="tab-panel space-y-5">
-                    <div class="flex items-start"><div class="flex-shrink-0 w-8 text-center"><svg class="w-6 h-6 text-gray-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" /></svg></div><div><p class="font-semibold text-gray-700">주소</p><p id="restaurant-address" class="text-gray-600"></p></div></div>
-                    <div class="flex items-start"><div class="flex-shrink-0 w-8 text-center"><svg class="w-6 h-6 text-gray-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" /></svg></div><div><p class="font-semibold text-gray-700">전화번호</p><p id="restaurant-call" class="text-gray-600"></p></div></div>
-                    <div class="flex items-start"><div class="flex-shrink-0 w-8 text-center"><svg class="w-6 h-6 text-gray-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div><div><p class="font-semibold text-gray-700">영업시간</p><div id="restaurant-time" class="text-gray-600 space-y-1"></div></div></div>
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-8 text-center">
+                            <svg class="w-6 h-6 text-gray-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-gray-700">주소</p>
+                            <p id="restaurant-address" class="text-gray-600"></p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-8 text-center">
+                            <svg class="w-6 h-6 text-gray-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <p class="font-semibold text-gray-700">전화번호</p>
+                            <p id="restaurant-call" class="text-gray-600"></p>
+                        </div>
+                    </div>
+                    <div class="flex items-start">
+                        <div class="flex-shrink-0 w-8 text-center">
+                            <svg class="w-6 h-6 text-gray-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-semibold text-gray-700">영업시간</p>
+                            <div id="restaurant-time" class="text-gray-600 space-y-1"></div>
+                        </div>
+                    </div>
                     <div id="map" class="w-full h-56 rounded-lg border border-gray-200 overflow-hidden mt-4"></div>
                 </div>
                 <div id="menu-panel" class="tab-panel hidden"><ul id="menu-list" class="space-y-3"></ul></div>
@@ -72,153 +103,81 @@
             </div>
         </main>
     </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+        import { firebaseConfig } from "./firebase-config.js";
 
-    <script>
-        // --- 가짜 데이터: 백엔드 API 대신 사용할 데이터입니다 ---
-        const fakeRestaurantDatabase = {
-            'resto1': { id: 'resto1', name: '전설의치킨 방학홈플러스점', category: '치킨,닭강정', rating: 4.31, visitor_reviews: 243, blog_reviews: 37, address: '서울 도봉구 도봉로145길 7', call: '02-954-6568', facilities: ['테이크아웃 할인', '단체 이용 가능', '포장', '남/녀 화장실 구분', '무선 인터넷', '배달'], time: { '월': '16:00 - 24:00', '화': '16:00 - 24:00', '수': '16:00 - 24:00', '목': '16:00 - 24:00', '금': '16:00 - 24:00', '토': '16:00 - 24:00', '일': '정기휴무 (매주 일요일)' }, menu: ['전설의치킨(포장가)', '고추양념치킨(포장가)', '크리스피치킨(포장가)', '양념치킨(포장가)', '치킨떡볶이', '닭똥집튀김(포장가)'], latitude: 37.6661, longitude: 127.0343, image_url: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=500' },
-            'resto2': { id: 'resto2', name: '든든한 국밥', category: '한식', rating: 4.8, visitor_reviews: 512, blog_reviews: null, address: '부산광역시 해운대구 우동 456', call: null, facilities: ['포장', '배달'], time: { '매일': '08:00 - 21:00' }, menu: ['돼지국밥', '순대국밥', '섞어국밥'], latitude: 35.163, longitude: 129.160, image_url: 'https://images.unsplash.com/photo-1599253428311-681a4d46a8d6?w=500' },
-            'resto3': { id: 'resto3', name: '신선한 초밥', category: '일식', rating: 4.5, visitor_reviews: 330, blog_reviews: 102, address: '서울특별시 강남구 테헤란로 789', call: '02-555-1234', facilities: [], menu: [], latitude: 37.502, longitude: 127.041, image_url: 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=500' }
-        };
-        const nearbyRestaurantDatabase = {
-            '1': { id: '1', name: '강남면옥', category: '한식 • 냉면', rating: 4.5, visitor_reviews: 874, blog_reviews: 102, address: '서울 강남구 학동로 343', call: '02-3446-5539', facilities: ['주차', '발렛파킹', '포장', '예약'], time: { '매일': '11:00 - 22:00' }, menu: ['냉면', '갈비찜', '만두'], latitude: 37.515, longitude: 127.042, image_url: 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=500' },
-            '2': { id: '2', name: '파파이스 키친', category: '이탈리안 • 파스타', rating: 4.8, visitor_reviews: 1203, blog_reviews: 256, address: '서울 서초구 서초대로 123', call: '02-555-1234', facilities: ['예약', '무선 인터넷', '남/녀 화장실 구분'], time: { '평일': '11:30 - 22:00', '주말': '12:00 - 21:00' }, menu: ['알리오 올리오', '까르보나라', '마르게리따 피자'], latitude: 37.498, longitude: 127.027, image_url: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=500' },
-            '3': { id: '3', name: '오스테리아 오르조', category: '양식 • 와인바', rating: null, visitor_reviews: 450, blog_reviews: null, address: '서울 용산구 이태원로55가길 34', call: null, facilities: ['예약'], time: { '화-토': '18:00 - 23:00', '일,월': '정기휴무' }, menu: [], latitude: 37.534, longitude: 126.994, image_url: 'https://images.unsplash.com/photo-1590846406792-044253a8064f?w=500' },
-            '4': { id: '4', name: '스시쇼우', category: '일식 • 오마카세', rating: 4.9, visitor_reviews: 102, blog_reviews: 55, address: '서울 송파구 백제고분로7길 8-16', call: '02-123-4567', facilities: ['예약 필수'], time: { '런치': '12:00 - 14:30', '디너': '18:00 - 22:00', '월': '정기휴무' }, menu: ['런치 오마카세', '디너 오마카세'], latitude: 37.512, longitude: 127.102, image_url: 'https://images.unsplash.com/photo-1578474846511-04ba529f0b88?w=500' },
-            '5': { id: '5', name: '브루클린 더 버거 조인트', category: '수제버거', rating: 4.6, visitor_reviews: 2048, blog_reviews: 890, address: '서울 강남구 봉은사로4길 39', call: '02-555-7660', facilities: ['포장', '배달'], time: {}, menu: ['치즈버거', '브루클린 웍스', '칠리 치즈 프라이'], latitude: 37.505, longitude: 127.025, image_url: 'https://images.unsplash.com/photo-1561758033-d89a9ad46330?w=500' },
-            '6': { id: '6', name: '도스타코스', category: '멕시칸 • 타코', rating: 4.2, visitor_reviews: 765, blog_reviews: 150, address: '서울 종로구 대학로 101', call: '02-745-3211', facilities: ['혼밥 가능'], time: { '매일': '11:00 - 21:30' }, menu: ['타코', '브리또', '퀘사디아'], latitude: 37.583, longitude: 127.002, image_url: 'https://images.unsplash.com/photo-1552332386-f8dd00dc2f85?w=500' }
-        };
-        
-        // [수정] 두 개의 데이터베이스를 하나로 합칩니다.
-        const allRestaurants = { ...fakeRestaurantDatabase, ...nearbyRestaurantDatabase };
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        const FASTAPI_BASE_URL = 'https://bab-back.onrender.com';
+
+        let currentRestaurant = null;
+        let currentUser = null;
 
         const backButton = document.getElementById('back-button');
+        const headerTitle = document.getElementById('header-title');
+        const restaurantImageEl = document.getElementById('restaurant-image');
+        const restaurantCategoryEl = document.getElementById('restaurant-category');
+        const restaurantNameEl = document.getElementById('restaurant-name');
         const scrapBtn = document.getElementById('scrap-btn');
-        const mainContent = document.getElementById('main-content');
-        const pageHeader = document.getElementById('page-header');
-        let currentRestaurant = null;
+        
+        // 상세 정보 패널 요소
+        const restaurantAddressEl = document.getElementById('restaurant-address');
+        const restaurantPhoneEl = document.getElementById('restaurant-call');
+        const restaurantTimeEl = document.getElementById('restaurant-time'); // 영업시간 요소
+        const mapContainer = document.getElementById('map');
+        
+        // 메뉴 리스트 요소
+        const menuListEl = document.getElementById('menu-list');
+        // 편의시설 리스트 요소
+        const facilitiesListEl = document.getElementById('facilities-list');
 
-        function loadRestaurantDetails() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const restaurantId = urlParams.get('id') || 'resto1';
-            
-            // [수정] 합쳐진 'allRestaurants'에서 식당 정보를 찾습니다.
-            currentRestaurant = allRestaurants[restaurantId];
+        // 탭 관련 요소
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabPanels = document.querySelectorAll('.tab-panel');
 
-            if (!currentRestaurant) {
-                alert("식당 정보가 없습니다.");
-                window.location.href = 'nearby-restaurants.html'; 
+
+        // 헤더 스크롤 이벤트 (스크롤 시 헤더 그림자 및 제목 변경)
+        document.querySelector('main').addEventListener('scroll', (e) => {
+            const header = document.getElementById('page-header');
+            if (e.target.scrollTop > 50) {
+                header.classList.add('scrolled');
+                headerTitle.textContent = restaurantNameEl.textContent;
+            } else {
+                header.classList.remove('scrolled');
+                headerTitle.textContent = '식당 정보';
+            }
+        });
+
+        // 뒤로가기 버튼
+        backButton.addEventListener('click', () => {
+            history.back();
+        });
+
+        // 지도 로드 함수 (Naver Map API)
+        function loadNaverMap(lat, lng, name) {
+            if (!window.naver) {
+                mapContainer.innerHTML = '<div class="p-4 text-center text-gray-500">지도 SDK 로드 실패.</div>';
                 return;
             }
             
-            // 기본 정보
-            document.getElementById('header-title').textContent = currentRestaurant.name;
-            document.getElementById('restaurant-image').src = currentRestaurant.image_url || `https://via.placeholder.com/400x240?text=${currentRestaurant.name}`;
-            document.getElementById('restaurant-category').textContent = currentRestaurant.category || '정보 없음';
-            document.getElementById('restaurant-name').textContent = currentRestaurant.name;
-            document.getElementById('restaurant-address').textContent = currentRestaurant.address || '정보 없음';
-            document.getElementById('restaurant-call').textContent = currentRestaurant.call || '정보 없음';
-            
-            // 리뷰 정보
-            const reviewInfo = document.getElementById('review-info');
-            reviewInfo.innerHTML = '';
-            if (currentRestaurant.rating) reviewInfo.innerHTML += `<div class="flex items-center gap-1">⭐<span class="font-bold">${currentRestaurant.rating}</span></div>`;
-            if (currentRestaurant.visitor_reviews) reviewInfo.innerHTML += `<div>방문자 리뷰 <span class="font-semibold">${currentRestaurant.visitor_reviews.toLocaleString()}</span></div>`;
-            if (currentRestaurant.blog_reviews) reviewInfo.innerHTML += `<div>블로그 리뷰 <span class="font-semibold">${currentRestaurant.blog_reviews.toLocaleString()}</span></div>`;
+            const position = new naver.maps.LatLng(lat, lng);
+            const mapOptions = { center: position, zoom: 17, mapTypeControl: true, zoomControl: true };
+            const map = new naver.maps.Map(mapContainer, mapOptions);
 
-            // 영업 시간
-            const timeEl = document.getElementById('restaurant-time');
-            timeEl.innerHTML = '';
-            if (currentRestaurant.time && Object.keys(currentRestaurant.time).length > 0) {
-                Object.entries(currentRestaurant.time).forEach(([day, hours]) => {
-                    const p = document.createElement('p');
-                    p.innerHTML = `<span class="font-semibold w-8 inline-block">${day}</span> ${hours.replace(/\n/g, '<br>')}`;
-                    timeEl.appendChild(p);
-                });
-            } else { timeEl.textContent = '정보 없음'; }
+            const marker = new naver.maps.Marker({ position: position, map: map });
 
-            // 메뉴
-            const menuList = document.getElementById('menu-list');
-            menuList.innerHTML = '';
-            if (currentRestaurant.menu && currentRestaurant.menu.length > 0) {
-                currentRestaurant.menu.forEach(item => {
-                    const li = document.createElement('li');
-                    li.className = "flex justify-between items-center py-2 border-b border-gray-100";
-                    li.textContent = item;
-                    menuList.appendChild(li);
-                });
-            } else { menuList.innerHTML = '<p class="text-gray-500">등록된 메뉴가 없습니다.</p>'; }
-
-            // 편의 시설
-            const facilitiesList = document.getElementById('facilities-list');
-            facilitiesList.innerHTML = '';
-            if (currentRestaurant.facilities && currentRestaurant.facilities.length > 0) {
-                currentRestaurant.facilities.forEach(item => {
-                    const li = document.createElement('li');
-                    li.className = "flex items-center gap-2 text-gray-700";
-                    li.innerHTML = `<svg class="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> ${item}`;
-                    facilitiesList.appendChild(li);
-                });
-            } else { facilitiesList.innerHTML = '<p class="text-gray-500">등록된 편의시설 정보가 없습니다.</p>'; }
-            
-            checkScrapStatus();
-            initMap(currentRestaurant.latitude, currentRestaurant.longitude, currentRestaurant.name);
-        }
-
-        const tabs = document.querySelectorAll('.tab-btn');
-        const panels = document.querySelectorAll('.tab-panel');
-        tabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                tabs.forEach(t => t.classList.remove('active'));
-                panels.forEach(p => p.classList.add('hidden'));
-                
-                tab.classList.add('active');
-                document.getElementById(`${tab.dataset.tab}-panel`).classList.remove('hidden');
+            const infowindow = new naver.maps.InfoWindow({
+                content: `<div style="padding:5px; border:1px solid #ccc; border-radius: 5px; background-color: white; font-size:12px;">${name}</div>`,
+                anchorSkew: true
             });
-        });
+
+            infowindow.open(map, marker);
+        }
         
-        mainContent.addEventListener('scroll', () => { pageHeader.classList.toggle('scrolled', mainContent.scrollTop > 10); });
-        document.addEventListener('DOMContentLoaded', loadRestaurantDetails);
-        backButton.addEventListener('click', () => { window.history.back(); });
-        
-        function initMap(lat, lng, name) {
-    // 네이버 지도 API 로드 확인
-    if (typeof naver === 'undefined' || typeof naver.maps === 'undefined') {
-        console.error("네이버 지도 API가 로드되지 않았습니다. 클라이언트 ID를 확인해주세요.");
-        document.getElementById('map').innerHTML = '<p class="text-center text-red-500 p-4">지도를 불러올 수 없습니다. 클라이언트 ID를 확인해주세요.</p>';
-        return;
-    }
-
-    // 지도가 표시될 위치(위도, 경도) 설정
-    const mapLocation = new naver.maps.LatLng(lat, lng);
-
-    // 지도 옵션 설정
-    const mapOptions = {
-        center: mapLocation,
-        level: 11, // 카카오 지도의 level 3과 비슷한 확대 수준
-        mapTypeId: naver.maps.MapTypeId.NORMAL
-    };
-
-    // 지도 생성 (HTML의 'map' div에 지도를 생성)
-    const map = new naver.maps.Map('map', mapOptions);
-
-    // 마커 생성
-    const marker = new naver.maps.Marker({
-        position: mapLocation,
-        map: map
-    });
-
-    // 정보창(인포윈도우) 생성
-    const infowindow = new naver.maps.InfoWindow({
-        content: `<div style="padding:5px 10px; border:1px solid #ccc; border-radius: 5px; background-color: white; font-size:12px;">${name}</div>`,
-        // 네이버 지도는 기본 스타일이 없어서 직접 꾸며줘야 합니다.
-        anchorSkew: true
-    });
-
-    // 마커 위에 정보창 열기
-    infowindow.open(map, marker);
-}
-
+        // 스크랩 상태 확인 및 업데이트
         function checkScrapStatus() {
             if (!currentRestaurant) return;
             const scraps = localStorage.getItem('bapickScraps');
@@ -232,19 +191,237 @@
             }
         }
 
+        // 스크랩 버튼 이벤트 리스너
         scrapBtn.addEventListener('click', () => {
-            if (!currentRestaurant) return;
+            if (!currentRestaurant) { alert('식당 정보를 먼저 로드해주세요.'); return; }
             const scraps = localStorage.getItem('bapickScraps');
             let scrappedIds = scraps ? JSON.parse(scraps) : [];
             const isScrapped = scrappedIds.includes(currentRestaurant.id);
+            
             if (isScrapped) {
                 scrappedIds = scrappedIds.filter(id => id !== currentRestaurant.id);
             } else {
                 scrappedIds.push(currentRestaurant.id);
             }
+            
             localStorage.setItem('bapickScraps', JSON.stringify(scrappedIds));
             checkScrapStatus();
         });
+
+        // 탭 전환 로직
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetTab = button.getAttribute('data-tab');
+                
+                // 탭 버튼 활성화/비활성화
+                tabButtons.forEach(btn => btn.classList.remove('active', 'border-[#FF7A5A]', 'text-[#FF7A5A]'));
+                button.classList.add('active', 'border-[#FF7A5A]', 'text-[#FF7A5A]');
+                button.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+
+                // 패널 표시/숨김
+                tabPanels.forEach(panel => {
+                    if (panel.id === `${targetTab}-panel`) {
+                        panel.classList.remove('hidden');
+                    } else {
+                        panel.classList.add('hidden');
+                    }
+                });
+            });
+        });
+
+        // api 호출
+        async function fetchRestaurantDetails(restaurantId, user) {
+            if (!user) {
+                console.error("fetchRestaurantDetails: User object is null.");
+                return null;
+            }
+            
+            const idToken = await user.getIdToken(); 
+
+            if (!idToken) {
+                window.location.href = 'index.html';
+                return null;
+            }
+
+            try {
+                const response = await fetch(`${FASTAPI_BASE_URL}/restaurants/detail/${restaurantId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${idToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (response.status === 404) {
+                    throw new Error("식당 정보를 찾을 수 없습니다.");
+                }
+                if (!response.ok) {
+                    throw new Error(`데이터 조회 오류: ${response.status} ${response.statusText}`);
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error("Fetch Error:", error);
+                alert(error.message);
+                return null;
+            }
+        }
+        
+        // 메뉴 리스트 렌더링
+        function renderMenus(menus) {
+            menuListEl.innerHTML = ''; 
+
+            if (!menus || menus.length === 0) {
+                menuListEl.innerHTML = '<li class="text-gray-500 p-2 text-center">등록된 메뉴 정보가 없습니다.</li>';
+                return;
+            }
+            
+            menuListEl.innerHTML = menus.map(menu => {
+                const menuName = menu.menu_name || menu.name || '메뉴 이름 없음 (키 불일치)';
+                return `
+                    <li class="flex justify-between items-center p-3 bg-white border-b border-gray-100 last:border-b-0">
+                        <span class="font-medium text-gray-700">${menuName}</span>
+                    </li>
+                `;
+            }).join('');
+        }
+
+        // 운영 시간 렌더링
+        function renderHours(hours) {
+            restaurantTimeEl.innerHTML = '';
+
+            if (!hours || hours.length === 0) {
+                restaurantTimeEl.innerHTML = '운영 시간 정보가 없습니다.';
+                return;
+            }
+
+            const dayOrder = ['월', '화', '수', '목', '금', '토', '일'];
+            hours.sort((a, b) => dayOrder.indexOf(a.day) - dayOrder.indexOf(b.day));
+
+            restaurantTimeEl.innerHTML = hours.map(hour => {
+                let mainTimeInfo = '';
+                let additionalInfo = '';
+
+                // 1. 메인 영업 시간 정보 (시간 또는 휴무)
+                if (hour.is_closed) {
+                    mainTimeInfo = `<span class="text-red-500 font-bold">휴무</span>`;
+                } else if (hour.open_time && hour.close_time) {
+                    // 시간 포맷팅은 API 응답 형태에 따라 다를 수 있습니다. (예: "09:00:00" -> "09:00")
+                    mainTimeInfo = `${hour.open_time.substring(0, 5)} - ${hour.close_time.substring(0, 5)}`;
+                } else {
+                    mainTimeInfo = '정보 없음';
+                }
+
+                let lastOrderInfo = '';
+                if (hour.last_order) {
+                    lastOrderInfo = ` (라스트 오더: ${hour.last_order.substring(0, 5)})`;
+                }
+
+                let breakInfo = '';
+                if (hour.break_start && hour.break_end) {
+                    breakInfo = `<span class="text-xs text-gray-500">브레이크: ${hour.break_start.substring(0, 5)} - ${hour.break_end.substring(0, 5)}</span>`;
+                }
+
+                if (breakInfo) {
+                    additionalInfo = `
+                        <div class="flex flex-col pt-0.5">
+                            ${breakInfo}
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="flex flex-col py-1">
+                        <div class="flex items-center text-sm gap-4">
+                            <span class="font-medium text-gray-700 w-2 flex-shrink-0">${hour.day}</span>
+                            <div class="flex-1">
+                                <span>${mainTimeInfo}${lastOrderInfo}</span>
+                                <span>${additionalInfo}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // 편의시설 렌더링
+        function renderFacilities(facilities) {
+            facilitiesListEl.innerHTML = '';
+
+            if (!facilities || facilities.length === 0) {
+                facilitiesListEl.innerHTML = '<li class="col-span-2 text-gray-500 p-2 text-center">등록된 편의시설 정보가 없습니다.</li>';
+                return;
+            }
+            
+            facilitiesListEl.innerHTML = facilities.map(facility => {
+                const facilityName = facility.name || '정보 없음';
+                return `
+                    <li class="flex items-center gap-2 p-2 bg-gray-50 rounded-lg text-sm text-gray-700 font-medium">
+                        <svg class="w-4 h-4 text-[#FF7A5A] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
+                        <span>${facilityName}</span>
+                    </li>
+                `;
+            }).join('');
+        }
+
+        //인증된 사용자 객체를 받아 데이터를 로드하고 DOM 업데이트
+        async function loadRestaurantDetails(user) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const restaurantId = urlParams.get('id');
+
+            if (!restaurantId) {
+                document.getElementById('main-content').innerHTML = '<div class="p-4 text-center text-red-500">잘못된 접근입니다: 식당 ID가 없습니다.</div>';
+                return;
+            }
+            
+            // API 호출 (user 객체 전달)
+            const details = await fetchRestaurantDetails(restaurantId, user);
+            if (!details) {
+                document.getElementById('main-content').innerHTML = '<div class="p-4 text-center text-gray-600">식당 정보를 불러오는 데 실패했습니다.</div>';
+                return;
+            }
+            
+            currentRestaurant = details;
+
+            // DOM 업데이트
+            restaurantNameEl.textContent = currentRestaurant.name || '이름 정보 없음';
+            restaurantCategoryEl.textContent = currentRestaurant.category || '카테고리';
+            restaurantAddressEl.textContent = currentRestaurant.address || '주소 정보 없음';
+            restaurantPhoneEl.textContent = currentRestaurant.phone || '전화번호 정보 없음';
+            restaurantImageEl.src = 'https://via.placeholder.com/400x240'; 
+            
+            // 운영 시간 정보 렌더링
+            renderHours(currentRestaurant.hours);
+
+            // 메뉴 정보 렌더링
+            renderMenus(currentRestaurant.menus); 
+            
+            // 편의시설 정보 렌더링
+            renderFacilities(currentRestaurant.facilities);
+            
+            // 지도 로직
+            /*
+            if (currentRestaurant.latitude && currentRestaurant.longitude) {
+                loadNaverMap(currentRestaurant.latitude, currentRestaurant.longitude, currentRestaurant.name);
+            } else {
+                mapContainer.innerHTML = '<div class="p-4 text-center text-gray-500">지도 정보를 불러올 수 없습니다.</div>';
+            }
+            */
+            
+            // 스크랩 상태 확인
+            checkScrapStatus(); 
+        }
+
+        // Firebase 인증
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user; 
+                loadRestaurantDetails(user);
+            } else {
+                window.location.href = 'index.html'; 
+            }
+        });
+
     </script>
 </body>
 </html>
