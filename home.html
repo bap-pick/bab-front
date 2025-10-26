@@ -158,7 +158,7 @@
         <div class="mt-4 p-6 bg-white backdrop-blur-sm rounded-2xl shadow-lg">
             <div class="mt-2">
                 <div class="flex justify-between items-center">
-                    <h3 id="nearby-restaurants-heading" class="text-xl font-bold text-gray-800">나를 위한 추천 맛집 🍚</h3>
+                    <h3 id="nearby-restaurants-heading" class="text-xl font-bold text-gray-800">나를 위한 맛집</h3>
 
                     <a href="restaurant_list.html" class="text-sm font-semibold text-gray-500 hover:text-[#FF7242]">
                         전체보기 &gt;
@@ -166,7 +166,7 @@
                 </div>
                 <div class="relative mt-4">
                     <div id="restaurant-carousel" class="flex overflow-x-auto scroll-smooth scrollbar-hide space-x-4 py-2">
-                        <p id="nearby-restaurants-loading" class="text-gray-500">주변 맛집 정보를 불러오는 중...</p>
+                        <p id="nearby-restaurants-loading" class="text-gray-500">주천 맛집 정보를 불러오는 중...</p>
                     </div>
                 </div>
             </div>
@@ -268,7 +268,8 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        const FASTAPI_BASE_URL = "https://bab-back.onrender.com"; 
+        //const FASTAPI_BASE_URL = "https://bab-back.onrender.com"; 
+        const FASTAPI_BASE_URL = "http://127.0.0.1:8000";
 
         const userNameEl = document.getElementById('user-nickname');
         const userbirthdateEl = document.getElementById('user-birthdate');
@@ -311,6 +312,7 @@
                             }
                             const data = await response.json();
                             const address = data.address;
+                            
                             const city = address.city || address.province || '';
                             const district = address.suburb || address.neighbourhood || address.borough || address.city_district || '';
 
@@ -382,23 +384,19 @@
 
         // 식당 정보를 받아 캐러셀 카드로 렌더링하는 함수
         const renderRestaurantCard = (restaurant) => {
-            // 임시 이미지 URL 사용
-            const imageUrl = "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDR8fHJlc3RhdXJhbnR8ZW58MHx8fHwxNjM4OTc1MjU0&ixlib=rb-1.2.1&q=80&w=400";
-
             const oheng = restaurant.recommended_oheng || 'N/A'; 
-            const reason = restaurant.recommendation_reason || '추천 이유 정보 없음';
+            //const reason = restaurant.recommendation_reason || '추천 이유 정보 없음';
 
             const recommendationHeader = `${oheng} 기운 보충`;
             return `
-                <div class="flex-shrink-0 w-56 bg-white rounded-lg shadow-lg overflow-hidden transform transition-transform hover:scale-105">
+                <a href="detail.html?id=${restaurant.id}" class="flex-shrink-0 w-56 bg-white rounded-lg shadow-lg overflow-hidden transform transition-transform hover:scale-105">
                     <div class="p-3">
                         <p class="text-xs font-semibold text-[#FF7242] mb-1">${recommendationHeader}</p> 
-                        <p class="text-xs text-gray-400 mt-1 truncate">${reason}</p>
                         <h4 class="font-bold text-gray-800 truncate">${restaurant.name}</h4>
                         <p class="text-sm text-gray-500 truncate">${restaurant.category}</p>
                         <p class="text-xs text-gray-400 mt-1 truncate">${restaurant.address}</p>
                     </div>
-                </div>
+                </a>
             `;
         };
 
@@ -434,6 +432,8 @@
                 const data = await response.json();
                 const restaurants = data.restaurants;
 
+                // localStorage에 추천 식당 데이터 저장
+                localStorage.setItem('RecommendedRestaurants', JSON.stringify(restaurants));
                 if (restaurants.length === 0) {
                     if (loadingEl) loadingEl.textContent = '현재 오행에 맞는 추천 식당이 없습니다.';
                     return;
@@ -479,7 +479,7 @@
 
                 const nearbyRestaurantsHeading = document.getElementById('nearby-restaurants-heading');
                 if (data.nickname) {
-                    nearbyRestaurantsHeading.textContent = `${data.nickname}님을 위한 추천 맛집 🍚`;
+                    nearbyRestaurantsHeading.textContent = `${data.nickname}님을 위한 맛집`;
                 }
 
                 const sajuStats = {
