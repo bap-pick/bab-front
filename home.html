@@ -158,59 +158,15 @@
         <div class="mt-4 p-6 bg-white backdrop-blur-sm rounded-2xl shadow-lg">
             <div class="mt-2">
                 <div class="flex justify-between items-center">
-                    <h3 id="nearby-restaurants-heading" class="text-xl font-bold text-gray-800">나의 주변 맛집 🍚</h3>
+                    <h3 id="nearby-restaurants-heading" class="text-xl font-bold text-gray-800">나를 위한 추천 맛집 🍚</h3>
 
                     <a href="restaurant_list.html" class="text-sm font-semibold text-gray-500 hover:text-[#FF7242]">
                         전체보기 &gt;
                     </a>
                 </div>
                 <div class="relative mt-4">
-                    <div id="restaurant-carousel"
-                        class="flex overflow-x-auto scroll-smooth scrollbar-hide space-x-4 py-2">
-                        <div
-                            class="flex-shrink-0 w-52 bg-white rounded-lg shadow-md overflow-hidden transform transition-transform hover:scale-105">
-                            <img class="w-full h-28 object-cover"
-                                src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDR8fHJlc3RhdXJhbnR8ZW58MHx8fHwxNjM4OTc1MjU0&ixlib=rb-1.2.1&q=80&w=400"
-                                alt="식당 이미지">
-                            <div class="p-3">
-                                <h4 class="font-bold text-gray-800">강남면옥</h4>
-                                <p class="text-sm text-gray-500">한식 • 냉면</p>
-                                <p class="text-xs text-gray-400 mt-1">강남구 • 1.2km</p>
-                            </div>
-                        </div>
-                        <div
-                            class="flex-shrink-0 w-52 bg-white rounded-lg shadow-md overflow-hidden transform transition-transform hover:scale-105">
-                            <img class="w-full h-28 object-cover"
-                                src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDEyfHxyZXN0YXVyYW50fGVufDB8fHx8MTYzODk3NTI1NA&ixlib=rb-1.2.1&q=80&w=400"
-                                alt="식당 이미지">
-                            <div class="p-3">
-                                <h4 class="font-bold text-gray-800">파파이스 키친</h4>
-                                <p class="text-sm text-gray-500">이탈리안 • 파스타</p>
-                                <p class="text-xs text-gray-400 mt-1">서초구 • 2.5km</p>
-                            </div>
-                        </div>
-                        <div
-                            class="flex-shrink-0 w-52 bg-white rounded-lg shadow-md overflow-hidden transform transition-transform hover:scale-105">
-                            <img class="w-full h-28 object-cover"
-                                src="https://images.unsplash.com/photo-1590846406792-044253a8064f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDI3fHxyZXN0YXVyYW50fGVufDB8fHx8MTYzODk3NTI5NQ&ixlib=rb-1.2.1&q=80&w=400"
-                                alt="식당 이미지">
-                            <div class="p-3">
-                                <h4 class="font-bold text-gray-800">오스테리아 오르조</h4>
-                                <p class="text-sm text-gray-500">양식 • 와인바</p>
-                                <p class="text-xs text-gray-400 mt-1">용산구 • 4.1km</p>
-                            </div>
-                        </div>
-                        <div
-                            class="flex-shrink-0 w-52 bg-white rounded-lg shadow-md overflow-hidden transform transition-transform hover:scale-105">
-                            <img class="w-full h-28 object-cover"
-                                src="https://images.unsplash.com/photo-1578474846511-04ba529f0b88?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDE3fHxyZXN0YXVyYW50fGVufDB8fHx8MTYzODk3NTI1NA&ixlib=rb-1.2.1&q=80&w=400"
-                                alt="식당 이미지">
-                            <div class="p-3">
-                                <h4 class="font-bold text-gray-800">스시쇼우</h4>
-                                <p class="text-sm text-gray-500">일식 • 오마카세</p>
-                                <p class="text-xs text-gray-400 mt-1">송파구 • 8.3km</p>
-                            </div>
-                        </div>
+                    <div id="restaurant-carousel" class="flex overflow-x-auto scroll-smooth scrollbar-hide space-x-4 py-2">
+                        <p id="nearby-restaurants-loading" class="text-gray-500">주변 맛집 정보를 불러오는 중...</p>
                     </div>
                 </div>
             </div>
@@ -327,7 +283,7 @@
             water: { bar: document.getElementById('stat-water'), value: document.getElementById('stat-water-value') }
         };
 
-        // 👇 1. 저장된 위치를 불러오는 새로운 함수
+        // 저장된 위치를 불러오는 함수
         function loadSavedLocation() {
             const savedLocation = localStorage.getItem('savedBapickLocation');
             if (savedLocation) {
@@ -340,6 +296,7 @@
             }
         }
 
+        // GPS 기반 현재 위치를 가져와 주소로 변환하는 함수
         async function updateLocation() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
@@ -392,10 +349,7 @@
             }
         }
 
-        const recommendationTypeEl = document.getElementById('recommendation-type');
-        const recommendationHeadlineEl = document.getElementById('recommendation-headline');
-        const recommendationAdviceEl = document.getElementById('recommendation-advice');
-
+        // 오행 비율 바 업데이트 함수
         function updateSajuStats(stats) {
             for (const elementKey in stats) {
                 const percentage = stats[elementKey];
@@ -407,6 +361,11 @@
             }
         }
 
+        const recommendationTypeEl = document.getElementById('recommendation-type');
+        const recommendationHeadlineEl = document.getElementById('recommendation-headline');
+        const recommendationAdviceEl = document.getElementById('recommendation-advice');
+
+        // 오행 분석 및 추천 메시지 가져오는 함수
         async function fetchRecommendation(idToken) {
             const res = await fetch(`${FASTAPI_BASE_URL}/saju/analyze`, {
                 headers: { 'Authorization': `Bearer ${idToken}` }
@@ -421,6 +380,80 @@
             return res.json();
         }
 
+        // 식당 정보를 받아 캐러셀 카드로 렌더링하는 함수
+        const renderRestaurantCard = (restaurant) => {
+            // 임시 이미지 URL 사용
+            const imageUrl = "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwzNjUyOXwwfDF8c2VhcmNofDR8fHJlc3RhdXJhbnR8ZW58MHx8fHwxNjM4OTc1MjU0&ixlib=rb-1.2.1&q=80&w=400";
+
+            const oheng = restaurant.recommended_oheng || 'N/A'; 
+            const reason = restaurant.recommendation_reason || '추천 이유 정보 없음';
+
+            const recommendationHeader = `${oheng} 기운 보충`;
+            return `
+                <div class="flex-shrink-0 w-56 bg-white rounded-lg shadow-lg overflow-hidden transform transition-transform hover:scale-105">
+                    <div class="p-3">
+                        <p class="text-xs font-semibold text-[#FF7242] mb-1">${recommendationHeader}</p> 
+                        <p class="text-xs text-gray-400 mt-1 truncate">${reason}</p>
+                        <h4 class="font-bold text-gray-800 truncate">${restaurant.name}</h4>
+                        <p class="text-sm text-gray-500 truncate">${restaurant.category}</p>
+                        <p class="text-xs text-gray-400 mt-1 truncate">${restaurant.address}</p>
+                    </div>
+                </div>
+            `;
+        };
+
+        // 오늘의 오행에 따른 추천 식당 목록을 API에서 가져와서 렌더링하는 함수
+        const fetchRecommendedRestaurants = async (idToken) => {
+            const carouselEl = document.getElementById('restaurant-carousel');
+
+            if (!carouselEl || !idToken) {
+                console.warn("경고: 주변 맛집 로드를 위한 'restaurant-carousel' 요소를 찾을 수 없거나 ID 토큰이 없습니다.");
+                return; 
+            }
+
+            // 1. 로딩 메시지 표시
+            carouselEl.innerHTML = `<p id="nearby-restaurants-loading" class="text-gray-500 p-3">주변 맛집 정보를 불러오는 중...</p>`;
+
+            try {
+                const response = await fetch(`${FASTAPI_BASE_URL}/saju/restaurants`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${idToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.status === 404) {
+                    carouselEl.innerHTML = '<p class="text-gray-500 p-3">사용자 정보 또는 오행 분석 정보가 없어 추천 식당을 찾을 수 없습니다.</p>';
+                    return;
+                }
+                if (!response.ok) {
+                    throw new Error('추천 식당 목록을 불러오는 데 실패했습니다.');
+                }
+
+                const data = await response.json();
+                const restaurants = data.restaurants;
+
+                if (restaurants.length === 0) {
+                    if (loadingEl) loadingEl.textContent = '현재 오행에 맞는 추천 식당이 없습니다.';
+                    return;
+                }
+
+                // 로딩 메시지 제거 및 식당 목록 렌더링
+                carouselEl.innerHTML = '';
+
+                restaurants.forEach(rest => {
+                    carouselEl.insertAdjacentHTML('beforeend', renderRestaurantCard(rest));
+                });
+
+            } catch (err) {
+                console.error("Restaurant fetch failed:", err);
+                const message = err.message || '식당 정보를 불러오는 중 서버 오류가 발생했습니다.';
+                carouselEl.innerHTML = `<p class="text-gray-500">${message}</p>`;
+            }
+        };
+
+        // Firebase 로그인 인증 및 데이터 로드
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
                 window.location.href = 'index.html';
@@ -429,6 +462,7 @@
 
             const idToken = await user.getIdToken();
 
+            // 사용자 프로필 및 기본 오행 비율 로드
             try {
                 const sajuFields = ['ohengWood', 'ohengFire', 'ohengEarth', 'ohengMetal', 'ohengWater'];
                 const fields = ['nickname', 'birthDate', 'profileImage', ...sajuFields];
@@ -445,7 +479,7 @@
 
                 const nearbyRestaurantsHeading = document.getElementById('nearby-restaurants-heading');
                 if (data.nickname) {
-                    nearbyRestaurantsHeading.textContent = `${data.nickname}님 주변 맛집 🍚`;
+                    nearbyRestaurantsHeading.textContent = `${data.nickname}님을 위한 추천 맛집 🍚`;
                 }
 
                 const sajuStats = {
@@ -457,7 +491,7 @@
                 };
                 updateSajuStats(sajuStats);
                 
-                // 👇 2. 기존 updateLocation() 대신 loadSavedLocation()을 호출합니다.
+                // 저장된 위치 정보 로드 또는 GPS 위치 업데이트
                 loadSavedLocation();
 
             } catch (err) {
@@ -466,6 +500,7 @@
                 userbirthdateEl.textContent = '';
             }
 
+            // 일진에 따라 보정된 오행 비율 및 오늘의 추천 메시지 로드
             try {
                 const analysisData = await fetchRecommendation(idToken);
                 recommendationTypeEl.textContent = analysisData.user_type;
@@ -482,6 +517,9 @@
                     water: finalOheng['수(水)'] || 0
                 };
                 updateSajuStats(mappedStats);
+
+                // 오행 비율 분석이 성공하면, 식당 추천 API 호출
+                await fetchRecommendedRestaurants(idToken);
             } catch (err) {
                 console.error("Recommendation fetch failed:", err);
                 recommendationTypeEl.textContent = '정보 없음';
@@ -490,6 +528,7 @@
             }
         });
 
+        // 핍압/모달 관련 로직
         const addChatBtn = document.getElementById('add-chat-btn');
         const addChatPopup = document.getElementById('add-chat-popup');
         const overlay = document.getElementById('overlay');
