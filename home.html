@@ -268,8 +268,8 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        //const FASTAPI_BASE_URL = "https://bab-back.onrender.com"; 
-        const FASTAPI_BASE_URL = "http://127.0.0.1:8000";
+        const FASTAPI_BASE_URL = "https://bab-back.onrender.com"; 
+        //const FASTAPI_BASE_URL = 'http://127.0.0.1:8000'; // 로컬 테스트용
 
         const userNameEl = document.getElementById('user-nickname');
         const userbirthdateEl = document.getElementById('user-birthdate');
@@ -384,14 +384,9 @@
 
         // 식당 정보를 받아 캐러셀 카드로 렌더링하는 함수
         const renderRestaurantCard = (restaurant) => {
-            const oheng = restaurant.recommended_oheng || 'N/A'; 
-            //const reason = restaurant.recommendation_reason || '추천 이유 정보 없음';
-
-            const recommendationHeader = `${oheng} 기운 보충`;
             return `
                 <a href="detail.html?id=${restaurant.id}" class="flex-shrink-0 w-56 bg-white rounded-lg shadow-lg overflow-hidden transform transition-transform hover:scale-105">
                     <div class="p-3">
-                        <p class="text-xs font-semibold text-[#FF7242] mb-1">${recommendationHeader}</p> 
                         <h4 class="font-bold text-gray-800 truncate">${restaurant.name}</h4>
                         <p class="text-sm text-gray-500 truncate">${restaurant.category}</p>
                         <p class="text-xs text-gray-400 mt-1 truncate">${restaurant.address}</p>
