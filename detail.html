@@ -180,13 +180,10 @@
 
             infowindow.open(map, marker);
         }
-        
-        // 스크랩 상태 확인 및 업데이트
-        function checkScrapStatus() {
-            if (!currentRestaurant) return;
-            const scraps = localStorage.getItem('bapickScraps');
-            const scrappedIds = scraps ? JSON.parse(scraps) : [];
-            if (scrappedIds.includes(currentRestaurant.id)) {
+
+        // 스크랩 버튼 상태 업데이트 함수
+        function updateScrapButton(isScrapped) {
+            if (isScrapped) {
                 scrapBtn.classList.add('scrapped');
                 scrapBtn.querySelector('span').textContent = '스크랩 완료';
             } else {
@@ -195,21 +192,62 @@
             }
         }
 
-        // 스크랩 버튼 이벤트 리스너
-        scrapBtn.addEventListener('click', () => {
-            if (!currentRestaurant) { alert('식당 정보를 먼저 로드해주세요.'); return; }
-            const scraps = localStorage.getItem('bapickScraps');
-            let scrappedIds = scraps ? JSON.parse(scraps) : [];
-            const isScrapped = scrappedIds.includes(currentRestaurant.id);
-            
-            if (isScrapped) {
-                scrappedIds = scrappedIds.filter(id => id !== currentRestaurant.id);
-            } else {
-                scrappedIds.push(currentRestaurant.id);
+        // 스크랩 상태 확인 및 버튼 초기화
+        async function checkScrapStatus() {
+            if (!currentUser || !currentRestaurant) return;
+
+            try {
+                const idToken = await currentUser.getIdToken(true);
+                const response = await fetch(`${FASTAPI_BASE_URL}/scraps/${currentRestaurant.id}`, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${idToken}` },
+                });
+
+                if (!response.ok) throw new Error('스크랩 상태 조회 실패');
+
+                const { is_scrapped } = await response.json();
+                updateScrapButton(is_scrapped);
+            } catch (error) {
+                console.error('스크랩 상태 확인 실패:', error);
             }
-            
-            localStorage.setItem('bapickScraps', JSON.stringify(scrappedIds));
-            checkScrapStatus();
+        }
+
+        // 페이지 로드 시 상태 확인
+        document.addEventListener('DOMContentLoaded', checkScrapStatus);
+
+        // 스크랩 버튼 클릭 처리
+        scrapBtn.addEventListener('click', async () => {
+            if (!currentUser) return window.location.href = 'index.html';
+
+            try {
+                const idToken = await currentUser.getIdToken(true);
+                const restaurantId = currentRestaurant.id;
+                const isScrapped = scrapBtn.classList.contains('scrapped');
+
+                const url = isScrapped
+                    ? `${FASTAPI_BASE_URL}/scraps/${restaurantId}`
+                    : `${FASTAPI_BASE_URL}/scraps`;
+                const method = isScrapped ? 'DELETE' : 'POST';
+                const body = isScrapped ? null : JSON.stringify({ restaurant_id: restaurantId });
+
+                const response = await fetch(url, {
+                    method,
+                    headers: { 
+                        'Authorization': `Bearer ${idToken}`,
+                        ...(body ? { 'Content-Type': 'application/json' } : {})
+                    },
+                    body,
+                });
+
+                if (response.ok) {
+                    updateScrapButton(!isScrapped);
+                } else {
+                    alert(isScrapped ? '스크랩 취소 실패' : '스크랩 실패');
+                }
+            } catch (error) {
+                console.error('스크랩 요청 실패:', error);
+                alert('스크랩 처리 중 오류가 발생했습니다.');
+            }
         });
 
         // 탭 전환 로직
