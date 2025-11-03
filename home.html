@@ -56,6 +56,7 @@
             visibility: visible;
         }
 
+        /* 스크롤바 숨김 (모바일 뷰 유지) */
         .scrollbar-hide::-webkit-scrollbar {
             display: none;
         }
@@ -67,114 +68,124 @@
     </style>
 </head>
 
-<body class="min-h-screen pt-16 bg-[#FF7242]">
+<body class="m-0 bg-[#FF7242] overflow-x-hidden">
     <header class="fixed top-0 left-0 right-0 h-16 bg-[#FF7242] z-20">
-        <div id="header-main" class="flex items-center justify-start h-full px-4">
+        <div id="header-main" class="flex items-center justify-start h-full px-4 max-w-screen-xl mx-auto">
             <div class="flex items-center gap-2">
                 <h1 class="text-xl font-bold text-gray-800">Bapick!</h1>
             </div>
         </div>
     </header>
 
-    <div class="relative flex items-center w-full bg-[#FF7242] px-4 py-4">
-        <input type="text" id='location-text'
-            class="w-full pl-5 pr-16 py-3 bg-white/80 backdrop-blur-sm border-none rounded-full shadow-lg focus:ring-2 focus:ring-[#FF7242] focus:outline-none text-gray-800 placeholder-gray-400">
-
-        <a href="map.html"
-            class="absolute right-6 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#FF7242] hover:bg-orange-600 text-white rounded-full flex items-center justify-center shadow-md transition-transform transform hover:scale-110">
-            <span class="material-symbols-outlined fill=0">location_on</span>
-        </a>
+    <div class="mt-16 relative flex items-center w-full bg-[#FF7242] px-4 py-4">
+        <div class="max-w-screen-xl mx-auto w-full relative">
+            <input type="text" id="location-text" class="w-full pl-5 pr-16 py-3 bg-white/80 backdrop-blur-sm border-none rounded-full shadow-lg focus:ring-2 focus:ring-[#FF7242] focus:outline-none text-gray-800 placeholder-gray-400">
+            <a href="map.html" class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#FF7242] hover:bg-orange-600 text-white rounded-full flex items-center justify-center shadow-md transition-transform transform hover:scale-110">
+                <span class="material-symbols-outlined">location_on</span>
+            </a>
+        </div>
     </div>
 
-    <main class="max-w-md w-full mx-auto bg-slate-100 rounded-t-3xl pb-24 p-4">
 
-        <div class="p-6 bg-white backdrop-blur-sm rounded-2xl shadow-lg">
-            <div class="text-center mb-6">
-                <h2 id="user-nickname" class="text-2xl font-bold text-gray-800"></h2>
-                <p id="user-birthdate" class="text-sm text-gray-500"></p>
-            </div>
+    <main class="w-full mx-auto bg-slate-100 rounded-t-3xl p-4 lg:p-6 lg:pt-8 min-h-[calc(100vh-10rem)] pb-24 lg:mt-4">
+        <div class="max-w-md lg:max-w-screen-xl w-full mx-auto">
+            <div class="flex flex-col lg:grid lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-1">
+                    <div class="p-6 lg:py-8 bg-white backdrop-blur-sm rounded-2xl shadow-lg">
+                        <div class="text-center mb-6">
+                            <h2 id="user-nickname" class="text-2xl font-bold text-gray-800"></h2>
+                            <p id="user-birthdate" class="text-sm text-gray-500"></p>
+                        </div>
 
-            <div class="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6">
-                <div class="profile-image-container flex-shrink-0">
-                    <img id="user-profile-image"
-                        class="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-white"
-                        src="https://bit.ly/3VZpUGD" alt="User Profile Image">
-                </div>
-                <div id="stats-container" class="flex flex-col space-y-3 w-full">
-                    <div class="flex items-center space-x-2">
-                        <div class="w-6 h-6 flex items-center justify-center" title="목 (Wood)"><span
-                                class="material-symbols-outlined text-[#4CAF50]">nature</span></div>
-                        <div class="w-full bg-gray-200 rounded-full h-4">
-                            <div id="stat-wood" class="h-full rounded-full progress-bar-wood" style="width: 0%;"></div>
-                        </div>
-                        <span id="stat-wood-value" class="font-bold text-gray-700 w-8 text-right">0</span>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <div class="w-6 h-6 flex items-center justify-center" title="화 (Fire)"><span
-                                class="material-symbols-outlined text-[#EF5350]">local_fire_department</span></div>
-                        <div class="w-full bg-gray-200 rounded-full h-4">
-                            <div id="stat-fire" class="h-full rounded-full progress-bar-fire" style="width: 0%;"></div>
-                        </div>
-                        <span id="stat-fire-value" class="font-bold text-gray-700 w-8 text-right">0</span>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <div class="w-6 h-6 flex items-center justify-center" title="토 (Earth)"><span
-                                class="material-symbols-outlined text-[#8D6E63]">landscape</span></div>
-                        <div class="w-full bg-gray-200 rounded-full h-4">
-                            <div id="stat-earth" class="h-full rounded-full progress-bar-earth" style="width: 0%;">
+                        <div class="flex flex-col gap-4 items-center lg:grid lg:grid-cols-[auto_1fr] lg:items-center">
+                            <div class="profile-image-container flex-shrink-0 w-auto max-w-[122px]">
+                                <img id="user-profile-image"
+                                    class="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-white"
+                                    src="https://bit.ly/3VZpUGD" alt="User Profile Image">
+                            </div>
+
+                            <div id="stats-container" class="flex flex-col space-y-3 w-full">
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-6 h-6 flex items-center justify-center" title="목 (Wood)"><span
+                                            class="material-symbols-outlined text-[#4CAF50]">nature</span></div>
+                                    <div class="w-full bg-gray-200 rounded-full h-4">
+                                        <div id="stat-wood" class="h-full rounded-full progress-bar-wood" style="width: 0%;">
+                                        </div>
+                                    </div>
+                                    <span id="stat-wood-value" class="font-bold text-gray-700 w-8 text-right">0</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-6 h-6 flex items-center justify-center" title="화 (Fire)"><span
+                                            class="material-symbols-outlined text-[#EF5350]">local_fire_department</span>
+                                    </div>
+                                    <div class="w-full bg-gray-200 rounded-full h-4">
+                                        <div id="stat-fire" class="h-full rounded-full progress-bar-fire" style="width: 0%;">
+                                        </div>
+                                    </div>
+                                    <span id="stat-fire-value" class="font-bold text-gray-700 w-8 text-right">0</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-6 h-6 flex items-center justify-center" title="토 (Earth)"><span
+                                            class="material-symbols-outlined text-[#8D6E63]">landscape</span></div>
+                                    <div class="w-full bg-gray-200 rounded-full h-4">
+                                        <div id="stat-earth" class="h-full rounded-full progress-bar-earth" style="width: 0%;">
+                                        </div>
+                                    </div>
+                                    <span id="stat-earth-value" class="font-bold text-gray-700 w-8 text-right">0</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-6 h-6 flex items-center justify-center" title="금 (Metal)"><span
+                                            class="material-symbols-outlined text-[#FFB300]">paid</span></div>
+                                    <div class="w-full bg-gray-200 rounded-full h-4">
+                                        <div id="stat-metal" class="h-full rounded-full progress-bar-metal" style="width: 0%;">
+                                        </div>
+                                    </div>
+                                    <span id="stat-metal-value" class="font-bold text-gray-700 w-8 text-right">0</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-6 h-6 flex items-center justify-center" title="수 (Water)"><span
+                                            class="material-symbols-outlined text-[#42A5F5]">water_drop</span></div>
+                                    <div class="w-full bg-gray-200 rounded-full h-4">
+                                        <div id="stat-water" class="h-full rounded-full progress-bar-water" style="width: 0%;">
+                                        </div>
+                                    </div>
+                                    <span id="stat-water-value" class="font-bold text-gray-700 w-8 text-right">0</span>
+                                </div>
                             </div>
                         </div>
-                        <span id="stat-earth-value" class="font-bold text-gray-700 w-8 text-right">0</span>
+                        <div class="mt-8 p-4 bg-[#FFEDC5]/50 border border-orange-200 rounded-xl shadow-inner">
+                            <span id="recommendation-type" class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-[#FF7242] text-white"></span>
+                            <h3 id="recommendation-headline" class="text-lg font-bold text-gray-800 mt-2"></h3>
+                            <p id="recommendation-advice" class="text-sm text-gray-600 mt-2"></p>
+                        </div>
                     </div>
-                    <div class="flex items-center space-x-2">
-                        <div class="w-6 h-6 flex items-center justify-center" title="금 (Metal)"><span
-                                class="material-symbols-outlined text-[#FFB300]">paid</span></div>
-                        <div class="w-full bg-gray-200 rounded-full h-4">
-                            <div id="stat-metal" class="h-full rounded-full progress-bar-metal" style="width: 0%;">
+                </div>
+
+                <div class="lg:col-span-2">
+                    <div class="p-6 bg-white backdrop-blur-sm rounded-2xl shadow-lg h-full overflow-hidden">
+                        <div class="pt-2 flex justify-between items-center">
+                            <h3 id="nearby-restaurants-heading" class="text-xl lg:text-2xl font-bold text-gray-800">나의 근처 맛집</h3>
+                            <a href="restaurant_list.html"
+                                class="text-base font-semibold text-gray-500 hover:text-[#FF7242]">
+                                전체보기 &gt;
+                            </a>
+                        </div>
+                        <div class="relative mt-4 lg:mt-10">
+                            <div id="restaurant-carousel"
+                                class="flex overflow-x-auto scroll-smooth scrollbar-hide space-x-4 py-2">
+                                <p id="nearby-restaurants-loading" class="text-gray-500">주변 맛집 정보를 불러오는 중...</p>
                             </div>
                         </div>
-                        <span id="stat-metal-value" class="font-bold text-gray-700 w-8 text-right">0</span>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <div class="w-6 h-6 flex items-center justify-center" title="수 (Water)"><span
-                                class="material-symbols-outlined text-[#42A5F5]">water_drop</span></div>
-                        <div class="w-full bg-gray-200 rounded-full h-4">
-                            <div id="stat-water" class="h-full rounded-full progress-bar-water" style="width: 0%;">
-                            </div>
-                        </div>
-                        <span id="stat-water-value" class="font-bold text-gray-700 w-8 text-right">0</span>
                     </div>
                 </div>
-            </div>
 
-            <div class="mt-8 p-4 bg-[#FFEDC5]/50 border border-orange-200 rounded-xl shadow-inner">
-                <span id="recommendation-type"
-                    class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-[#FF7242] text-white"></span>
-                <h3 id="recommendation-headline" class="text-lg font-bold text-gray-800 mt-2"></h3>
-                <p id="recommendation-advice" class="text-sm text-gray-600 mt-2"></p>
-            </div>
-        </div>
-
-        <div class="mt-4 p-6 bg-white backdrop-blur-sm rounded-2xl shadow-lg">
-            <div class="mt-2">
-                <div class="flex justify-between items-center">
-                    <h3 id="nearby-restaurants-heading" class="text-xl font-bold text-gray-800">나를 위한 맛집</h3>
-
-                    <a href="restaurant_list.html" class="text-sm font-semibold text-gray-500 hover:text-[#FF7242]">
-                        전체보기 &gt;
-                    </a>
-                </div>
-                <div class="relative mt-4">
-                    <div id="restaurant-carousel" class="flex overflow-x-auto scroll-smooth scrollbar-hide space-x-4 py-2">
-                        <p id="nearby-restaurants-loading" class="text-gray-500">주천 맛집 정보를 불러오는 중...</p>
-                    </div>
-                </div>
             </div>
         </div>
     </main>
 
     <footer class="fixed bottom-0 left-0 right-0 z-30">
-        <nav class="flex justify-around items-center h-16 bg-white rounded-t-2xl shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+        <nav
+            class="flex justify-around items-center h-16 bg-white rounded-t-2xl shadow-[0_-2px_10px_rgba(0,0,0,0.05)] max-w-screen-xl mx-auto">
             <a href="#" class="flex flex-col items-center justify-center w-1/5 h-full text-[#FF7242] text-xs">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor"
                     stroke-width="1.5">
@@ -263,7 +274,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { firebaseConfig } from "./firebase-config.js";
+        import { firebaseConfig } from "./firebase-config.js"; // 실제 배포 시 주석 해제
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -293,7 +304,7 @@
                 locationTextEl.value = locationData.address || locationData.name;
             } else {
                 // 저장된 위치가 없으면, 기존의 GPS 기반 위치 찾기 실행
-                updateLocation(); 
+                updateLocation();
             }
         }
 
@@ -312,7 +323,7 @@
                             }
                             const data = await response.json();
                             const address = data.address;
-                            
+
                             const city = address.city || address.province || '';
                             const district = address.suburb || address.neighbourhood || address.borough || address.city_district || '';
 
@@ -382,14 +393,28 @@
             return res.json();
         }
 
-        // 식당 정보를 받아 캐러셀 카드로 렌더링하는 함수
+        // 식당 정보를 받아 캐러셀 카드로 렌더링하는 함수 (w-56으로 너비 축소)
         const renderRestaurantCard = (restaurant) => {
+            // 임시 이미지 URL을 생성 (실제 데이터에 'imageUrl'이 있다면 그것을 사용)
+            const imageUrl = restaurant.imageUrl || `https://source.unsplash.com/random/400x300/?food,restaurant,${Math.random()}`;
+            
+            // w-64 (256px)에서 w-56 (224px)로 너비 축소
+            // [재수정] 이미지 높이 h-48 -> h-64로 변경하여 카드 세로 길이 더 증가 (12rem -> 16rem)
             return `
-                <a href="detail.html?id=${restaurant.id}" class="flex-shrink-0 w-56 bg-white rounded-lg shadow-lg overflow-hidden transform transition-transform hover:scale-105">
-                    <div class="p-3">
-                        <h4 class="font-bold text-gray-800 truncate">${restaurant.name}</h4>
-                        <p class="text-sm text-gray-500 truncate">${restaurant.category}</p>
-                        <p class="text-xs text-gray-400 mt-1 truncate">${restaurant.address}</p>
+                <a href="detail.html?id=${restaurant.id}" class="flex-shrink-0 w-56 bg-white rounded-lg shadow-xl overflow-hidden transform transition-transform duration-300 hover:scale-[1.03] hover:shadow-2xl">
+                    <div class="relative w-full h-64"> 
+                        <img class="w-full h-full object-cover" src="${imageUrl}" alt="${restaurant.name}">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="font-bold text-lg text-gray-900 truncate">${restaurant.name}</h4>
+                        <p class="text-sm text-gray-600 truncate mt-1">${restaurant.category}</p>
+                        <div class="flex items-center text-sm text-gray-500 mt-2">
+                            <span class="material-symbols-outlined text-yellow-500 text-base mr-1 fill-1">star</span>
+                            <span class="font-semibold">4.5</span>
+                            <span class="ml-2 text-gray-400">리뷰 120개</span>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-2 truncate">${restaurant.address}</p>
                     </div>
                 </a>
             `;
@@ -400,8 +425,7 @@
             const carouselEl = document.getElementById('restaurant-carousel');
 
             if (!carouselEl || !idToken) {
-                console.warn("경고: 주변 맛집 로드를 위한 'restaurant-carousel' 요소를 찾을 수 없거나 ID 토큰이 없습니다.");
-                return; 
+                return;
             }
 
             // 1. 로딩 메시지 표시
@@ -429,8 +453,9 @@
 
                 // localStorage에 추천 식당 데이터 저장
                 localStorage.setItem('RecommendedRestaurants', JSON.stringify(restaurants));
+
                 if (restaurants.length === 0) {
-                    if (loadingEl) loadingEl.textContent = '현재 오행에 맞는 추천 식당이 없습니다.';
+                    carouselEl.innerHTML = '<p class="text-gray-500 p-3">현재 오행에 맞는 추천 식당이 없습니다.</p>';
                     return;
                 }
 
@@ -444,7 +469,7 @@
             } catch (err) {
                 console.error("Restaurant fetch failed:", err);
                 const message = err.message || '식당 정보를 불러오는 중 서버 오류가 발생했습니다.';
-                carouselEl.innerHTML = `<p class="text-gray-500">${message}</p>`;
+                carouselEl.innerHTML = `<p class="text-gray-500 p-3">${message}</p>`;
             }
         };
 
@@ -474,7 +499,7 @@
 
                 const nearbyRestaurantsHeading = document.getElementById('nearby-restaurants-heading');
                 if (data.nickname) {
-                    nearbyRestaurantsHeading.textContent = `${data.nickname}님을 위한 맛집`;
+                    nearbyRestaurantsHeading.textContent = `${data.nickname}님 근처 맛집`;
                 }
 
                 const sajuStats = {
@@ -485,7 +510,7 @@
                     water: data.ohengWater || 0.0,
                 };
                 updateSajuStats(sajuStats);
-                
+
                 // 저장된 위치 정보 로드 또는 GPS 위치 업데이트
                 loadSavedLocation();
 
@@ -503,7 +528,7 @@
                 recommendationAdviceEl.textContent = analysisData.recommendation_advice;
 
                 // 최종 보정 오행 비율
-                const finalOheng = analysisData.oheng_analysis_scores; 
+                const finalOheng = analysisData.oheng_analysis_scores;
                 const mappedStats = {
                     wood: finalOheng['목(木)'] || 0,
                     fire: finalOheng['화(火)'] || 0,
