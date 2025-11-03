@@ -10,12 +10,12 @@
         html, body {
             height: 100%;
             margin: 0;
-            overflow: hidden;
+            overflow: hidden; /* body 자체 스크롤 방지 */
         }
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f0f2f5;
-            padding-bottom: 80px;
+            background-color: #f8f9fa;
+            padding-bottom: 80px; /* 하단 네비게이션 공간 확보 */
         }
         .popup-hidden {
             opacity: 0;
@@ -29,12 +29,23 @@
             transition: all 0.2s ease-in;
             pointer-events: auto;
         }
+        /* 활성화된 탭 스타일 */
+        .tab-active {
+            color: #EF633A; /* 밥픽 오렌지색 */
+            font-weight: 700;
+            border-bottom-width: 2px;
+            border-color: #EF633A;
+        }
+        /* 비활성화된 탭 스타일 */
+        .tab-inactive {
+            color: #6b7280; /* 회색 */
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
 
-    <div class="w-full h-full bg-white">
-        <div id="overlay" class="fixed inset-0 bg-black bg-opacity-20 z-40 hidden transition-opacity"></div>
+    <div class="w-full h-full bg-white max-w-2xl mx-auto flex flex-col"> <div id="overlay" class="fixed inset-0 bg-black bg-opacity-20 z-40 hidden transition-opacity"></div>
         
         <div id="add-friend-modal" class="fixed inset-0 bg-black bg-opacity-40 z-50 hidden items-center justify-center p-4">
             <div class="bg-white rounded-lg shadow-xl w-full max-w-sm">
@@ -54,11 +65,12 @@
         </div>
 
         <div id="chat-list-screen" class="h-full flex flex-col relative">
+            
             <header class="h-16 bg-white border-b border-gray-200 flex-shrink-0">
-                <div id="header-main" class="flex items-center justify-between h-full px-4">
-                    <div class="w-1/4"></div>
-                    <h1 class="text-xl font-bold text-gray-800 text-center w-1/2">채팅</h1>
-                    <div class="flex items-center space-x-3 justify-end w-1/4">
+                <div id="header-main" class="grid grid-cols-3 items-center h-full px-4">
+                    <div></div> 
+                    <h1 class="text-xl font-bold text-gray-800 text-center">채팅</h1>
+                    <div class="flex items-center space-x-3 justify-self-end">
                         <button id="search-btn" class="text-gray-500 hover:text-gray-800">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                         </button>
@@ -72,12 +84,84 @@
                     <button id="cancel-search-btn" class="text-gray-600 hover:text-gray-900 text-sm font-medium flex-shrink-0">취소</button>
                 </div>
             </header>
+        
+            <div class="flex border-b border-gray-200 bg-white flex-shrink-0">
+                <button id="tab-private" class="flex-1 py-3 text-center tab-active">
+                    1:1 채팅
+                </button>
+                <button id="tab-group" class="flex-1 py-3 text-center tab-inactive">
+                    단체 채팅
+                </button>
+            </div>
             
-            <main id="chat-list-container" class="flex-1 overflow-y-auto bg-white"></main>
+            <main id="main-content" class="flex-1 overflow-y-auto bg-gray-50">
 
+    <div id="chat-list-private">
+        <ul id="oneToOneList" class="space-y-3 p-4 bg-white">
+            <li class="bg-white rounded-xl p-4 flex items-center hover:bg-gray-100 transition shadow-sm border border-gray-100">
+                <div class="ml-4 flex-1 overflow-hidden">
+                    <p class="font-semibold text-gray-800 truncate">오늘의 밥풀이 추천</p>
+                    <p class="text-sm text-gray-500 truncate">맛있게 드세요~</p>
+                </div>
+                <div class="text-right flex flex-col items-end ml-2">
+                    <span class="text-xs text-gray-400">오후 3:21</span>
+                    <span class="mt-1 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">1</span>
+                </div>
+            </li>
+            <li class="bg-white rounded-xl p-4 flex items-center hover:bg-gray-100 transition shadow-sm border border-gray-100">
+                <div class="ml-4 flex-1 overflow-hidden">
+                    <p class="font-semibold text-gray-800 truncate">아늑한 식당 추천</p>
+                    <p class="text-sm text-gray-500 truncate">맛있게 드셨으니 기쁩니다^^</p>
+                </div>
+                <div class="text-right flex flex-col items-end ml-2">
+                    <span class="text-xs text-gray-400">어제</span>
+                    <div class="w-5 h-5"></div>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <div id="chat-list-group" class="hidden"> 
+        <ul id="groupList" class="space-y-3 p-4 bg-white">
+            <li class="bg-white rounded-xl p-4 flex justify-between items-start hover:bg-gray-100 transition shadow-sm border border-gray-100">
+                
+                <div class="flex items-center space-x-3 flex-1 overflow-hidden"> 
+                    <img src="https://picsum.photos/100?random=1" class="w-16 h-16 rounded-lg object-cover flex-shrink-0" alt="Group"> 
+                    <div class="flex-1 overflow-hidden"> 
+                        <div class="flex items-center justify-between w-full">
+                            <div class="flex items-center space-x-2"> 
+                                <p class="font-semibold text-gray-800">졸업작품 팀</p>
+                                <div class="flex items-center space-x-1 text-sm text-gray-500">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                        <path d="M17 21v-2a4 4 0 0 0-3-3.87" />
+                                        <path d="M7 21v-2a4 4 0 0 1 3-3.87" />
+                                        <circle cx="12" cy="7" r="4" />
+                                    </svg>
+                                    <span>6</span>
+                                </div>
+                            </div>
+                            <div class="text-right text-sm text-gray-500 ml-2"> 
+                                <p class="text-xs">오후 2:55</p> 
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-500 truncate"> 졸업작품 힘내시고 맛있는 거 많이 드세요!</p>
+                    </div>
+                </div>
+
+
+            </li>
+        </ul>
+    </div>
+</main>
             <div id="add-chat-popup" class="absolute bottom-24 left-1/2 -translate-x-1/2 w-48 bg-white rounded-md shadow-xl z-50 popup-hidden">
                 <div class="py-2">
-                    <a href="chat.html" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    <a href="chat_list.html" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line>
+                        </svg>
+                        채팅 목록
+                    </a>
+                    <a href="#" id="start-private-chat-btn" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
                         1:1 채팅방
                     </a>
@@ -88,8 +172,7 @@
                 </div>
             </div>
 
-            <footer class="fixed bottom-0 left-0 right-0 z-30">
-                <nav class="flex justify-around items-center h-16 bg-white rounded-t-2xl shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+            <footer class="fixed bottom-0 left-0 right-0 z-30 max-w-2xl mx-auto"> <nav class="flex justify-around items-center h-16 bg-white rounded-t-2xl shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
                     <a href="home.html" class="flex flex-col items-center justify-center w-1/5 h-full text-gray-500 hover:text-[#FF7242] text-xs">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                         <span class="mt-1">홈</span>
@@ -98,8 +181,7 @@
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                         <span class="mt-1">캘린더</span>
                     </a>
-                    <div class="w-1/5"></div>
-                    <a href="scrap.index.html" class="flex flex-col items-center justify-center w-1/5 h-full text-gray-500 hover:text-[#FF7242] text-xs">
+                    <div class="w-1/5"></div> <a href="scrap.index.html" class="flex flex-col items-center justify-center w-1/5 h-full text-gray-500 hover:text-[#FF7242] text-xs">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
                         <span class="mt-1">스크랩</span>
                     </a>
@@ -119,17 +201,17 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { getFirestore, collection, query, where, getDocs, doc, setDoc, onSnapshot, serverTimestamp, orderBy, limit, startAt, endAt } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        import { getFirestore, collection, query, where, getDocs, doc, getDoc, setDoc, onSnapshot, serverTimestamp, orderBy, limit, startAt, endAt } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
         // =================================================================================
         const firebaseConfig = {
-         apiKey: "AIzaSyAlmVXljDPwkmi4rik69GLhBIHLskw7P2o",
-         authDomain: "bapick-front.firebaseapp.com",
-         projectId: "bapick-front",
-         storageBucket: "bapick-front.firebasestorage.app",
-         messagingSenderId: "883956844611",
-         appId: "1:883956844611:web:ac74a589aae30be9d0ecf6",
-         measurementId: "G-Z1WEHMPL7F"
+          apiKey: "AIzaSyAlmVXljDPwkmi4rik69GLhBIHLskw7P2o",
+          authDomain: "bapick-front.firebaseapp.com",
+          projectId: "bapick-front",
+          storageBucket: "bapick-front.firebasestorage.app",
+          messagingSenderId: "883956844611",
+          appId: "1:883956844611:web:ac74a589aae30be9d0ecf6",
+          measurementId: "G-Z1WEHMPL7F"
         };
         // =================================================================================
         
@@ -146,10 +228,26 @@
         const cancelAddFriendBtn = document.getElementById('cancel-add-friend-btn');
         const friendEmailInput = document.getElementById('friend-email-input');
         const profileListContainer = document.getElementById('profile-list-container');
-        const chatListContainer = document.getElementById('chat-list-container');
+        
+        // ▼▼▼ [수정] 탭 UI 및 컨테이너 (A) ▼▼▼
+        const tabPrivate = document.getElementById('tab-private');
+        const tabGroup = document.getElementById('tab-group');
+        const chatListPrivate = document.getElementById('chat-list-private');
+        const chatListGroup = document.getElementById('chat-list-group');
+        
+        // [수정] 헤더 검색 UI
+        const searchBtn = document.getElementById('search-btn');
+        const cancelSearchBtn = document.getElementById('cancel-search-btn');
+        const headerMain = document.getElementById('header-main');
+        const headerSearch = document.getElementById('header-search');
+        const chatSearchInput = document.getElementById('chat-search-input');
+        
+        // [수정] 팝업 메뉴 버튼
+        const startPrivateChatBtn = document.getElementById('start-private-chat-btn');
+        // ▲▲▲ [수정] ▲▲▲
 
         let currentUser = null;
-        let unsubscribeChatListener = null; // 실시간 리스너를 중지하기 위한 변수
+        let unsubscribeChatListener = null;
 
         // --- 로그인 상태 확인 ---
         onAuthStateChanged(auth, (user) => {
@@ -161,9 +259,26 @@
             }
         });
 
+        // --- 탭 스위칭 로직 ---
+        tabPrivate.addEventListener('click', () => {
+            chatListPrivate.classList.remove('hidden');
+            chatListGroup.classList.add('hidden');
+            
+            tabPrivate.classList.replace('tab-inactive', 'tab-active');
+            tabGroup.classList.replace('tab-active', 'tab-inactive');
+        });
+
+        tabGroup.addEventListener('click', () => {
+            chatListPrivate.classList.add('hidden');
+            chatListGroup.classList.remove('hidden');
+
+            tabGroup.classList.replace('tab-inactive', 'tab-active');
+            tabPrivate.classList.replace('tab-active', 'tab-inactive');
+        });
+
         // --- 채팅 목록 실시간 감지 ---
         function listenToChats() {
-            if (unsubscribeChatListener) unsubscribeChatListener(); // 이전 리스너 중지
+            if (unsubscribeChatListener) unsubscribeChatListener(); 
 
             const chatsRef = collection(db, "chats");
             const q = query(chatsRef, 
@@ -173,20 +288,85 @@
 
             unsubscribeChatListener = onSnapshot(q, (snapshot) => {
                 if (snapshot.empty) {
-                    showEmptyState();
+                    chatListPrivate.innerHTML = showEmptyState("1:1");
+                    chatListGroup.innerHTML = showEmptyState("단체");
                     return;
                 }
-                renderChatList(snapshot.docs);
+                renderChatTabs(snapshot.docs);
             });
         }
         
-        // --- 채팅 목록 화면에 그리기 ---
-        async function renderChatList(docs) {
-            chatListContainer.innerHTML = '';
+        // --- 탭/그룹별 렌더링 함수 ---
+        async function renderChatTabs(docs) {
+            const privateChats = [];
+            const groupChats = [];
+
             for (const doc of docs) {
                 const chat = { id: doc.id, ...doc.data() };
-                const chatItem = await createChatItem(chat);
-                chatListContainer.appendChild(chatItem);
+                if (chat.type === 'private' || !chat.type) { // type 없어도 1:1로 분류
+                    privateChats.push(chat);
+                } else if (chat.type === 'group') {
+                    groupChats.push(chat);
+                }
+            }
+
+            await renderGroupedList(chatListPrivate, privateChats, "1:1");
+            await renderGroupedList(chatListGroup, groupChats, "단체");
+        }
+
+        // "오늘/이전" 그룹으로 나누어 렌더링하는 함수
+        async function renderGroupedList(containerElement, chats, chatType) {
+            containerElement.innerHTML = ''; // 렌더링 전 초기화
+
+            if (chats.length === 0) {
+                containerElement.innerHTML = showEmptyState(chatType);
+                return;
+            }
+
+            const todayChats = [];
+            const previousChats = [];
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); 
+
+            for (const chat of chats) {
+                if (chat.lastUpdatedAt) {
+                    const lastUpdateDate = chat.lastUpdatedAt.toDate();
+                    if (lastUpdateDate >= today) {
+                        todayChats.push(chat);
+                    } else {
+                        previousChats.push(chat);
+                    }
+                } else {
+                    previousChats.push(chat);
+                }
+            }
+
+            if (todayChats.length > 0) {
+                const header = document.createElement('h2');
+                header.className = "text-sm font-medium text-gray-500 p-4 pb-2";
+                header.textContent = "오늘 받은 알림";
+                containerElement.appendChild(header);
+
+                const ul = document.createElement('ul');
+                ul.className = "bg-white"; // [수정] 흰색 배경 추가
+                for (const chat of todayChats) {
+                    ul.appendChild(await createChatItem(chat)); 
+                }
+                containerElement.appendChild(ul);
+            }
+
+            if (previousChats.length > 0) {
+                const header = document.createElement('h2');
+                header.className = "text-sm font-medium text-gray-500 p-4 pb-2";
+                header.textContent = "이전 알림";
+                containerElement.appendChild(header);
+
+                const ul = document.createElement('ul');
+                ul.className = "bg-white"; // [수정] 흰색 배경 추가
+                for (const chat of previousChats) {
+                    ul.appendChild(await createChatItem(chat));
+                }
+                containerElement.appendChild(ul);
             }
         }
         
@@ -196,37 +376,49 @@
             let chatName = chat.name || '알 수 없는 채팅';
             let profileImageUrl = 'https://via.placeholder.com/128';
 
-            if (chat.type === 'private' && otherMemberId) {
-                const userDoc = await getDoc(doc(db, "users", otherMemberId));
-                if (userDoc.exists()) {
-                    const userData = userDoc.data();
-                    chatName = userData.nickname || userData.email;
-                    profileImageUrl = userData.profileImageUrl || profileImageUrl;
-                }
+            if ((chat.type === 'private' || !chat.type) && otherMemberId) {
+                try {
+                    const userDoc = await getDoc(doc(db, "users", otherMemberId));
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        chatName = userData.nickname || userData.email;
+                        profileImageUrl = userData.profileImageUrl || profileImageUrl;
+                    }
+                } catch (e) { console.warn(e); }
             }
             
+            const unreadCount = chat.unreadCount ? (chat.unreadCount[currentUser.uid] || 0) : 0;
+            
             const li = document.createElement('li');
+            // [수정] 스타일 수정 (border-b 추가)
             li.innerHTML = `
-                <a href="chat.html?chatId=${chat.id}" class="flex items-center p-4 hover:bg-gray-100 transition-colors">
-                    <img class="h-14 w-14 rounded-full object-cover" src="${profileImageUrl}" alt="Profile">
-                    <div class="ml-4 flex-1">
-                        <p class="font-semibold text-gray-800">${chatName}</p>
-                        <p class="text-sm text-gray-500 truncate">${chat.lastMessage || ''}</p>
+                <a href="chat.html?chatId=${chat.id}" class="flex items-center p-4 hover:bg-gray-100 transition-colors border-b border-gray-100">
+                    <img class="h-14 w-14 rounded-full object-cover flex-shrink-0" src="${profileImageUrl}" alt="Profile">
+                    <div class="ml-4 flex-1 overflow-hidden">
+                        <p class="font-semibold text-gray-800 truncate">${chatName}</p>
+                        <p class="text-sm text-gray-500 truncate">${chat.lastMessage || '...'}</p>
                     </div>
-                    <span class="text-xs text-gray-400">${formatTimestamp(chat.lastUpdatedAt)}</span>
+                    <div class="flex flex-col items-end space-y-1.5 flex-shrink-0 ml-2 w-16 text-right">
+                        <span class="text-xs text-gray-400">${formatTimestamp(chat.lastUpdatedAt)}</span>
+                        ${unreadCount > 0 
+                            ? `<span class="bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">${unreadCount > 9 ? '9+' : unreadCount}</span>` 
+                            : '<div class="w-5 h-5"></div>' 
+                        }
+                    </div>
                 </a>
             `;
             return li;
         }
 
         // --- 빈 화면 표시 ---
-        function showEmptyState() {
-            chatListContainer.innerHTML = `
-                <div class="h-full flex flex-col items-center justify-center text-center">
+        function showEmptyState(chatType = "채팅") {
+            const typeText = chatType === "1:1" ? "1:1 채팅" : "단체 채팅";
+            return `
+                <div class="h-full flex flex-col items-center justify-center text-center p-4 mt-16">
                     <div class="bg-gray-200 p-5 rounded-full mb-4 inline-block">
                         <svg class="w-12 h-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </div>
-                    <h2 class="mt-2 text-lg font-medium text-gray-900">채팅방이 없습니다</h2>
+                    <h2 class="mt-2 text-lg font-medium text-gray-900">참여 중인 ${typeText}이 없습니다.</h2>
                     <p class="mt-1 text-sm text-gray-500">새로운 대화를 시작해보세요.</p>
                 </div>`;
         }
@@ -234,9 +426,23 @@
         // --- 날짜 포맷 ---
         function formatTimestamp(firebaseTimestamp) {
             if (!firebaseTimestamp) return '';
+            
             const date = firebaseTimestamp.toDate();
-            // ... (시간 포맷 로직 추가, 예: '오후 3:10')
-            return date.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' });
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const yesterday = new Date(today);
+            yesterday.setDate(today.getDate() - 1);
+
+            if (date >= today) {
+                // 오늘: "오후 3:21"
+                return date.toLocaleTimeString('ko-KR', { hour: 'numeric', minute: '2-digit', hour12: true });
+            } else if (date >= yesterday) {
+                // 어제
+                return '어제';
+            } else {
+                // 이전: "10월 31일"
+                return date.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
+            }
         }
         
         // --- 친구 추가 기능 ---
@@ -254,7 +460,7 @@
                     return;
                 }
                 const usersRef = collection(db, "users");
-                const q = query(usersRef, where("email", "==", searchTerm));
+                const q = query(usersRef, where("email", ">=", searchTerm), where("email", "<=", searchTerm + '\uf8ff'));
                 const querySnapshot = await getDocs(q);
 
                 profileListContainer.innerHTML = '';
@@ -283,7 +489,6 @@
         profileListContainer.addEventListener('click', async (e) => {
             if (e.target.classList.contains('start-chat-btn')) {
                 const friendId = e.target.dataset.userId;
-                // 1:1 채팅방 생성 또는 찾기
                 const chatId = currentUser.uid > friendId ? `${currentUser.uid}_${friendId}` : `${friendId}_${currentUser.uid}`;
                 const chatRef = doc(db, "chats", chatId);
                 const chatSnap = await getDoc(chatRef);
@@ -291,7 +496,10 @@
                     await setDoc(chatRef, {
                         type: 'private',
                         members: [currentUser.uid, friendId],
-                        lastUpdatedAt: serverTimestamp()
+                        lastMessage: "대화가 시작되었습니다.",
+                        lastUpdatedAt: serverTimestamp(),
+                        createdAt: serverTimestamp(),
+                        unreadCount: { [currentUser.uid]: 0, [friendId]: 1 }
                     });
                 }
                 window.location.href = `chat.html?chatId=${chatId}`;
@@ -316,6 +524,53 @@
         });
         overlay.addEventListener('click', closeAllPopups);
 
+        // 팝업 메뉴 -> '1:1 채팅' 클릭
+        startPrivateChatBtn.addEventListener('click', (e) => {
+            e.preventDefault(); // href="#" 이동 방지
+            closeAllPopups();
+            addFriendModal.classList.remove('hidden');
+            addFriendModal.classList.add('flex');
+            friendEmailInput.focus();
+        });
+
+        // --- 헤더 검색 기능 ---
+        searchBtn.addEventListener('click', () => {
+            headerMain.classList.add('hidden');
+            headerSearch.classList.remove('hidden');
+            headerSearch.classList.add('flex');
+            chatSearchInput.focus();
+        });
+
+        cancelSearchBtn.addEventListener('click', () => {
+            headerMain.classList.remove('hidden');
+            headerSearch.classList.add('hidden');
+            headerSearch.classList.remove('flex');
+            chatSearchInput.value = '';
+            
+            // 검색 필터링 초기화 (모든 항목 다시 보이게)
+            document.querySelectorAll('#main-content li').forEach(item => {
+                item.style.display = '';
+            });
+        });
+
+        chatSearchInput.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase().trim();
+            // [수정] #main-content 내부의 li만 필터링
+            document.querySelectorAll('#main-content li').forEach(item => {
+                const chatNameEl = item.querySelector('p.font-semibold');
+                if (chatNameEl) {
+                    const chatName = chatNameEl.textContent.toLowerCase();
+                    if (chatName.includes(term)) {
+                        item.style.display = '';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                }
+            });
+        });
+
+        // [제거] 불필요한 정적 탭(B) 로직 제거
+ 
     </script>
 </body>
 </html>

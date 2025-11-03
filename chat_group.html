@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>밥픽 - 대화상대 선택</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        /* ✅ 체크박스 커스텀 스타일 */
+        .custom-checkbox {
+            appearance: none;
+            -webkit-appearance: none;
+            border-radius: 9999px; /* 완전한 원형 */
+            border-width: 1px;
+        }
+
+        .custom-checkbox:checked {
+            background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
+            background-color: #FF7242;
+            border-color: #FF7242;
+        }
+    </style>
+</head>
+<body class="bg-white">
+    <div class="max-w-lg mx-auto h-screen flex flex-col">
+        <!-- 상단 헤더 -->
+        <header class="flex items-center justify-between p-4 border-b border-gray-200">
+            <button onclick="history.back()">
+                <svg class="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+            </button>
+            <h1 class="text-lg font-bold">대화상대 선택</h1>
+            <button id="confirm-btn" class="text-gray-400 font-semibold" disabled>확인</button>
+        </header>
+
+        <!-- 검색창 -->
+        <div class="p-4 border-b border-gray-200">
+            <div class="relative">
+                <input type="text" id="search-input" placeholder="이름으로 검색" 
+                    class="w-full py-2 pl-10 pr-4 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400">
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- 친구 목록 -->
+        <main id="friends-list" class="flex-1 overflow-y-auto p-4"></main>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // 친구 데이터 (예시)
+        const mockFriends = [
+            { id: 1, name: '마디나', profileImg: 'https://placehold.co/40x40/4A5568/FFFFFF?text=마' },
+            { id: 2, name: '덕새', profileImg: 'https://placehold.co/40x40/4A5568/FFFFFF?text=덕' },
+            { id: 3, name: '너구리', profileImg: 'https://placehold.co/40x40/4A5568/FFFFFF?text=너' },
+        ];
+
+        const friendsListContainer = document.getElementById('friends-list');
+        const searchInput = document.getElementById('search-input');
+        const confirmBtn = document.getElementById('confirm-btn');
+
+        let selectedFriends = new Set();
+
+        // 친구 목록 렌더링
+        const renderFriends = (friends) => {
+            friendsListContainer.innerHTML = '';
+            if (friends.length === 0) {
+                friendsListContainer.innerHTML = '<p class="text-center text-gray-500 mt-4">검색 결과가 없습니다.</p>';
+                return;
+            }
+
+            friends.forEach(friend => {
+                const friendElement = document.createElement('label');
+                friendElement.className = 'flex items-center p-2 rounded-lg hover:bg-gray-50 cursor-pointer';
+                friendElement.innerHTML = `
+                    <img src="${friend.profileImg}" class="w-10 h-10 rounded-full mr-4" alt="${friend.name}">
+                    <span class="flex-1 text-gray-800">${friend.name}</span>
+                    <input type="checkbox" class="custom-checkbox w-5 h-5 border-gray-300 focus:ring-transparent" data-id="${friend.id}">
+                `;
+                friendsListContainer.appendChild(friendElement);
+            });
+        };
+
+        // 확인 버튼 상태 업데이트
+        const updateConfirmButton = () => {
+            const count = selectedFriends.size;
+            confirmBtn.textContent = '확인';
+            if (count > 0) {
+                confirmBtn.disabled = false;
+                confirmBtn.classList.remove('text-gray-400');
+                confirmBtn.classList.add('text-orange-500');
+            } else {
+                confirmBtn.disabled = true;
+                confirmBtn.classList.add('text-gray-400');
+                confirmBtn.classList.remove('text-orange-500');
+            }
+        };
+
+        // 검색 기능
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filteredFriends = mockFriends.filter(friend => friend.name.toLowerCase().includes(searchTerm));
+            renderFriends(filteredFriends);
+        });
+
+        // 체크박스 선택
+        friendsListContainer.addEventListener('change', (e) => {
+            if (e.target.type === 'checkbox') {
+                const friendId = parseInt(e.target.dataset.id);
+                if (e.target.checked) {
+                    selectedFriends.add(friendId);
+                } else {
+                    selectedFriends.delete(friendId);
+                }
+                updateConfirmButton();
+            }
+        });
+
+        // ✅ 확인 버튼 → 채팅방 생성 + 자동 저장
+        confirmBtn.addEventListener('click', () => {
+            if (selectedFriends.size > 0) {
+                const selectedIds = Array.from(selectedFriends);
+                const selectedNames = mockFriends
+                    .filter(f => selectedIds.includes(f.id))
+                    .map(f => f.name);
+
+                // 새 채팅방 객체 생성
+                const newChatRoom = {
+                    id: Date.now(),
+                    members: selectedNames,
+                    createdAt: new Date().toISOString(),
+                    lastMessage: ""
+                };
+
+                // localStorage에 저장
+                const savedRooms = JSON.parse(localStorage.getItem('chatRooms')) || [];
+                savedRooms.push(newChatRoom);
+                localStorage.setItem('chatRooms', JSON.stringify(savedRooms));
+
+                alert(`✅ 새 채팅방 생성 완료!\n멤버: ${selectedNames.join(', ')}`);
+
+                // (선택) 채팅방 목록 페이지로 이동
+                // window.location.href = "chat_list.html";
+            }
+        });
+
+        // 초기 목록 렌더링
+        renderFriends(mockFriends);
+    });
+    </script>
+</body>
+</html>
