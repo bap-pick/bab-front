@@ -1,57 +1,132 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>식당 상세 정보</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
     <script type="text/javascript" src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=jkpav5xenu"></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js" defer></script>
+
     <style>
-        html, body { height: 100%; margin: 0; scroll-behavior: smooth; }
-        body { font-family: 'Noto Sans KR', 'Inter', sans-serif; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-        #scrap-btn.scrapped { background-color: #FF7A5A; color: white; border-color: #FF7A5A; }
-        #scrap-btn.scrapped svg { fill: white; }
-        header.scrolled { box-shadow: 0 4px_6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07); }
-        .tab-btn.active { color: #FF7A5A; border-color: #FF7A5A; }
-        /* (기존 <style> 태그 안에 추가) */
-.sheet-visible {
-    transform: translateY(0);
-}
-.sheet-hidden { /* (혹시 모르니 닫기용으로 추가) */
-    transform: translateY(100%);
-}
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        #scrap-btn.scrapped {
+            background-color: #FF7A5A;
+            color: white;
+            border-color: #FF7A5A;
+        }
+
+        #scrap-btn.scrapped svg {
+            fill: white;
+        }
+
+        header.scrolled {
+            box-shadow: 0 4px_6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07);
+        }
+
+        .tab-btn.active {
+            color: #FF7A5A;
+            border-color: #FF7A5A;
+        }
+
+        .sheet-visible {
+            transform: translateY(0);
+        }
+
+        .sheet-hidden {
+            transform: translateY(100%);
+        }
+
+        /* (중요) Swiper 페이지네이션(점) 색상 커스텀 */
+        .swiper-pagination-bullet-active {
+            background-color: #FF7A5A !important;
+        }
+
+        .swiper-pagination.swiper-pagination-fraction {
+            /* (위치) 기본값(중앙) 대신 오른쪽 아래로 */
+            width: auto;
+            left: auto;
+            right: 1.25rem;
+            /* 20px */
+            bottom: 1.25rem;
+            /* 20px */
+
+            /* (디자인) 캡슐 모양 */
+            background-color: rgba(0, 0, 0, 0.5);
+            /* 반투명 검은 배경 */
+            color: white;
+            /* 흰색 글씨 */
+            font-size: 12px;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 99px;
+            /* 둥근 모서리 */
+
+            /* (중요) 이미지 위 그라데이션(z-10)보다 위에 오도록 */
+            z-index: 20;
+        }
     </style>
 </head>
-<div id="collection-overlay" class="fixed inset-0 bg-black bg-opacity-30 z-40 hidden transition-opacity duration-300"></div>
+<div id="collection-overlay" class="fixed inset-0 bg-black bg-opacity-30 z-40 hidden transition-opacity duration-300">
+</div>
 
 <div id="collection-sheet"
     class="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-2xl shadow-xl transition-transform duration-300 ease-in-out transform translate-y-full">
-    
+
     <div class="p-5 pt-4">
         <div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-4"></div>
-        
+
         <h2 class="text-xl font-bold text-center text-gray-800 mb-2">컬렉션에 추가</h2>
 
         <ul id="sheet-collection-list" class="max-h-60 overflow-y-auto divide-y divide-gray-100">
-            </ul>
+        </ul>
 
         <div class="mt-4 pt-4 border-t border-gray-200">
-            <button id="sheet-add-new-btn" class="w-full flex items-center justify-center gap-2 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+            <button id="sheet-add-new-btn"
+                class="w-full flex items-center justify-center gap-2 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
                 새 컬렉션 만들기
             </button>
         </div>
     </div>
 </div>
+
 <body class="bg-gray-100">
-    
+
     <div class="max-w-md mx-auto h-full flex flex-col bg-white shadow-lg">
-        
-        <header id="page-header" class="grid grid-cols-3 items-center p-4 bg-white sticky top-0 z-20 transition-shadow duration-300">
+
+        <header id="page-header"
+            class="grid grid-cols-3 items-center p-4 bg-white sticky top-0 z-20 transition-shadow duration-300">
             <div class="justify-self-start">
                 <button id="back-button" class="p-2 text-gray-600 hover:bg-gray-100 rounded-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                    </svg>
                 </button>
             </div>
             <h1 id="header-title" class="text-lg font-bold text-center text-gray-800 truncate">식당 정보</h1>
@@ -60,41 +135,62 @@
 
         <main id="main-content" class="flex-1 overflow-y-auto">
             <div class="relative w-full h-56">
-                <img id="restaurant-image" src="https://via.placeholder.com/400x240" alt="식당 대표 이미지" class="w-full h-full object-cover">
-                <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                <div id="image-swiper" class="swiper h-full">
+                    <div class="swiper-wrapper">
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+
+                <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent z-10 pointer-events-none">
+                </div>
             </div>
 
             <div class="p-5 -mt-10 relative z-10">
                 <div class="bg-white rounded-xl shadow-lg p-5">
-                    <p id="restaurant-category" class="inline-block bg-orange-100 text-[#FF7A5A] text-sm font-semibold px-3 py-1 rounded-full mb-2">카테고리</p>
+                    <p id="restaurant-category"
+                        class="inline-block bg-orange-100 text-[#FF7A5A] text-sm font-semibold px-3 py-1 rounded-full mb-2">
+                        카테고리</p>
                     <h2 id="restaurant-name" class="text-3xl font-bold text-gray-900 leading-tight">식당 이름</h2>
-                    
+
                     <div id="review-info" class="flex items-center gap-4 text-sm text-gray-600 mt-3"></div>
 
                     <div class="mt-6">
-                        <button id="scrap-btn" class="w-full flex items-center justify-center gap-2 py-3 border-2 border-gray-200 bg-white text-gray-700 rounded-lg font-semibold transition-all duration-300 ease-in-out hover:shadow-md transform hover:-translate-y-0.5">
-                            <svg class="w-5 h-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.5 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" /></svg>
+                        <button id="scrap-btn"
+                            class="w-full flex items-center justify-center gap-2 py-3 border-2 border-gray-200 bg-white text-gray-700 rounded-lg font-semibold transition-all duration-300 ease-in-out hover:shadow-md transform hover:-translate-y-0.5">
+                            <svg class="w-5 h-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                fill="currentColor">
+                                <path
+                                    d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.5 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
+                            </svg>
                             <span>스크랩</span>
                         </button>
                     </div>
                 </div>
             </div>
-            
+
             <div class="px-5 border-b border-gray-200">
                 <nav class="flex -mb-px">
-                    <button class="tab-btn active py-4 px-1 text-center border-b-2 font-medium text-sm flex-1" data-tab="info">상세정보</button>
-                    <button class="tab-btn py-4 px-1 text-center border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm flex-1" data-tab="menu">메뉴</button>
-                    <button class="tab-btn py-4 px-1 text-center border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm flex-1" data-tab="facilities">편의시설</button>
+                    <button class="tab-btn active py-4 px-1 text-center border-b-2 font-medium text-sm flex-1"
+                        data-tab="info">상세정보</button>
+                    <button
+                        class="tab-btn py-4 px-1 text-center border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm flex-1"
+                        data-tab="menu">메뉴</button>
+                    <button
+                        class="tab-btn py-4 px-1 text-center border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm flex-1"
+                        data-tab="facilities">편의시설</button>
                 </nav>
             </div>
-            
+
             <div class="p-5">
                 <div id="info-panel" class="tab-panel space-y-5">
                     <div class="flex items-start">
                         <div class="flex-shrink-0 w-8 text-center">
-                            <svg class="w-6 h-6 text-gray-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                            <svg class="w-6 h-6 text-gray-400 mx-auto" fill="none" viewBox="0 0 24 24"
+                                stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
                             </svg>
                         </div>
                         <div>
@@ -104,8 +200,10 @@
                     </div>
                     <div class="flex items-start">
                         <div class="flex-shrink-0 w-8 text-center">
-                            <svg class="w-6 h-6 text-gray-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+                            <svg class="w-6 h-6 text-gray-400 mx-auto" fill="none" viewBox="0 0 24 24"
+                                stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
                             </svg>
                         </div>
                         <div>
@@ -115,8 +213,10 @@
                     </div>
                     <div class="flex items-start">
                         <div class="flex-shrink-0 w-8 text-center">
-                            <svg class="w-6 h-6 text-gray-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            <svg class="w-6 h-6 text-gray-400 mx-auto" fill="none" viewBox="0 0 24 24"
+                                stroke-width="1.5" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                         </div>
                         <div class="flex-1">
@@ -126,295 +226,299 @@
                     </div>
                     <div id="map" class="w-full h-56 rounded-lg border border-gray-200 overflow-hidden mt-4"></div>
                 </div>
-                <div id="menu-panel" class="tab-panel hidden"><ul id="menu-list" class="space-y-3"></ul></div>
-                <div id="facilities-panel" class="tab-panel hidden"><ul id="facilities-list" class="grid grid-cols-2 gap-3"></ul></div>
+                <div id="menu-panel" class="tab-panel hidden">
+                    <ul id="menu-list" class="space-y-3"></ul>
+                </div>
+                <div id="facilities-panel" class="tab-panel hidden">
+                    <ul id="facilities-list" class="grid grid-cols-2 gap-3"></ul>
+                </div>
             </div>
         </main>
     </div>
     <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-    import { firebaseConfig } from "./firebase-config.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+        import { firebaseConfig } from "./firebase-config.js";
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
 
-    const FASTAPI_BASE_URL = 'https://bab-back.onrender.com';
-    //const FASTAPI_BASE_URL = 'http://127.0.0.1:8000'; // 로컬 테스트용
+        const FASTAPI_BASE_URL = 'https://bab-back.onrender.com';
+        //const FASTAPI_BASE_URL = 'http://127.0.0.1:8000'; // 로컬 테스트용
 
-    let currentRestaurant = null;
-    let currentUser = null;
+        let currentRestaurant = null;
+        let currentUser = null;
 
-    // --- 1. (기존) UI 요소 선언 ---
-    const backButton = document.getElementById('back-button');
-    const headerTitle = document.getElementById('header-title');
-    const restaurantImageEl = document.getElementById('restaurant-image');
-    const restaurantCategoryEl = document.getElementById('restaurant-category');
-    const restaurantNameEl = document.getElementById('restaurant-name');
-    const scrapBtn = document.getElementById('scrap-btn');
-    const reviewInfo = document.getElementById('review-info');
-    const restaurantAddressEl = document.getElementById('restaurant-address');
-    const restaurantPhoneEl = document.getElementById('restaurant-call');
-    const restaurantTimeEl = document.getElementById('restaurant-time');
-    const mapContainer = document.getElementById('map');
-    const menuListEl = document.getElementById('menu-list');
-    const facilitiesListEl = document.getElementById('facilities-list');
-    const tabButtons = document.querySelectorAll('.tab-btn');
-    const tabPanels = document.querySelectorAll('.tab-panel');
+        // --- 1. (기존) UI 요소 선언 ---
+        const backButton = document.getElementById('back-button');
+        const headerTitle = document.getElementById('header-title');
+        const restaurantImageEl = document.getElementById('restaurant-image');
+        const restaurantCategoryEl = document.getElementById('restaurant-category');
+        const restaurantNameEl = document.getElementById('restaurant-name');
+        const scrapBtn = document.getElementById('scrap-btn');
+        const reviewInfo = document.getElementById('review-info');
+        const restaurantAddressEl = document.getElementById('restaurant-address');
+        const restaurantPhoneEl = document.getElementById('restaurant-call');
+        const restaurantTimeEl = document.getElementById('restaurant-time');
+        const mapContainer = document.getElementById('map');
+        const menuListEl = document.getElementById('menu-list');
+        const facilitiesListEl = document.getElementById('facilities-list');
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabPanels = document.querySelectorAll('.tab-panel');
 
-    // ⭐ (A) 여기에 '바텀 시트' 관련 새 UI 요소 추가
-    const collectionOverlay = document.getElementById('collection-overlay');
-    const collectionSheet = document.getElementById('collection-sheet');
-    const collectionListEl = document.getElementById('sheet-collection-list');
+        // ⭐ (A) 여기에 '바텀 시트' 관련 새 UI 요소 추가
+        const collectionOverlay = document.getElementById('collection-overlay');
+        const collectionSheet = document.getElementById('collection-sheet');
+        const collectionListEl = document.getElementById('sheet-collection-list');
 
 
-    // --- 2. (기존) 헤더 스크롤 이벤트 ---
-    document.querySelector('main').addEventListener('scroll', (e) => {
-        const header = document.getElementById('page-header');
-        if (e.target.scrollTop > 50) {
-            header.classList.add('scrolled');
-            headerTitle.textContent = restaurantNameEl.textContent;
-        } else {
-            header.classList.remove('scrolled');
-            headerTitle.textContent = '식당 정보';
-        }
-    });
-
-    // --- 3. (기존) 뒤로가기 버튼 ---
-    backButton.addEventListener('click', () => {
-        history.back();
-    });
-
-    // --- 4. (기존) 지도, 스크랩 버튼 UI, 스크랩 상태 확인 함수 ---
-    function loadNaverMap(lat, lng, name) {
-        if (!window.naver) {
-            mapContainer.innerHTML = '<div class="p-4 text-center text-gray-500">지도 SDK 로드 실패.</div>';
-            return;
-        }
-        
-        const position = new naver.maps.LatLng(lat, lng);
-        const mapOptions = { center: position, zoom: 17, mapTypeControl: true, zoomControl: true };
-        const map = new naver.maps.Map(mapContainer, mapOptions);
-
-        const marker = new naver.maps.Marker({ position: position, map: map });
-
-        const infowindow = new naver.maps.InfoWindow({
-            content: `<div style="padding:5px; border:1px solid #ccc; border-radius: 5px; background-color: white; font-size:12px;">${name}</div>`,
-            anchorSkew: true
+        // --- 2. (기존) 헤더 스크롤 이벤트 ---
+        document.querySelector('main').addEventListener('scroll', (e) => {
+            const header = document.getElementById('page-header');
+            if (e.target.scrollTop > 50) {
+                header.classList.add('scrolled');
+                headerTitle.textContent = restaurantNameEl.textContent;
+            } else {
+                header.classList.remove('scrolled');
+                headerTitle.textContent = '식당 정보';
+            }
         });
 
-        infowindow.open(map, marker);
-    }
+        // --- 3. (기존) 뒤로가기 버튼 ---
+        backButton.addEventListener('click', () => {
+            history.back();
+        });
 
-    function updateScrapButton(isScrapped) {
-        if (isScrapped) {
-            scrapBtn.classList.add('scrapped');
-            scrapBtn.querySelector('span').textContent = '스크랩 완료';
-        } else {
-            scrapBtn.classList.remove('scrapped');
-            scrapBtn.querySelector('span').textContent = '스크랩';
-        }
-    }
+        // --- 4. (기존) 지도, 스크랩 버튼 UI, 스크랩 상태 확인 함수 ---
+        function loadNaverMap(lat, lng, name) {
+            if (!window.naver) {
+                mapContainer.innerHTML = '<div class="p-4 text-center text-gray-500">지도 SDK 로드 실패.</div>';
+                return;
+            }
 
-    async function checkScrapStatus() {
-        if (!currentUser || !currentRestaurant) return;
-        try {
-            const idToken = await currentUser.getIdToken(true);
-            const response = await fetch(`${FASTAPI_BASE_URL}/scraps/${currentRestaurant.id}`, {
-                method: 'GET',
-                headers: { 'Authorization': `Bearer ${idToken}` },
+            const position = new naver.maps.LatLng(lat, lng);
+            const mapOptions = { center: position, zoom: 17, mapTypeControl: true, zoomControl: true };
+            const map = new naver.maps.Map(mapContainer, mapOptions);
+
+            const marker = new naver.maps.Marker({ position: position, map: map });
+
+            const infowindow = new naver.maps.InfoWindow({
+                content: `<div style="padding:5px; border:1px solid #ccc; border-radius: 5px; background-color: white; font-size:12px;">${name}</div>`,
+                anchorSkew: true
             });
-            if (!response.ok) throw new Error('스크랩 상태 조회 실패');
-            const { is_scrapped } = await response.json();
-            updateScrapButton(is_scrapped);
-        } catch (error) {
-            console.error('스크랩 상태 확인 실패:', error);
+
+            infowindow.open(map, marker);
         }
-    }
-    document.addEventListener('DOMContentLoaded', checkScrapStatus); // (기존 코드)
 
-    // --- ⭐ (B) 5. '스크랩 버튼' 클릭 이벤트 (⭐ 수정됨!) ---
-    scrapBtn.addEventListener('click', async () => {
-        if (!currentUser) return window.location.href = 'index.html';
+        function updateScrapButton(isScrapped) {
+            if (isScrapped) {
+                scrapBtn.classList.add('scrapped');
+                scrapBtn.querySelector('span').textContent = '스크랩 완료';
+            } else {
+                scrapBtn.classList.remove('scrapped');
+                scrapBtn.querySelector('span').textContent = '스크랩';
+            }
+        }
 
-        const isScrapped = scrapBtn.classList.contains('scrapped');
-        const restaurantId = currentRestaurant.id;
-        
-        if (isScrapped) {
-            // 1. 이미 스크랩된 경우: (기존 로직) 스크랩 '취소'
+        async function checkScrapStatus() {
+            if (!currentUser || !currentRestaurant) return;
             try {
                 const idToken = await currentUser.getIdToken(true);
-                const response = await fetch(`${FASTAPI_BASE_URL}/scraps/${restaurantId}`, {
-                    method: 'DELETE',
-                    headers: { 'Authorization': `Bearer ${idToken}` }
+                const response = await fetch(`${FASTAPI_BASE_URL}/scraps/${currentRestaurant.id}`, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${idToken}` },
                 });
-                if (response.ok) {
-                    updateScrapButton(false); // UI 업데이트
-                } else {
-                    alert('스크랩 취소 실패');
-                }
+                if (!response.ok) throw new Error('스크랩 상태 조회 실패');
+                const { is_scrapped } = await response.json();
+                updateScrapButton(is_scrapped);
             } catch (error) {
-                console.error('스크랩 취소 실패:', error);
+                console.error('스크랩 상태 확인 실패:', error);
             }
-        } else {
-            // 2. 스크랩 안된 경우: (새 로직) '컬렉션 선택' 시트 열기
-            openCollectionSheet();
         }
-    });
+        document.addEventListener('DOMContentLoaded', checkScrapStatus); // (기존 코드)
 
-    // --- 6. (기존) 탭 전환 로직 ---
-    tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const targetTab = button.getAttribute('data-tab');
-            
-            // 탭 버튼 활성화/비활성화
-            tabButtons.forEach(btn => btn.classList.remove('active', 'border-[#FF7A5A]', 'text-[#FF7A5A]'));
-            button.classList.add('active', 'border-[#FF7A5A]', 'text-[#FF7A5A]');
-            button.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+        // --- ⭐ (B) 5. '스크랩 버튼' 클릭 이벤트 (⭐ 수정됨!) ---
+        scrapBtn.addEventListener('click', async () => {
+            if (!currentUser) return window.location.href = 'index.html';
 
-            // 패널 표시/숨김
-            tabPanels.forEach(panel => {
-                if (panel.id === `${targetTab}-panel`) {
-                    panel.classList.remove('hidden');
-                } else {
-                    panel.classList.add('hidden');
+            const isScrapped = scrapBtn.classList.contains('scrapped');
+            const restaurantId = currentRestaurant.id;
+
+            if (isScrapped) {
+                // 1. 이미 스크랩된 경우: (기존 로직) 스크랩 '취소'
+                try {
+                    const idToken = await currentUser.getIdToken(true);
+                    const response = await fetch(`${FASTAPI_BASE_URL}/scraps/${restaurantId}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${idToken}` }
+                    });
+                    if (response.ok) {
+                        updateScrapButton(false); // UI 업데이트
+                    } else {
+                        alert('스크랩 취소 실패');
+                    }
+                } catch (error) {
+                    console.error('스크랩 취소 실패:', error);
                 }
+            } else {
+                // 2. 스크랩 안된 경우: (새 로직) '컬렉션 선택' 시트 열기
+                openCollectionSheet();
+            }
+        });
+
+        // --- 6. (기존) 탭 전환 로직 ---
+        tabButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetTab = button.getAttribute('data-tab');
+
+                // 탭 버튼 활성화/비활성화
+                tabButtons.forEach(btn => btn.classList.remove('active', 'border-[#FF7A5A]', 'text-[#FF7A5A]'));
+                button.classList.add('active', 'border-[#FF7A5A]', 'text-[#FF7A5A]');
+                button.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+
+                // 패널 표시/숨김
+                tabPanels.forEach(panel => {
+                    if (panel.id === `${targetTab}-panel`) {
+                        panel.classList.remove('hidden');
+                    } else {
+                        panel.classList.add('hidden');
+                    }
+                });
             });
         });
-    });
 
-    // --- 7. (기존) API 호출 및 렌더링 함수들 ---
-    async function fetchRestaurantDetails(restaurantId, user) {
-        if (!user) {
-            console.error("fetchRestaurantDetails: User object is null.");
-            return null;
-        }
-        
-        const idToken = await user.getIdToken(); 
-
-        if (!idToken) {
-            window.location.href = 'index.html';
-            return null;
-        }
-
-        try {
-            const response = await fetch(`${FASTAPI_BASE_URL}/restaurants/detail/${restaurantId}`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': `Bearer ${idToken}`,
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            if (response.status === 404) {
-                throw new Error("식당 정보를 찾을 수 없습니다.");
-            }
-            if (!response.ok) {
-                throw new Error(`데이터 조회 오류: ${response.status} ${response.statusText}`);
+        // --- 7. (기존) API 호출 및 렌더링 함수들 ---
+        async function fetchRestaurantDetails(restaurantId, user) {
+            if (!user) {
+                console.error("fetchRestaurantDetails: User object is null.");
+                return null;
             }
 
-            return await response.json();
-        } catch (error) {
-            console.error("Fetch Error:", error);
-            alert(error.message);
-            return null;
+            const idToken = await user.getIdToken();
+
+            if (!idToken) {
+                window.location.href = 'index.html';
+                return null;
+            }
+
+            try {
+                const response = await fetch(`${FASTAPI_BASE_URL}/restaurants/detail/${restaurantId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${idToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (response.status === 404) {
+                    throw new Error("식당 정보를 찾을 수 없습니다.");
+                }
+                if (!response.ok) {
+                    throw new Error(`데이터 조회 오류: ${response.status} ${response.statusText}`);
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error("Fetch Error:", error);
+                alert(error.message);
+                return null;
+            }
         }
-    }
 
-    function renderReview(reviews) {
-        reviewInfo.innerHTML = '';
-
-        if (!reviews || reviews.length === 0) {
+        function renderReview(reviews) {
             reviewInfo.innerHTML = '';
-            return;
-        }
 
-        reviewInfo.innerHTML = reviews.map(review => {
-            let ratingInfo = '';
-            if (review.rating) {
-                ratingInfo = `<div class="flex items-center gap-1">⭐<span class="font-bold">${review.rating}</span></div>`;
+            if (!reviews || reviews.length === 0) {
+                reviewInfo.innerHTML = '';
+                return;
             }
 
-            let visitorReviewsInfo = '';
-            if (review.visitor_reviews > 0) {
-                visitorReviewsInfo = `<div>방문자 리뷰 <span class="font-semibold">${review.visitor_reviews}</span></div>`;
-            }
+            reviewInfo.innerHTML = reviews.map(review => {
+                let ratingInfo = '';
+                if (review.rating) {
+                    ratingInfo = `<div class="flex items-center gap-1">⭐<span class="font-bold">${review.rating}</span></div>`;
+                }
 
-            let blogReviewsInfo = '';
-            if (review.blog_reviews > 0) {
-                blogReviewsInfo = `<div>블로그 리뷰 <span class="font-semibold">${review.blog_reviews}</span></div>`;
-            }
-            
-            if (!ratingInfo && !visitorReviewsInfo && !blogReviewsInfo) {
-                return ''; 
-            }
+                let visitorReviewsInfo = '';
+                if (review.visitor_reviews > 0) {
+                    visitorReviewsInfo = `<div>방문자 리뷰 <span class="font-semibold">${review.visitor_reviews}</span></div>`;
+                }
 
-            return `
+                let blogReviewsInfo = '';
+                if (review.blog_reviews > 0) {
+                    blogReviewsInfo = `<div>블로그 리뷰 <span class="font-semibold">${review.blog_reviews}</span></div>`;
+                }
+
+                if (!ratingInfo && !visitorReviewsInfo && !blogReviewsInfo) {
+                    return '';
+                }
+
+                return `
                 ${ratingInfo}${visitorReviewsInfo}${blogReviewsInfo}
             `;
-        }).join('');
-    }
-
-    function renderMenus(menus) {
-        menuListEl.innerHTML = ''; 
-
-        if (!menus || menus.length === 0) {
-            menuListEl.innerHTML = '<li class="text-gray-500 p-2 text-center">등록된 메뉴 정보가 없습니다.</li>';
-            return;
+            }).join('');
         }
-        
-        menuListEl.innerHTML = menus.map(menu => {
-            const menuName = menu.menu_name || menu.name || '메뉴 이름 없음 (키 불일치)';
-            return `
+
+        function renderMenus(menus) {
+            menuListEl.innerHTML = '';
+
+            if (!menus || menus.length === 0) {
+                menuListEl.innerHTML = '<li class="text-gray-500 p-2 text-center">등록된 메뉴 정보가 없습니다.</li>';
+                return;
+            }
+
+            menuListEl.innerHTML = menus.map(menu => {
+                const menuName = menu.menu_name || menu.name || '메뉴 이름 없음 (키 불일치)';
+                return `
                 <li class="flex justify-between items-center p-3 bg-white border-b border-gray-100 last:border-b-0">
                     <span class="font-medium text-gray-700">${menuName}</span>
                 </li>
             `;
-        }).join('');
-    }
-
-    function renderHours(hours) {
-        restaurantTimeEl.innerHTML = '';
-
-        if (!hours || hours.length === 0) {
-            restaurantTimeEl.innerHTML = '운영 시간 정보가 없습니다.';
-            return;
+            }).join('');
         }
 
-        const dayOrder = ['월', '화', '수', '목', '금', '토', '일'];
-        hours.sort((a, b) => dayOrder.indexOf(a.day) - dayOrder.indexOf(b.day));
+        function renderHours(hours) {
+            restaurantTimeEl.innerHTML = '';
 
-        restaurantTimeEl.innerHTML = hours.map(hour => {
-            let mainTimeInfo = '';
-            let additionalInfo = '';
-
-            if (hour.is_closed) {
-                mainTimeInfo = `<span class="text-red-500 font-bold">휴무</span>`;
-            } else if (hour.open_time && hour.close_time) {
-                mainTimeInfo = `${hour.open_time.substring(0, 5)} - ${hour.close_time.substring(0, 5)}`;
-            } else {
-                mainTimeInfo = '정보 없음';
+            if (!hours || hours.length === 0) {
+                restaurantTimeEl.innerHTML = '운영 시간 정보가 없습니다.';
+                return;
             }
 
-            let lastOrderInfo = '';
-            if (hour.last_order) {
-                lastOrderInfo = ` (라스트 오더: ${hour.last_order.substring(0, 5)})`;
-            }
+            const dayOrder = ['월', '화', '수', '목', '금', '토', '일'];
+            hours.sort((a, b) => dayOrder.indexOf(a.day) - dayOrder.indexOf(b.day));
 
-            let breakInfo = '';
-            if (hour.break_start && hour.break_end) {
-                breakInfo = `<span class="text-xs text-gray-500">브레이크: ${hour.break_start.substring(0, 5)} - ${hour.break_end.substring(0, 5)}</span>`;
-            }
+            restaurantTimeEl.innerHTML = hours.map(hour => {
+                let mainTimeInfo = '';
+                let additionalInfo = '';
 
-            if (breakInfo) {
-                additionalInfo = `
+                if (hour.is_closed) {
+                    mainTimeInfo = `<span class="text-red-500 font-bold">휴무</span>`;
+                } else if (hour.open_time && hour.close_time) {
+                    mainTimeInfo = `${hour.open_time.substring(0, 5)} - ${hour.close_time.substring(0, 5)}`;
+                } else {
+                    mainTimeInfo = '정보 없음';
+                }
+
+                let lastOrderInfo = '';
+                if (hour.last_order) {
+                    lastOrderInfo = ` (라스트 오더: ${hour.last_order.substring(0, 5)})`;
+                }
+
+                let breakInfo = '';
+                if (hour.break_start && hour.break_end) {
+                    breakInfo = `<span class="text-xs text-gray-500">브레이크: ${hour.break_start.substring(0, 5)} - ${hour.break_end.substring(0, 5)}</span>`;
+                }
+
+                if (breakInfo) {
+                    additionalInfo = `
                     <div class="flex flex-col pt-0.5">
                         ${breakInfo}
                     </div>
                 `;
-            }
+                }
 
-            return `
+                return `
                 <div class="flex flex-col py-1">
                     <div class="flex items-center text-sm gap-4">
                         <span class="font-medium text-gray-700 w-2 flex-shrink-0">${hour.day}</span>
@@ -425,200 +529,236 @@
                     </div>
                 </div>
             `;
-        }).join('');
-    }
-    
-    function renderFacilities(facilities) {
-        facilitiesListEl.innerHTML = '';
-
-        if (!facilities || facilities.length === 0) {
-            facilitiesListEl.innerHTML = '<li class="col-span-2 text-gray-500 p-2 text-center">등록된 편의시설 정보가 없습니다.</li>';
-            return;
+            }).join('');
         }
-        
-        facilitiesListEl.innerHTML = facilities.map(facility => {
-            const facilityName = facility.name || '정보 없음';
-            return `
+
+        function renderFacilities(facilities) {
+            facilitiesListEl.innerHTML = '';
+
+            if (!facilities || facilities.length === 0) {
+                facilitiesListEl.innerHTML = '<li class="col-span-2 text-gray-500 p-2 text-center">등록된 편의시설 정보가 없습니다.</li>';
+                return;
+            }
+
+            facilitiesListEl.innerHTML = facilities.map(facility => {
+                const facilityName = facility.name || '정보 없음';
+                return `
                 <li class="flex items-center gap-2 p-2 bg-gray-50 rounded-lg text-sm text-gray-700 font-medium">
                     <svg class="w-4 h-4 text-[#FF7A5A] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>
                     <span>${facilityName}</span>
                 </li>
             `;
-        }).join('');
-    }
-
-    // --- 8. (기존) 메인 데이터 로드 함수 ---
-    async function loadRestaurantDetails(user) {
-        const urlParams = new URLSearchParams(window.location.search);
-        const restaurantId = urlParams.get('id');
-
-        if (!restaurantId) {
-            document.getElementById('main-content').innerHTML = '<div class="p-4 text-center text-red-500">잘못된 접근입니다: 식당 ID가 없습니다.</div>';
-            return;
+            }).join('');
         }
-        
-        // API 호출 (user 객체 전달)
-        const details = await fetchRestaurantDetails(restaurantId, user);
-        if (!details) {
-            document.getElementById('main-content').innerHTML = '<div class="p-4 text-center text-gray-600">식당 정보를 불러오는 데 실패했습니다.</div>';
-            return;
-        }
-        
-        currentRestaurant = details;
 
-        // DOM 업데이트
-        restaurantNameEl.textContent = currentRestaurant.name || '이름 정보 없음';
-        restaurantCategoryEl.textContent = currentRestaurant.category || '카테고리';
-        restaurantAddressEl.textContent = currentRestaurant.address || '주소 정보 없음';
-        restaurantPhoneEl.textContent = currentRestaurant.phone || '전화번호 정보 없음';
-        restaurantImageEl.src = 'https://via.placeholder.com/400x240'; 
-        
-        // 운영 시간 정보 렌더링
-        renderHours(currentRestaurant.hours);
+        // --- 8. (기존) 메인 데이터 로드 함수 ---
+        async function loadRestaurantDetails(user) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const restaurantId = urlParams.get('id');
 
-        // 리뷰 정보 렌더링
-        renderReview(currentRestaurant.reviews);
-        
-        // 메뉴 정보 렌더링
-        renderMenus(currentRestaurant.menus); 
-        
-        // 편의시설 정보 렌더링
-        renderFacilities(currentRestaurant.facilities);
-        
-        // 지도 로직 (일단 주석 처리됨)
-        /*
-        if (currentRestaurant.latitude && currentRestaurant.longitude) {
-            loadNaverMap(currentRestaurant.latitude, currentRestaurant.longitude, currentRestaurant.name);
-        } else {
-            mapContainer.innerHTML = '<div class="p-4 text-center text-gray-500">지도 정보를 불러올 수 없습니다.</div>';
-        }
-        */
-        
-        // 스크랩 상태 확인
-        checkScrapStatus(); 
-    }
-    
-    // --- ⭐ (D) 9. 팝업 닫기 이벤트 (⭐ 추가됨!) ---
-    // 어두운 배경(오버레이) 클릭 시 시트 닫기
-    collectionOverlay.addEventListener('click', closeCollectionSheet);
+            if (!restaurantId) {
+                document.getElementById('main-content').innerHTML = '<div class="p-4 text-center text-red-500">잘못된 접근입니다: 식당 ID가 없습니다.</div>';
+                return;
+            }
 
-    // --- ⭐ (C) 10. 팝업 및 컬렉션 관련 새 함수들 (⭐ 추가됨!) ---
-    
-    // [새 함수 1] 팝업 열기
-    function openCollectionSheet() {
-        collectionOverlay.classList.remove('hidden');
-        collectionSheet.classList.add('sheet-visible');
-        collectionSheet.classList.remove('translate-y-full');
-        // 시트가 열릴 때, 컬렉션 목록을 불러옵니다.
-        loadCollectionsIntoSheet();
-    }
+            // API 호출 (user 객체 전달)
+            const details = await fetchRestaurantDetails(restaurantId, user);
+            if (!details) {
+                document.getElementById('main-content').innerHTML = '<div class="p-4 text-center text-gray-600">식당 정보를 불러오는 데 실패했습니다.</div>';
+                return;
+            }
 
-    // [새 함수 2] 팝업 닫기
-    function closeCollectionSheet() {
-        collectionOverlay.classList.add('hidden');
-        collectionSheet.classList.remove('sheet-visible');
-        collectionSheet.classList.add('translate-y-full');
-    }
+            currentRestaurant = details;
 
-    // [새 함수 3] (가상) API: '사용자 생성' 컬렉션 목록을 불러오는 함수
-    async function fetchCollections() {
-        if (!currentUser) return [];
-        try {
-            // TODO: 밥픽님의 실제 '컬렉션 목록' API로 교체해야 합니다.
-            // const idToken = await currentUser.getIdToken(true);
-            // const response = await fetch(`${FASTAPI_BASE_URL}/collections/me`, ...);
-            // const collections = await response.json();
-            
-            // [임시 데이터]
-            await new Promise(resolve => setTimeout(resolve, 300)); 
-            const dummyCollections = [
-                { id: '1', name: '가고싶은 곳' },
-                { id: '2', name: '강남 맛집' }
+            // DOM 업데이트
+            restaurantNameEl.textContent = currentRestaurant.name || '이름 정보 없음';
+            restaurantCategoryEl.textContent = currentRestaurant.category || '카테고리';
+            restaurantAddressEl.textContent = currentRestaurant.address || '주소 정보 없음';
+            restaurantPhoneEl.textContent = currentRestaurant.phone || '전화번호 정보 없음';
+            const swiperWrapper = document.querySelector('#image-swiper .swiper-wrapper');
+            swiperWrapper.innerHTML = ''; // 일단 비웁니다.
+
+            // 1. (수정) 로컬 테스트용 이미지 두 개
+            // detail.html과 Untitled.png, logo_test.png가 같은 폴더에 있으므로, 파일 이름만 적으면 됩니다.
+            const placeholderImages = [
+                'Untitled.png',        // 첫 번째 이미지
+                'logo_test.png'        // 두 번째 이미지
             ];
-            return dummyCollections;
-            // [임시 데이터 끝]
-        } catch (error) {
-            console.error('컬렉션 목록 로드 실패:', error);
-            return [];
+
+            // 2. (수정) 백엔드가 이미지를 안 주거나, 빈 배열([])로 줄 때
+            //        위에서 지정한 'placeholderImages' 배열을 사용하도록 합니다.
+            const images = (currentRestaurant.images && currentRestaurant.images.length > 0)
+                ? currentRestaurant.images
+                : placeholderImages;
+
+            if (images.length > 0) {
+                images.forEach(imageUrl => {
+                    const slide = document.createElement('div');
+                    slide.className = 'swiper-slide';
+                    slide.innerHTML = `<img src="${imageUrl}" alt="식당 이미지" class="w-full h-full object-cover">`;
+                    swiperWrapper.appendChild(slide);
+                });
+            }
+
+            // 2. Swiper 초기화
+            const swiper = new Swiper('#image-swiper', {
+                // Optional parameters
+                loop: images.length > 1, // 이미지가 1개보다 많을 때만 루프
+
+                // If we want pagination
+                pagination: {
+                    el: '.swiper-pagination',
+                    type: 'fraction',
+                },
+            });
+
+            // 운영 시간 정보 렌더링
+            renderHours(currentRestaurant.hours);
+
+            // 리뷰 정보 렌더링
+            renderReview(currentRestaurant.reviews);
+
+            // 메뉴 정보 렌더링
+            renderMenus(currentRestaurant.menus);
+
+            // 편의시설 정보 렌더링
+            renderFacilities(currentRestaurant.facilities);
+
+            // 지도 로직 (일단 주석 처리됨)
+            /*
+            if (currentRestaurant.latitude && currentRestaurant.longitude) {
+                loadNaverMap(currentRestaurant.latitude, currentRestaurant.longitude, currentRestaurant.name);
+            } else {
+                mapContainer.innerHTML = '<div class="p-4 text-center text-gray-500">지도 정보를 불러올 수 없습니다.</div>';
+            }
+            */
+
+            // 스크랩 상태 확인
+            checkScrapStatus();
         }
-    }
 
-    // [새 함수 4] 시트 안에 컬렉션을 로드하고 렌더링하는 함수
-    async function loadCollectionsIntoSheet() {
-        collectionListEl.innerHTML = '<li><p class="text-center text-gray-500 p-4">컬렉션 불러오는 중...</p></li>';
-        const userCollections = await fetchCollections();
-        collectionListEl.innerHTML = ''; // 로딩 메시지 제거
+        // --- ⭐ (D) 9. 팝업 닫기 이벤트 (⭐ 추가됨!) ---
+        // 어두운 배경(오버레이) 클릭 시 시트 닫기
+        collectionOverlay.addEventListener('click', closeCollectionSheet);
 
-        // 1. "모든 스크랩" (기본) 항목 추가
-        const allScrapsItem = createSheetCollectionItem({ id: 'all', name: '모든 스크랩' }, true);
-        collectionListEl.appendChild(allScrapsItem);
+        // --- ⭐ (C) 10. 팝업 및 컬렉션 관련 새 함수들 (⭐ 추가됨!) ---
 
-        // 2. 사용자 정의 컬렉션 항목 추가
-        userCollections.forEach(collection => {
-            const item = createSheetCollectionItem(collection, false);
-            collectionListEl.appendChild(item);
-        });
-    }
+        // [새 함수 1] 팝업 열기
+        function openCollectionSheet() {
+            collectionOverlay.classList.remove('hidden');
+            collectionSheet.classList.add('sheet-visible');
+            collectionSheet.classList.remove('translate-y-full');
+            // 시트가 열릴 때, 컬렉션 목록을 불러옵니다.
+            loadCollectionsIntoSheet();
+        }
 
-    // [새 함수 5] 시트의 각 컬렉션 항목(li)을 만드는 함수
-    function createSheetCollectionItem(collection, isAllScraps) {
-        const li = document.createElement('li');
-        li.className = 'flex items-center justify-between p-4 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 cursor-pointer';
-        li.dataset.collectionId = collection.id;
-        
-        const textClass = isAllScraps ? 'text-orange-500 font-bold' : 'text-gray-700 font-medium';
-        
-        li.innerHTML = `
+        // [새 함수 2] 팝업 닫기
+        function closeCollectionSheet() {
+            collectionOverlay.classList.add('hidden');
+            collectionSheet.classList.remove('sheet-visible');
+            collectionSheet.classList.add('translate-y-full');
+        }
+
+        // [새 함수 3] (가상) API: '사용자 생성' 컬렉션 목록을 불러오는 함수
+        async function fetchCollections() {
+            if (!currentUser) return [];
+            try {
+                // TODO: 밥픽님의 실제 '컬렉션 목록' API로 교체해야 합니다.
+                // const idToken = await currentUser.getIdToken(true);
+                // const response = await fetch(`${FASTAPI_BASE_URL}/collections/me`, ...);
+                // const collections = await response.json();
+
+                // [임시 데이터]
+                await new Promise(resolve => setTimeout(resolve, 300));
+                const dummyCollections = [
+                    { id: '1', name: '가고싶은 곳' },
+                    { id: '2', name: '강남 맛집' }
+                ];
+                return dummyCollections;
+                // [임시 데이터 끝]
+            } catch (error) {
+                console.error('컬렉션 목록 로드 실패:', error);
+                return [];
+            }
+        }
+
+        // [새 함수 4] 시트 안에 컬렉션을 로드하고 렌더링하는 함수
+        async function loadCollectionsIntoSheet() {
+            collectionListEl.innerHTML = '<li><p class="text-center text-gray-500 p-4">컬렉션 불러오는 중...</p></li>';
+            const userCollections = await fetchCollections();
+            collectionListEl.innerHTML = ''; // 로딩 메시지 제거
+
+            // 1. "모든 스크랩" (기본) 항목 추가
+            const allScrapsItem = createSheetCollectionItem({ id: 'all', name: '모든 스크랩' }, true);
+            collectionListEl.appendChild(allScrapsItem);
+
+            // 2. 사용자 정의 컬렉션 항목 추가
+            userCollections.forEach(collection => {
+                const item = createSheetCollectionItem(collection, false);
+                collectionListEl.appendChild(item);
+            });
+        }
+
+        // [새 함수 5] 시트의 각 컬렉션 항목(li)을 만드는 함수
+        function createSheetCollectionItem(collection, isAllScraps) {
+            const li = document.createElement('li');
+            li.className = 'flex items-center justify-between p-4 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 cursor-pointer';
+            li.dataset.collectionId = collection.id;
+
+            const textClass = isAllScraps ? 'text-orange-500 font-bold' : 'text-gray-700 font-medium';
+
+            li.innerHTML = `
             <span class="${textClass}">${collection.name}</span>
             <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
         `;
 
-        // [중요] 팝업 안의 컬렉션 항목을 클릭했을 때의 이벤트
-        li.addEventListener('click', async () => {
-            const collectionId = li.dataset.collectionId;
-            
-            // (임시) 어떤 컬렉션을 눌러도 밥픽님의 (기존) '기본 스크랩' API를 호출합니다.
-            // 나중에는 이 부분을 "선택한 컬렉션에 식당을 추가하는" API로 바꾸셔야 합니다!
-            
-            try {
-                const idToken = await currentUser.getIdToken(true);
-                const restaurantId = currentRestaurant.id;
+            // [중요] 팝업 안의 컬렉션 항목을 클릭했을 때의 이벤트
+            li.addEventListener('click', async () => {
+                const collectionId = li.dataset.collectionId;
 
-                const response = await fetch(`${FASTAPI_BASE_URL}/scraps`, {
-                    method: 'POST',
-                    headers: { 
-                        'Authorization': `Bearer ${idToken}`,
-                        'Content-Type': 'application/json' 
-                    },
-                    body: JSON.stringify({ restaurant_id: restaurantId })
-                });
+                // (임시) 어떤 컬렉션을 눌러도 밥픽님의 (기존) '기본 스크랩' API를 호출합니다.
+                // 나중에는 이 부분을 "선택한 컬렉션에 식당을 추가하는" API로 바꾸셔야 합니다!
 
-                if (response.ok) {
-                    updateScrapButton(true); // 스크랩 버튼 UI 업데이트
-                    closeCollectionSheet(); // 시트 닫기
-                } else {
-                    alert('스크랩 실패');
+                try {
+                    const idToken = await currentUser.getIdToken(true);
+                    const restaurantId = currentRestaurant.id;
+
+                    const response = await fetch(`${FASTAPI_BASE_URL}/scraps`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${idToken}`,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ restaurant_id: restaurantId })
+                    });
+
+                    if (response.ok) {
+                        updateScrapButton(true); // 스크랩 버튼 UI 업데이트
+                        closeCollectionSheet(); // 시트 닫기
+                    } else {
+                        alert('스크랩 실패');
+                    }
+                } catch (error) {
+                    console.error('스크랩 요청 실패:', error);
+                    alert('스크랩 처리 중 오류가 발생했습니다.');
                 }
-            } catch (error) {
-                console.error('스크랩 요청 실패:', error);
-                alert('스크랩 처리 중 오류가 발생했습니다.');
+            });
+
+            return li;
+        }
+
+
+        // --- 11. (기존) Firebase 인증 (페이지 시작) ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                loadRestaurantDetails(user);
+            } else {
+                window.location.href = 'index.html';
             }
         });
 
-        return li;
-    }
-
-
-    // --- 11. (기존) Firebase 인증 (페이지 시작) ---
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            currentUser = user; 
-            loadRestaurantDetails(user);
-        } else {
-            window.location.href = 'index.html'; 
-        }
-    });
-
-</script>
+    </script>
 </body>
+
 </html>
