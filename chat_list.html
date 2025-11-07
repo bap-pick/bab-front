@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>채팅 목록</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         html, body {
@@ -41,6 +43,38 @@
             color: #6b7280; /* 회색 */
             font-weight: 500;
         }
+
+        /* ▼▼▼ [추가] 스와이프 관련 스타일 ▼▼▼ */
+        /* li 항목이 스와이프 컨텐츠와 액션 버튼을
+          내부에서 상대적으로 배치할 수 있도록 기준점이 됩니다.
+        */
+        .chat-list-item {
+            position: relative;
+            overflow: hidden;
+            background-color: white;
+        }
+        /* 실제 사용자가 보고 스와이프할 채팅방 정보 영역입니다.
+          li 내의 다른 요소(나가기 버튼)보다 위에 보이기 위해 z-index를 가집니다.
+        */
+        .swipeable-content {
+            position: relative;
+            z-index: 10;
+            background-color: inherit; /* 부모(li)의 배경색을 따름 */
+        }
+        /*
+          스와이프 시 나타날 '나가기' 버튼 영역입니다.
+          컨텐츠(z-index: 10)보다 뒤(z-index: 1)에 위치합니다.
+        */
+        .swipe-action {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 80px; /* 나가기 버튼의 폭 */
+            z-index: 1;
+        }
+        /* ▲▲▲ [추가] ▲▲▲ */
+
     </style>
 </head>
 <body>
@@ -95,64 +129,50 @@
             </div>
             
             <main id="main-content" class="flex-1 overflow-y-auto bg-gray-50">
-
-    <div id="chat-list-private">
-        <ul id="oneToOneList" class="space-y-3 p-4 bg-white">
-            <li class="bg-white rounded-xl p-4 flex items-center hover:bg-gray-100 transition shadow-sm border border-gray-100">
-                <div class="ml-4 flex-1 overflow-hidden">
-                    <p class="font-semibold text-gray-800 truncate">오늘의 밥풀이 추천</p>
-                    <p class="text-sm text-gray-500 truncate">맛있게 드세요~</p>
-                </div>
-                <div class="text-right flex flex-col items-end ml-2">
-                    <span class="text-xs text-gray-400">오후 3:21</span>
-                    <span class="mt-1 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">1</span>
-                </div>
-            </li>
-            <li class="bg-white rounded-xl p-4 flex items-center hover:bg-gray-100 transition shadow-sm border border-gray-100">
-                <div class="ml-4 flex-1 overflow-hidden">
-                    <p class="font-semibold text-gray-800 truncate">아늑한 식당 추천</p>
-                    <p class="text-sm text-gray-500 truncate">맛있게 드셨으니 기쁩니다^^</p>
-                </div>
-                <div class="text-right flex flex-col items-end ml-2">
-                    <span class="text-xs text-gray-400">어제</span>
-                    <div class="w-5 h-5"></div>
-                </div>
-            </li>
-        </ul>
-    </div>
-
-    <div id="chat-list-group" class="hidden"> 
-        <ul id="groupList" class="space-y-3 p-4 bg-white">
-            <li class="bg-white rounded-xl p-4 flex justify-between items-start hover:bg-gray-100 transition shadow-sm border border-gray-100">
                 
-                <div class="flex items-center space-x-3 flex-1 overflow-hidden"> 
-                    <img src="https://picsum.photos/100?random=1" class="w-16 h-16 rounded-lg object-cover flex-shrink-0" alt="Group"> 
-                    <div class="flex-1 overflow-hidden"> 
-                        <div class="flex items-center justify-between w-full">
-                            <div class="flex items-center space-x-2"> 
-                                <p class="font-semibold text-gray-800">졸업작품 팀</p>
-                                <div class="flex items-center space-x-1 text-sm text-gray-500">
-                                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                        <path d="M17 21v-2a4 4 0 0 0-3-3.87" />
-                                        <path d="M7 21v-2a4 4 0 0 1 3-3.87" />
-                                        <circle cx="12" cy="7" r="4" />
-                                    </svg>
-                                    <span>6</span>
+                <div id="chat-list-private">
+                    <ul class="space-y-3 p-4 bg-white">
+                        <li class="bg-white rounded-xl p-4 flex items-center hover:bg-gray-100 transition shadow-sm border border-gray-100">
+                            <div class="ml-4 flex-1 overflow-hidden">
+                                <p class="font-semibold text-gray-800 truncate">오늘의 밥풀이 추천</p>
+                                <p class="text-sm text-gray-500 truncate">맛있게 드세요~</p>
+                            </div>
+                            <div class="text-right flex flex-col items-end ml-2">
+                                <span class="text-xs text-gray-400">오후 3:21</span>
+                                <span class="mt-1 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">1</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div id="chat-list-group" class="hidden"> 
+                    <ul class="space-y-3 p-4 bg-white">
+                        <li class="bg-white rounded-xl p-4 flex justify-between items-start hover:bg-gray-100 transition shadow-sm border border-gray-100">
+                            <div class="flex items-center space-x-3 flex-1 overflow-hidden"> 
+                                <img src="https://picsum.photos/100?random=1" class="w-16 h-16 rounded-lg object-cover flex-shrink-0" alt="Group"> 
+                                <div class="flex-1 overflow-hidden"> 
+                                    <div class="flex items-center justify-between w-full">
+                                        <div class="flex items-center space-x-2"> 
+                                            <p class="font-semibold text-gray-800">졸업작품 팀</p>
+                                            <div class="flex items-center space-x-1 text-sm text-gray-500">
+                                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                    <path d="M17 21v-2a4 4 0 0 0-3-3.87" /><path d="M7 21v-2a4 4 0 0 1 3-3.87" /><circle cx="12" cy="7" r="4" />
+                                                </svg>
+                                                <span>6</span>
+                                            </div>
+                                        </div>
+                                        <div class="text-right text-sm text-gray-500 ml-2"> 
+                                            <p class="text-xs">오후 2:55</p> 
+                                        </div>
+                                    </div>
+                                    <p class="text-sm text-gray-500 truncate"> 졸업작품 힘내시고 맛있는 거 많이 드세요!</p>
                                 </div>
                             </div>
-                            <div class="text-right text-sm text-gray-500 ml-2"> 
-                                <p class="text-xs">오후 2:55</p> 
-                            </div>
-                        </div>
-                        <p class="text-sm text-gray-500 truncate"> 졸업작품 힘내시고 맛있는 거 많이 드세요!</p>
-                    </div>
+                        </li>
+                    </ul>
                 </div>
-
-
-            </li>
-        </ul>
-    </div>
-</main>
+            </main>
+            
             <div id="add-chat-popup" class="absolute bottom-24 left-1/2 -translate-x-1/2 w-48 bg-white rounded-md shadow-xl z-50 popup-hidden">
                 <div class="py-2">
                     <a href="chat_list.html" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
@@ -161,7 +181,7 @@
                         </svg>
                         채팅 목록
                     </a>
-                    <a href="#" id="start-private-chat-btn" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    <a href="chat.html" id="start-private-chat-btn" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
                         1:1 채팅방
                     </a>
@@ -201,7 +221,10 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { getFirestore, collection, query, where, getDocs, doc, getDoc, setDoc, onSnapshot, serverTimestamp, orderBy, limit, startAt, endAt } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        
+        // ▼▼▼ [수정] updateDoc, arrayRemove 추가 ▼▼▼
+        import { getFirestore, collection, query, where, getDocs, doc, getDoc, setDoc, onSnapshot, serverTimestamp, orderBy, limit, startAt, endAt, updateDoc, arrayRemove } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        // ▲▲▲ [수정] ▲▲▲
 
         // =================================================================================
         const firebaseConfig = {
@@ -229,22 +252,18 @@
         const friendEmailInput = document.getElementById('friend-email-input');
         const profileListContainer = document.getElementById('profile-list-container');
         
-        // ▼▼▼ [수정] 탭 UI 및 컨테이너 (A) ▼▼▼
         const tabPrivate = document.getElementById('tab-private');
         const tabGroup = document.getElementById('tab-group');
         const chatListPrivate = document.getElementById('chat-list-private');
         const chatListGroup = document.getElementById('chat-list-group');
         
-        // [수정] 헤더 검색 UI
         const searchBtn = document.getElementById('search-btn');
         const cancelSearchBtn = document.getElementById('cancel-search-btn');
         const headerMain = document.getElementById('header-main');
         const headerSearch = document.getElementById('header-search');
         const chatSearchInput = document.getElementById('chat-search-input');
         
-        // [수정] 팝업 메뉴 버튼
         const startPrivateChatBtn = document.getElementById('start-private-chat-btn');
-        // ▲▲▲ [수정] ▲▲▲
 
         let currentUser = null;
         let unsubscribeChatListener = null;
@@ -348,7 +367,7 @@
                 containerElement.appendChild(header);
 
                 const ul = document.createElement('ul');
-                ul.className = "bg-white"; // [수정] 흰색 배경 추가
+                ul.className = "bg-white"; 
                 for (const chat of todayChats) {
                     ul.appendChild(await createChatItem(chat)); 
                 }
@@ -362,7 +381,7 @@
                 containerElement.appendChild(header);
 
                 const ul = document.createElement('ul');
-                ul.className = "bg-white"; // [수정] 흰색 배경 추가
+                ul.className = "bg-white"; 
                 for (const chat of previousChats) {
                     ul.appendChild(await createChatItem(chat));
                 }
@@ -370,7 +389,7 @@
             }
         }
         
-        // --- 채팅 아이템 HTML 생성 ---
+        // --- ▼▼▼ [교체] 채팅 아이템 HTML 생성 (스와이프 기능 추가) ▼▼▼ ---
         async function createChatItem(chat) {
             const otherMemberId = chat.members.find(id => id !== currentUser.uid);
             let chatName = chat.name || '알 수 없는 채팅';
@@ -389,9 +408,14 @@
             
             const unreadCount = chat.unreadCount ? (chat.unreadCount[currentUser.uid] || 0) : 0;
             
+            // li 요소 생성
             const li = document.createElement('li');
-            // [수정] 스타일 수정 (border-b 추가)
-            li.innerHTML = `
+            li.className = 'chat-list-item'; // 스타일(relative, overflow, bg) 적용
+
+            // 1. 스와이프될 컨텐츠 (기존 a 태그)
+            const content = document.createElement('div');
+            content.className = 'swipeable-content'; // 스타일(relative, z-index, bg) 적용
+            content.innerHTML = `
                 <a href="chat.html?chatId=${chat.id}" class="flex items-center p-4 hover:bg-gray-100 transition-colors border-b border-gray-100">
                     <img class="h-14 w-14 rounded-full object-cover flex-shrink-0" src="${profileImageUrl}" alt="Profile">
                     <div class="ml-4 flex-1 overflow-hidden">
@@ -407,8 +431,57 @@
                     </div>
                 </a>
             `;
+
+            // 2. 뒤에 숨겨질 '나가기' 버튼
+            const action = document.createElement('div');
+            action.className = 'swipe-action bg-red-500 flex items-center justify-center'; // 스타일(absolute, z-index) 적용
+            action.innerHTML = `
+                <button class="leave-chat-btn text-white font-medium" data-chat-id="${chat.id}" data-chat-name="${chatName}">
+                    나가기
+                </button>
+            `;
+
+            // 3. li에 자식으로 추가 (순서 중요: action이 먼저, content가 나중)
+            li.appendChild(action);
+            li.appendChild(content);
+
+            // 4. Hammer.js 스와이프 로직 적용
+            const hammer = new Hammer(content);
+            const swipeThreshold = -80; // '나가기' 버튼의 폭
+
+            hammer.on('pan', (ev) => {
+                // 이전에 열린 다른 채팅방 닫기
+                document.querySelectorAll('.swipeable-content').forEach(otherContent => {
+                    if (otherContent !== content) {
+                        otherContent.style.transition = 'transform 0.2s ease-out';
+                        otherContent.style.transform = 'translateX(0px)';
+                    }
+                });
+
+                let newX = ev.deltaX;
+                // 오른쪽 스와이프 방지
+                if (newX > 0) newX = 0; 
+                // 임계값보다 더 스와이프 방지
+                if (newX < swipeThreshold) newX = swipeThreshold;
+
+                content.style.transition = 'none'; // 패닝 중에는 transition 제거
+                content.style.transform = `translateX(${newX}px)`;
+            });
+
+            hammer.on('panend', (ev) => {
+                content.style.transition = 'transform 0.2s ease-out'; // transition 복구
+                if (ev.deltaX < (swipeThreshold / 2)) {
+                    // 임계값의 절반 이상 밀었으면 열기
+                    content.style.transform = `translateX(${swipeThreshold}px)`;
+                } else {
+                    // 아니면 원위치
+                    content.style.transform = 'translateX(0px)';
+                }
+            });
+            
             return li;
         }
+        // --- ▲▲▲ [교체] ▲▲▲ ---
 
         // --- 빈 화면 표시 ---
         function showEmptyState(chatType = "채팅") {
@@ -444,6 +517,42 @@
                 return date.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
             }
         }
+
+        // --- ▼▼▼ [추가] 채팅방 나가기 로직 ▼▼▼ ---
+        async function leaveChat(chatId) {
+            if (!currentUser) return;
+            const chatRef = doc(db, "chats", chatId);
+            
+            try {
+                // members 배열에서 현재 유저를 제거합니다.
+                // onSnapshot 리스너가 이 변경을 감지하고 자동으로 목록에서 채팅방을 제거합니다.
+                await updateDoc(chatRef, {
+                    members: arrayRemove(currentUser.uid)
+                });
+                console.log(`Successfully left chat ${chatId}`);
+            } catch (error) {
+                console.error("Error leaving chat: ", error);
+                alert("채팅방 나가기에 실패했습니다.");
+            }
+        }
+
+        // '나가기' 버튼 클릭 이벤트 리스너 (이벤트 위임 사용)
+        document.getElementById('main-content').addEventListener('click', async (e) => {
+            // 클릭한 대상이 'leave-chat-btn' 클래스를 가졌는지 확인
+            if (e.target.classList.contains('leave-chat-btn')) {
+                e.preventDefault(); // 기본 동작(a 태그 링크 이동 등) 방지
+                e.stopPropagation(); // 이벤트 버블링 중지
+
+                const chatId = e.target.dataset.chatId;
+                const chatName = e.target.dataset.chatName;
+
+                if (confirm(`'${chatName}' 채팅방에서 나가시겠습니까?`)) {
+                    await leaveChat(chatId);
+                    // UI는 onSnapshot에 의해 자동으로 업데이트됩니다.
+                }
+            }
+        });
+        // --- ▲▲▲ [추가] ▲▲▲ ---
         
         // --- 친구 추가 기능 ---
         addFriendBtn.addEventListener('click', () => { addFriendModal.classList.remove('hidden'); addFriendModal.classList.add('flex'); });
@@ -524,15 +633,7 @@
         });
         overlay.addEventListener('click', closeAllPopups);
 
-        // 팝업 메뉴 -> '1:1 채팅' 클릭
-        startPrivateChatBtn.addEventListener('click', (e) => {
-            e.preventDefault(); // href="#" 이동 방지
-            closeAllPopups();
-            addFriendModal.classList.remove('hidden');
-            addFriendModal.classList.add('flex');
-            friendEmailInput.focus();
-        });
-
+        
         // --- 헤더 검색 기능 ---
         searchBtn.addEventListener('click', () => {
             headerMain.classList.add('hidden');
@@ -555,22 +656,20 @@
 
         chatSearchInput.addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase().trim();
-            // [수정] #main-content 내부의 li만 필터링
-            document.querySelectorAll('#main-content li').forEach(item => {
+            // #main-content 내부의 li만 필터링 (스와이프 구조에서도 잘 동작)
+            document.querySelectorAll('#main-content li.chat-list-item').forEach(item => {
                 const chatNameEl = item.querySelector('p.font-semibold');
                 if (chatNameEl) {
                     const chatName = chatNameEl.textContent.toLowerCase();
                     if (chatName.includes(term)) {
-                        item.style.display = '';
+                        item.style.display = ''; // li를 다시 보이게
                     } else {
-                        item.style.display = 'none';
+                        item.style.display = 'none'; // li를 숨김
                     }
                 }
             });
         });
-
-        // [제거] 불필요한 정적 탭(B) 로직 제거
- 
+  
     </script>
 </body>
 </html>
