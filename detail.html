@@ -424,6 +424,54 @@
                 return null;
             }
         }
+        function renderImage(image) {
+            const defalutImages = 'Untitled.png'; // 기본 이미지
+
+            let images = [];
+
+            if (typeof currentRestaurant.image === 'string' && currentRestaurant.image.trim() !== '') {
+                images = currentRestaurant.image.split(',').map(url => url.trim());
+            } 
+
+            const swiperWrapper = document.querySelector('.swiper-wrapper');
+            const swiperContainer = document.querySelector('#image-swiper');
+
+            swiperWrapper.innerHTML = '';
+
+            // 이미지가 1장인 경우
+            if (images.length === 1) {
+                swiperContainer.classList.remove('swiper');
+                swiperWrapper.innerHTML = `
+                    <div class="w-full h-full">
+                    <img src="${images[0]}" alt="식당 이미지" class="w-full h-full object-cover rounded-xl">
+                    </div>
+                `;
+            // 이미지가 2장 이상인 경우
+            } else if (images.length > 1) {
+                swiperContainer.classList.add('swiper');
+                images.forEach(imageUrl => {
+                    const slide = document.createElement('div');
+                    slide.className = 'swiper-slide';
+                    slide.innerHTML = `<img src="${imageUrl}" alt="식당 이미지" class="w-full h-full object-cover rounded-xl">`;
+                    swiperWrapper.appendChild(slide);
+            });
+
+            new Swiper('#image-swiper', {
+                loop: true,
+                pagination: {
+                el: '.swiper-pagination',
+                type: 'fraction',
+                },
+            });
+            // 가게 이미지가 없는 경우
+            } else {
+                swiperWrapper.innerHTML = `
+                    <div class="w-full h-full">
+                    <img src="${defalutImages}" alt="기본 이미지" class="w-full h-full object-cover rounded-xl">
+                    </div>
+                `;
+            }
+        }
 
         function renderReview(reviews) {
             reviewInfo.innerHTML = '';
@@ -468,10 +516,12 @@
             }
 
             menuListEl.innerHTML = menus.map(menu => {
-                const menuName = menu.menu_name || menu.name || '메뉴 이름 없음 (키 불일치)';
+                const menuName = menu.menu_name || menu.name || '메뉴 이름 없음';
+                const menuPrice = menu.menu_price || menu.price || '메뉴 가격 없음';
                 return `
                 <li class="flex justify-between items-center p-3 bg-white border-b border-gray-100 last:border-b-0">
                     <span class="font-medium text-gray-700">${menuName}</span>
+                    <span class="font-medium text-gray-700">${menuPrice}</span>
                 </li>
             `;
             }).join('');
@@ -575,42 +625,9 @@
             restaurantCategoryEl.textContent = currentRestaurant.category || '카테고리';
             restaurantAddressEl.textContent = currentRestaurant.address || '주소 정보 없음';
             restaurantPhoneEl.textContent = currentRestaurant.phone || '전화번호 정보 없음';
-            const swiperWrapper = document.querySelector('#image-swiper .swiper-wrapper');
-            swiperWrapper.innerHTML = ''; // 일단 비웁니다.
 
-            // 1. (수정) 로컬 테스트용 이미지 두 개
-            // detail.html과 Untitled.png, logo_test.png가 같은 폴더에 있으므로, 파일 이름만 적으면 됩니다.
-            const placeholderImages = [
-                'Untitled.png',        // 첫 번째 이미지
-                'logo_test.png'        // 두 번째 이미지
-            ];
-
-            // 2. (수정) 백엔드가 이미지를 안 주거나, 빈 배열([])로 줄 때
-            //        위에서 지정한 'placeholderImages' 배열을 사용하도록 합니다.
-            const images = (currentRestaurant.images && currentRestaurant.images.length > 0)
-                ? currentRestaurant.images
-                : placeholderImages;
-
-            if (images.length > 0) {
-                images.forEach(imageUrl => {
-                    const slide = document.createElement('div');
-                    slide.className = 'swiper-slide';
-                    slide.innerHTML = `<img src="${imageUrl}" alt="식당 이미지" class="w-full h-full object-cover">`;
-                    swiperWrapper.appendChild(slide);
-                });
-            }
-
-            // 2. Swiper 초기화
-            const swiper = new Swiper('#image-swiper', {
-                // Optional parameters
-                loop: images.length > 1, // 이미지가 1개보다 많을 때만 루프
-
-                // If we want pagination
-                pagination: {
-                    el: '.swiper-pagination',
-                    type: 'fraction',
-                },
-            });
+            // 이미지 렌더링
+            renderImage(currentRestaurant.image);
 
             // 운영 시간 정보 렌더링
             renderHours(currentRestaurant.hours);
