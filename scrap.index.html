@@ -193,149 +193,248 @@
     </a>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { firebaseConfig } from "./firebase-config.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+    import { firebaseConfig } from "./firebase-config.js";
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const headerAddButton = document.getElementById('header-add-button');
-            const collectionSheet = document.getElementById('collection-sheet');
-            const overlay = document.getElementById('overlay');
-            const createCollectionBtn = document.getElementById('create-collection-btn');
-            const collectionNameInput = document.getElementById('collection-name');
+    const FASTAPI_BASE_URL = 'https://bab-back.onrender.com';
+    //const FASTAPI_BASE_URL = 'http://127.0.0.1:8000'; // 로컬 테스트용
 
-            // '새 컬렉션' 시트 열기
-            function openCollectionSheet() {
-                overlay.classList.remove('hidden'); // 오버레이(배경) 표시
-                collectionSheet.classList.add('sheet-visible'); // 시트 보이기
-                collectionSheet.classList.remove('translate-y-full'); // 아래로 숨기는 클래스 제거
+    let currentUser = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- 1. 기본 UI 요소 가져오기 ---
+        const headerAddButton = document.getElementById('header-add-button');
+        const collectionSheet = document.getElementById('collection-sheet');
+        const overlay = document.getElementById('overlay');
+        const createCollectionBtn = document.getElementById('create-collection-btn');
+        const collectionNameInput = document.getElementById('collection-name');
+        const mainContent = document.getElementById('main-content');
+        
+        // --- [NEW] home.html에서 가져온 UI 요소 ---
+        const addChatBtn = document.getElementById('add-chat-btn');
+        const addChatPopup = document.getElementById('add-chat-popup');
+
+        // --- [NEW] 2. 모든 팝업을 닫는 통합 함수 ---
+        // (채팅 팝업과 새 컬렉션 시트가 동시에 뜨지 않도록 관리)
+        function closeAllPopups() {
+            // 1. 오버레이(배경) 숨기기
+            overlay.classList.add('hidden');
+            
+            // 2. '새 컬렉션' 바텀 시트 닫기
+            collectionSheet.classList.remove('sheet-visible');
+            collectionSheet.classList.add('translate-y-full');
+            
+            // 3. '채팅' 팝업 닫기 (home.html의 로직)
+            addChatPopup.classList.remove('popup-visible');
+            addChatPopup.classList.add('popup-hidden');
+        }
+
+        // --- 3. '새 컬렉션' 시트 여는 함수 (수정됨) ---
+        function openCollectionSheet() {
+            closeAllPopups(); // 다른 팝업(채팅)이 열려있으면 닫기
+            overlay.classList.remove('hidden'); 
+            collectionSheet.classList.add('sheet-visible'); 
+            collectionSheet.classList.remove('translate-y-full');
+        }
+
+        // '새 컬렉션' 시트 닫기 함수
+        function closeCollectionSheet() {
+            closeAllPopups(); // 통합 함수 호출
+            collectionNameInput.value = ''; 
+        }
+
+        // --- [NEW] 4. '채팅' 팝업 여는 로직 (home.html에서 가져옴) ---
+        addChatBtn.addEventListener('click', (event) => {
+            event.stopPropagation(); // 이벤트 버블링 방지
+            
+            // 현재 채팅 팝업이 열려있는지 확인
+            const isAddChatOpen = addChatPopup.classList.contains('popup-visible');
+            
+            // (중요) '새 컬렉션' 시트가 열려있을 수 있으니 일단 모두 닫기
+            closeAllPopups(); 
+            
+            // 채팅 팝업이 닫혀있었다면 열기
+            if (!isAddChatOpen) {
+                overlay.classList.remove('hidden');
+                addChatPopup.classList.remove('popup-hidden');
+                addChatPopup.classList.add('popup-visible');
+            }
+        });
+
+
+        // --- 5. 컬렉션 카드 1개를 만드는 함수 ---
+        function createCollectionCard(collection, isAllScraps = false) {
+            const card = document.createElement('div');
+            card.className = 'bg-white rounded-xl shadow-md overflow-hidden cursor-pointer transition-transform transform hover:scale-105';
+            card.dataset.id = collection.id;
+
+            const collectionImageUrl = collection.image_url;
+            let imageAreaContent = '';
+
+            // (A) 1:1 이미지 영역
+            if (collectionImageUrl) {
+                imageAreaContent = `
+            <img src="${collectionImageUrl}" alt="${collection.name} 대표 이미지" 
+                 class="absolute inset-0 w-full h-full object-cover">
+        `;
+            } else {
+                const bgColor = isAllScraps ?
+                    'bg-gradient-to-br from-orange-400 to-orange-500' : 
+                    'bg-gray-200';
+                imageAreaContent = `
+            <div class="absolute inset-0 ${bgColor}"></div>
+        `;
             }
 
-            // '새 컬렉션' 시트 닫기
-            function closeCollectionSheet() {
-                overlay.classList.add('hidden'); // 오버레이 숨기기
-                collectionSheet.classList.remove('sheet-visible'); // 시트 숨기기
-                collectionSheet.classList.add('translate-y-full'); // 아래로 숨기는 클래스 추가
-                collectionNameInput.value = ''; // 입력 필드 초기화
-            }
+            // (B) 하단 텍스트 영역
+            const textClass = isAllScraps ?
+                'text-orange-500 font-bold' :
+                'text-gray-800 font-bold';
 
-            // --- 이벤트 리스너 연결 ---
+            const textAreaContent = `
+        <div class="p-3"> 
+            <h3 class="${textClass} text-base truncate">${collection.name}</h3>
+        </div>
+    `;
 
-            // 헤더의 '+' 버튼 클릭 시 시트 열기
-            headerAddButton.addEventListener('click', openCollectionSheet);
+            // (A)와 (B) 조립
+            card.innerHTML = `
+        <div class="relative aspect-square">
+            ${imageAreaContent}
+        </div>
+        
+        ${textAreaContent}
+    `;
 
-            // 어두운 배경(오버레이) 클릭 시 시트 닫기
-            overlay.addEventListener('click', closeCollectionSheet);
-
-            // '만들기' 버튼 클릭 시
-            createCollectionBtn.addEventListener('click', () => {
-                const name = collectionNameInput.value.trim();
-                if (name) {
-                    // (TODO: 여기에 실제 컬렉션을 생성하는 API 호출 로직을 추가하세요)
-                    console.log('새 컬렉션:', name);
-                    closeCollectionSheet(); // 시트 닫기
-                } else {
-                    alert('컬렉션 이름을 입력하세요.');
-                }
+            // 카드 클릭 시 이벤트 (collection_list.html로 이동)
+            card.addEventListener('click', () => {
+                const collectionId = collection.id;
+                const collectionName = collection.name;
+                const encodedName = encodeURIComponent(collectionName);
+                
+                window.location.href = `collection_list.html?id=${collectionId}&name=${encodedName}`;
             });
-            const mainContent = document.getElementById('main-content');
 
-            const FASTAPI_BASE_URL = 'https://bab-back.onrender.com';
-            //const FASTAPI_BASE_URL = 'http://127.0.0.1:8000'; // 로컬 테스트용
+            return card;
+        }
 
-            let currentUser = null;
+        // --- 6. 컬렉션 목록 렌더링 함수 ---
+        function renderCollectionList(userCollections = [], allScrapsImageUrl = null) {
+            mainContent.innerHTML = ''; 
+            const grid = document.createElement('div');
+            grid.id = 'collection-grid';
+            grid.className = 'grid grid-cols-2 gap-4';
 
-            // 스크랩 목록 가져오기
-            async function fetchScrapList() {
-                if (!currentUser) return;
+            // 1. "모든 스크랩" 컬렉션 카드
+            const allScrapsCollection = {
+                id: 'all',
+                name: '모든 스크랩',
+                image_url: allScrapsImageUrl
+            };
+            const allScrapsCard = createCollectionCard(allScrapsCollection, true); 
+            grid.appendChild(allScrapsCard);
 
-                try {
-                    const idToken = await currentUser.getIdToken(true);
-                    const response = await fetch(`${FASTAPI_BASE_URL}/scraps/me`, {
-                        headers: { 'Authorization': `Bearer ${idToken}` }
-                    });
-
-                    if (!response.ok) throw new Error('스크랩 목록 조회 실패');
-
-                    const scraps = await response.json();
-                    renderScrapList(scraps);
-                } catch (error) {
-                    console.error('스크랩 목록 로드 실패:', error);
-                    mainContent.innerHTML = '<p class="text-center text-gray-500 mt-4">스크랩 목록을 불러오지 못했습니다.</p>';
-                }
-            }
-
-            // 스크랩 목록 렌더링
-            function renderScrapList(restaurants) {
-                mainContent.innerHTML = '';
-
-                if (restaurants.length === 0) {
-                    mainContent.innerHTML = '<p class="text-center text-gray-500 mt-4">스크랩한 식당이 없습니다.</p>';
-                    return;
-                }
-
-                const grid = document.createElement('div');
-                grid.className = 'grid grid-cols-2 gap-4';
-
-                restaurants.forEach(r => {
-                    const card = document.createElement('div');
-                    card.className = 'bg-white rounded-xl shadow-md overflow-hidden cursor-pointer relative aspect-square flex flex-col justify-end';
-                    card.dataset.id = r.id;
-
-                    // 카드 클릭 -> 상세 페이지 이동
-                    card.addEventListener('click', () => {
-                        window.location.href = `detail.html?id=${r.id}`;
-                    });
-
-                    card.innerHTML = `
-                ${r.image_url ? `
-                    <div class="flex-grow">
-                        <img src="${r.image_url}" alt="${r.name}" class="w-full h-full object-cover rounded-t-xl">
-                    </div>
-                ` : `
-                    <div class="flex-grow flex items-center justify-center bg-gray-200 text-gray-500 text-sm">
-                        이미지 없음
-                    </div>
-                `}
-                <div class="p-3">
-                    <h3 class="font-bold text-gray-800 text-base truncate">${r.name}</h3>
-                    <p class="text-sm text-gray-500 truncate">${r.category}</p>
-                </div>
-                <button class="absolute top-2 right-2 p-1.5 rounded-full text-[#FF7A5A] bg-white/70 hover:bg-orange-100 focus:outline-none">
-                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.5 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z"/>
-                    </svg>
-                </button>
-            `;
-
-                    // 북마크 버튼 클릭 시 카드 클릭 이벤트 막기
-                    const bookmarkBtn = card.querySelector('button');
-                    bookmarkBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        console.log('북마크 클릭!');
-                        // 여기에 북마크 기능 추가 가능
-                    });
-
+            // 2. 사용자가 생성한 다른 컬렉션들
+            if (userCollections.length > 0) {
+                userCollections.forEach(collection => {
+                    const card = createCollectionCard(collection, false); 
                     grid.appendChild(card);
                 });
+            }
+            mainContent.appendChild(grid);
+        }
 
-                mainContent.appendChild(grid);
+        // --- 7. (가상) API: 컬렉션 목록 불러오기 ---
+        async function fetchCollections() {
+            if (!currentUser) return;
+            mainContent.innerHTML = '<p class="text-center text-gray-500 mt-4">컬렉션 목록을 불러오는 중...</p>';
+
+            try {
+                // [임시 데이터]
+                await new Promise(resolve => setTimeout(resolve, 500));
+                const dummyCollections = [
+                    { id: '1', name: '가고싶은 곳', image_url: 'https://source.unsplash.com/random/300x300/?pasta' }
+                ];
+                // [임시 데이터 끝]
+
+                const allScrapsImageUrl = 'https://source.unsplash.com/random/300x300/?food,restaurant';
+                renderCollectionList(dummyCollections, allScrapsImageUrl);
+
+            } catch (error) {
+                console.error('컬렉션 목록 로드 실패:', error);
+                renderCollectionList([]); 
+            }
+        }
+
+        // --- 8. (가상) API: 새 컬렉션 생성 ---
+        async function createNewCollection(name) {
+             if (!currentUser) return null;
+             
+             try {
+                // [임시 데이터]
+                await new Promise(resolve => setTimeout(resolve, 300)); 
+                const newCollection = {
+                    id: `new_${Date.now()}`,
+                    name: name,
+                    image_url: null // 새로 만든건 이미지가 없음
+                };
+                // [임시 데이터 끝]
+                
+                return newCollection;
+
+             } catch (error) {
+                 console.error('컬렉션 생성 실패:', error);
+                 alert('컬렉션 생성에 실패했습니다.');
+                 return null;
+             }
+        }
+
+        // --- 9. 이벤트 리스너 연결 ---
+
+        // 헤더의 '+' 버튼 (새 컬렉션)
+        headerAddButton.addEventListener('click', openCollectionSheet);
+
+        // 어두운 배경 클릭 (수정됨)
+        overlay.addEventListener('click', closeAllPopups); // 통합 함수로 변경
+
+        // '만들기' 버튼 클릭
+        createCollectionBtn.addEventListener('click', async () => {
+            const name = collectionNameInput.value.trim();
+            if (!name) {
+                alert('컬렉션 이름을 입력하세요.');
+                return;
             }
 
-            // Firebase 인증
-            onAuthStateChanged(auth, (user) => {
-                if (user) {
-                    currentUser = user;
-                    fetchScrapList(); // 로그인되어 있으면 스크랩 목록 로드
+            const newCollection = await createNewCollection(name);
+
+            if (newCollection) {
+                const grid = document.getElementById('collection-grid');
+                const newCard = createCollectionCard(newCollection, false); 
+                
+                if (grid) {
+                    grid.appendChild(newCard);
                 } else {
-                    window.location.href = 'index.html'; // 로그인 안 된 경우
+                    renderCollectionList([newCollection]);
                 }
-            });
+                closeCollectionSheet(); 
+            }
         });
-    </script>
+
+        // --- 10. Firebase 인증 및 페이지 시작 ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                fetchCollections(); // 컬렉션 목록 불러오기
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+    });
+</script>
 </body>
 
 </html>
