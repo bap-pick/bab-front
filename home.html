@@ -386,20 +386,53 @@
 
             if (!res.ok) {
                 if (res.status === 404) {
-                    throw new Error("오행 분석 데이터가 아직 준비되지 않았습니다. 마이페이지에서 사주 정보 입력 여부를 확인해 주세요.");
+                    throw new Error("오행 분석에 필요한 데이터가 아직 준비되지 않았습니다.");
                 }
-                throw new Error(`추천 분석 API 오류: ${res.status} ${res.statusText}`);
+                throw new Error(`API 오류: ${res.status} ${res.statusText}`);
             }
             return res.json();
         }
 
-        // 식당 정보를 받아 캐러셀 카드로 렌더링하는 함수 (w-56으로 너비 축소)
+        // 식당 정보를 캐러셀 카드로 렌더링
         const renderRestaurantCard = (restaurant) => {
-            // 임시 이미지 URL을 생성 (실제 데이터에 'imageUrl'이 있다면 그것을 사용)
-            const imageUrl = restaurant.imageUrl || `https://source.unsplash.com/random/400x300/?food,restaurant,${Math.random()}`;
-            
-            // w-64 (256px)에서 w-56 (224px)로 너비 축소
-            // [재수정] 이미지 높이 h-48 -> h-64로 변경하여 카드 세로 길이 더 증가 (12rem -> 16rem)
+            const defaultImageUrl = 'Untitled.png'; 
+            let imageUrl = defaultImageUrl;
+
+            // 이미지 렌더링: image가 문자열인 동시에 비어있지 않은 경우 첫 번째 이미지 렌더링
+            if (typeof restaurant.image === 'string' && restaurant.image.trim() !== '') {
+                // 쉼표로 분리 후 앞뒤 공백 제거
+                const images = restaurant.image.split(',').map(url => url.trim()).filter(url => url);
+                
+                // 첫 번째 이미지 사용
+                if (images.length > 0) {
+                    imageUrl = images[0];
+                }
+            }
+
+            // 조건부 렌더링
+            const ratingValue = restaurant.rating || 0; 
+            const reviewCount = restaurant.review_count || 0;
+            let statsHtml = '';
+
+            // 1) 평점이 있으면 평점과 리뷰 개수 모두 표시
+            if (ratingValue > 0) {
+                statsHtml = `
+                    <div class="flex items-center text-sm text-gray-500 mt-2">
+                        <span class="material-symbols-outlined text-yellow-500 text-base mr-1 fill-1">star</span>
+                        <span class="font-semibold">${ratingValue.toFixed(1)}</span>
+                        <span class="ml-2 text-gray-400">리뷰 ${reviewCount}개</span>
+                    </div>
+                `;
+            } 
+            // 2) 평점이 없으면 리뷰 개수만 표시
+            else {
+                statsHtml = `
+                    <div class="flex items-center text-sm text-gray-500 mt-2">
+                        <span class="text-gray-400">리뷰 ${reviewCount}개</span>
+                    </div>
+                `;
+            }
+
             return `
                 <a href="detail.html?id=${restaurant.id}" class="flex-shrink-0 w-56 bg-white rounded-lg shadow-xl overflow-hidden transform transition-transform duration-300 hover:scale-[1.03] hover:shadow-2xl">
                     <div class="relative w-full h-64"> 
@@ -409,67 +442,70 @@
                     <div class="p-4">
                         <h4 class="font-bold text-lg text-gray-900 truncate">${restaurant.name}</h4>
                         <p class="text-sm text-gray-600 truncate mt-1">${restaurant.category}</p>
-                        <div class="flex items-center text-sm text-gray-500 mt-2">
-                            <span class="material-symbols-outlined text-yellow-500 text-base mr-1 fill-1">star</span>
-                            <span class="font-semibold">4.5</span>
-                            <span class="ml-2 text-gray-400">리뷰 120개</span>
-                        </div>
+                        
+                        ${statsHtml}
+                        
                         <p class="text-xs text-gray-400 mt-2 truncate">${restaurant.address}</p>
                     </div>
                 </a>
             `;
         };
 
-        // 오늘의 오행에 따른 추천 식당 목록을 API에서 가져와서 렌더링하는 함수
-        const fetchRecommendedRestaurants = async (idToken) => {
+        // 추천 식당 목록 렌더링
+        const fetchRecommendedRestaurants = async (idToken, restaurantIds) => {
             const carouselEl = document.getElementById('restaurant-carousel');
 
             if (!carouselEl || !idToken) {
                 return;
             }
 
+            // 테스트용으로 임의의 id 설정 
+            const testRestaurantIds = [1, 5, 8, 12, 15];
+
+            // const idsToFetch = restaurantIds.length > 0 ? restaurantIds.slice(0, 5) : testRestaurantIds;
+            const idsToFetch = testRestaurantIds;
+
+            if (idsToFetch.length === 0) {
+                carouselEl.innerHTML = '<p class="text-gray-500 p-3">불러올 맛집이 없습니다</p>';
+                return;
+            }
+            
             // 1. 로딩 메시지 표시
-            carouselEl.innerHTML = `<p id="nearby-restaurants-loading" class="text-gray-500 p-3">주변 맛집 정보를 불러오는 중...</p>`;
+            carouselEl.innerHTML = `<p class="text-gray-500 p-3">추천 식당 정보를 ${idsToFetch.length}개 불러오는 중...</p>`;
 
             try {
-                const response = await fetch(`${FASTAPI_BASE_URL}/saju/restaurants`, {
+                // 2. ID 목록을 쿼리 스트링으로 변환 (ids=1&ids=5&ids=8)
+                const queryParams = idsToFetch.map(id => `ids=${id}`).join('&');
+                
+                // 3. 새로운 목록 조회 API 호출
+                const response = await fetch(`${FASTAPI_BASE_URL}/restaurants/summaries?${queryParams}`, {
                     method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${idToken}`,
-                        'Content-Type': 'application/json'
-                    }
+                    headers: { 'Authorization': `Bearer ${idToken}` }
                 });
 
-                if (response.status === 404) {
-                    carouselEl.innerHTML = '<p class="text-gray-500 p-3">사용자 정보 또는 오행 분석 정보가 없어 추천 식당을 찾을 수 없습니다.</p>';
-                    return;
-                }
                 if (!response.ok) {
-                    throw new Error('추천 식당 목록을 불러오는 데 실패했습니다.');
+                    if (response.status === 404) {
+                        throw new Error('요청한 ID에 해당하는 식당을 찾을 수 없습니다.');
+                    }
+                    throw new Error(`식당 목록 API 오류: ${response.status} ${response.statusText}`);
                 }
 
-                const data = await response.json();
-                const restaurants = data.restaurants;
-
-                // localStorage에 추천 식당 데이터 저장
-                localStorage.setItem('RecommendedRestaurants', JSON.stringify(restaurants));
-
+                const restaurants = await response.json();
+                
                 if (restaurants.length === 0) {
-                    carouselEl.innerHTML = '<p class="text-gray-500 p-3">현재 오행에 맞는 추천 식당이 없습니다.</p>';
+                    carouselEl.innerHTML = '<p class="text-gray-500 p-3">추천 식당 정보를 하나도 가져오지 못했습니다.</p>';
                     return;
                 }
 
-                // 로딩 메시지 제거 및 식당 목록 렌더링
+                // 4. 로딩 메시지 제거 및 식당 목록 렌더링
                 carouselEl.innerHTML = '';
-
                 restaurants.forEach(rest => {
                     carouselEl.insertAdjacentHTML('beforeend', renderRestaurantCard(rest));
                 });
-
+                
             } catch (err) {
                 console.error("Restaurant fetch failed:", err);
-                const message = err.message || '식당 정보를 불러오는 중 서버 오류가 발생했습니다.';
-                carouselEl.innerHTML = `<p class="text-gray-500 p-3">${message}</p>`;
+                carouselEl.innerHTML = `<p class="text-gray-500 p-3">${err.message || '식당 정보를 불러오는 중 오류가 발생했습니다.'}</p>`;
             }
         };
 
@@ -538,7 +574,6 @@
                 };
                 updateSajuStats(mappedStats);
 
-                // 오행 비율 분석이 성공하면, 식당 추천 API 호출
                 await fetchRecommendedRestaurants(idToken);
             } catch (err) {
                 console.error("Recommendation fetch failed:", err);
