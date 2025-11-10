@@ -12,12 +12,12 @@
         html, body {
             height: 100%;
             margin: 0;
-            overflow: hidden; /* body 자체 스크롤 방지 */
+            overflow: hidden;
         }
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f8f9fa;
-            padding-bottom: 80px; /* 하단 네비게이션 공간 확보 */
+            padding-bottom: 80px;
         }
         .popup-hidden {
             opacity: 0;
@@ -31,50 +31,39 @@
             transition: all 0.2s ease-in;
             pointer-events: auto;
         }
-        /* 활성화된 탭 스타일 */
+
         .tab-active {
-            color: #EF633A; /* 밥픽 오렌지색 */
+            color: #EF633A;
             font-weight: 700;
             border-bottom-width: 2px;
             border-color: #EF633A;
         }
-        /* 비활성화된 탭 스타일 */
+
         .tab-inactive {
-            color: #6b7280; /* 회색 */
+            color: #6b7280;
             font-weight: 500;
         }
 
-        /* ▼▼▼ [추가] 스와이프 관련 스타일 ▼▼▼ */
-        /* li 항목이 스와이프 컨텐츠와 액션 버튼을
-          내부에서 상대적으로 배치할 수 있도록 기준점이 됩니다.
-        */
         .chat-list-item {
             position: relative;
             overflow: hidden;
             background-color: white;
         }
-        /* 실제 사용자가 보고 스와이프할 채팅방 정보 영역입니다.
-          li 내의 다른 요소(나가기 버튼)보다 위에 보이기 위해 z-index를 가집니다.
-        */
+
         .swipeable-content {
             position: relative;
             z-index: 10;
-            background-color: inherit; /* 부모(li)의 배경색을 따름 */
+            background-color: inherit;
         }
-        /*
-          스와이프 시 나타날 '나가기' 버튼 영역입니다.
-          컨텐츠(z-index: 10)보다 뒤(z-index: 1)에 위치합니다.
-        */
+
         .swipe-action {
             position: absolute;
             top: 0;
             right: 0;
             bottom: 0;
-            width: 80px; /* 나가기 버튼의 폭 */
+            width: 80px;
             z-index: 1;
         }
-        /* ▲▲▲ [추가] ▲▲▲ */
-
     </style>
 </head>
 <body>
@@ -132,43 +121,11 @@
                 
                 <div id="chat-list-private">
                     <ul class="space-y-3 p-4 bg-white">
-                        <li class="bg-white rounded-xl p-4 flex items-center hover:bg-gray-100 transition shadow-sm border border-gray-100">
-                            <div class="ml-4 flex-1 overflow-hidden">
-                                <p class="font-semibold text-gray-800 truncate">오늘의 밥풀이 추천</p>
-                                <p class="text-sm text-gray-500 truncate">맛있게 드세요~</p>
-                            </div>
-                            <div class="text-right flex flex-col items-end ml-2">
-                                <span class="text-xs text-gray-400">오후 3:21</span>
-                                <span class="mt-1 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">1</span>
-                            </div>
-                        </li>
                     </ul>
                 </div>
 
                 <div id="chat-list-group" class="hidden"> 
                     <ul class="space-y-3 p-4 bg-white">
-                        <li class="bg-white rounded-xl p-4 flex justify-between items-start hover:bg-gray-100 transition shadow-sm border border-gray-100">
-                            <div class="flex items-center space-x-3 flex-1 overflow-hidden"> 
-                                <img src="https://picsum.photos/100?random=1" class="w-16 h-16 rounded-lg object-cover flex-shrink-0" alt="Group"> 
-                                <div class="flex-1 overflow-hidden"> 
-                                    <div class="flex items-center justify-between w-full">
-                                        <div class="flex items-center space-x-2"> 
-                                            <p class="font-semibold text-gray-800">졸업작품 팀</p>
-                                            <div class="flex items-center space-x-1 text-sm text-gray-500">
-                                                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                                    <path d="M17 21v-2a4 4 0 0 0-3-3.87" /><path d="M7 21v-2a4 4 0 0 1 3-3.87" /><circle cx="12" cy="7" r="4" />
-                                                </svg>
-                                                <span>6</span>
-                                            </div>
-                                        </div>
-                                        <div class="text-right text-sm text-gray-500 ml-2"> 
-                                            <p class="text-xs">오후 2:55</p> 
-                                        </div>
-                                    </div>
-                                    <p class="text-sm text-gray-500 truncate"> 졸업작품 힘내시고 맛있는 거 많이 드세요!</p>
-                                </div>
-                            </div>
-                        </li>
                     </ul>
                 </div>
             </main>
@@ -221,26 +178,15 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        
-        // ▼▼▼ [수정] updateDoc, arrayRemove 추가 ▼▼▼
-        import { getFirestore, collection, query, where, getDocs, doc, getDoc, setDoc, onSnapshot, serverTimestamp, orderBy, limit, startAt, endAt, updateDoc, arrayRemove } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
-        // ▲▲▲ [수정] ▲▲▲
+        import { firebaseConfig } from "./firebase-config.js";
 
-        // =================================================================================
-        const firebaseConfig = {
-          apiKey: "AIzaSyAlmVXljDPwkmi4rik69GLhBIHLskw7P2o",
-          authDomain: "bapick-front.firebaseapp.com",
-          projectId: "bapick-front",
-          storageBucket: "bapick-front.firebasestorage.app",
-          messagingSenderId: "883956844611",
-          appId: "1:883956844611:web:ac74a589aae30be9d0ecf6",
-          measurementId: "G-Z1WEHMPL7F"
-        };
-        // =================================================================================
-        
+        // Firebase 앱 초기화
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
+
+        // api url
+        //const FASTAPI_BASE_URL = "https://bab-back.onrender.com"; 
+        const FASTAPI_BASE_URL = 'http://127.0.0.1:8000'; // 로컬 테스트용
 
         // --- UI 요소 ---
         const overlay = document.getElementById('overlay');
@@ -264,20 +210,93 @@
         const chatSearchInput = document.getElementById('chat-search-input');
         
         const startPrivateChatBtn = document.getElementById('start-private-chat-btn');
-
+        
         let currentUser = null;
-        let unsubscribeChatListener = null;
+        let searchTimeout;
 
         // --- 로그인 상태 확인 ---
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
-                listenToChats();
+                fetchChats(false); // 로그인 후 기본 탭 (1:1 채팅) 로드
             } else {
                 window.location.href = 'index.html';
             }
         });
 
+        // --- 채팅 목록 호출 및 렌더링 ---
+        async function fetchChats(isGroup) {
+            if (!currentUser) return;
+            
+            const chatType = isGroup ? "단체" : "1:1";
+            const containerElement = isGroup ? chatListGroup : chatListPrivate;
+            
+            containerElement.innerHTML = `<p class="p-4 text-center text-gray-500">채팅 목록을 불러오는 중...</p>`; 
+
+            try {
+                const token = await currentUser.getIdToken();
+                
+                const url = new URL(`${FASTAPI_BASE_URL}/chat/list`);
+                url.searchParams.append('is_group', isGroup);
+
+                const response = await fetch(url.toString(), {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`, 
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.status === 404) {
+                    throw new Error('사용자 인증 실패 또는 API 오류');
+                }
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+                }
+
+                const chats = await response.json();
+                
+                await renderGroupedList(containerElement, chats, chatType, isGroup);
+
+            } catch (error) {
+                console.error("채팅 목록 로드 실패:", error);
+                containerElement.innerHTML = showEmptyState(chatType, true);
+            }
+        }
+
+        // --- 채팅방 나가기 로직 ---
+        async function leaveChat(roomId) {
+            if (!currentUser) return;
+            
+            try {
+                const token = await currentUser.getIdToken();
+                
+                const response = await fetch(`${FASTAPI_BASE_URL}/chat/${roomId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`, 
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+                }
+                
+                console.log(`Successfully left chat ${roomId}`);
+                
+                // 목록 갱신
+                const isGroupActive = tabGroup.classList.contains('tab-active');
+                fetchChats(isGroupActive);
+
+            } catch (error) {
+                console.error("Error leaving chat: ", error);
+                alert(`채팅방 나가기에 실패했습니다: ${error.message}`);
+            }
+        }
+        
         // --- 탭 스위칭 로직 ---
         tabPrivate.addEventListener('click', () => {
             chatListPrivate.classList.remove('hidden');
@@ -285,6 +304,8 @@
             
             tabPrivate.classList.replace('tab-inactive', 'tab-active');
             tabGroup.classList.replace('tab-active', 'tab-inactive');
+            
+            fetchChats(false); // 1:1 채팅 로드
         });
 
         tabGroup.addEventListener('click', () => {
@@ -293,64 +314,50 @@
 
             tabGroup.classList.replace('tab-inactive', 'tab-active');
             tabPrivate.classList.replace('tab-active', 'tab-inactive');
+            
+            fetchChats(true); // 단체 채팅 로드
         });
 
-        // --- 채팅 목록 실시간 감지 ---
-        function listenToChats() {
-            if (unsubscribeChatListener) unsubscribeChatListener(); 
-
-            const chatsRef = collection(db, "chats");
-            const q = query(chatsRef, 
-                where("members", "array-contains", currentUser.uid),
-                orderBy("lastUpdatedAt", "desc")
-            );
-
-            unsubscribeChatListener = onSnapshot(q, (snapshot) => {
-                if (snapshot.empty) {
-                    chatListPrivate.innerHTML = showEmptyState("1:1");
-                    chatListGroup.innerHTML = showEmptyState("단체");
-                    return;
-                }
-                renderChatTabs(snapshot.docs);
-            });
-        }
-        
-        // --- 탭/그룹별 렌더링 함수 ---
-        async function renderChatTabs(docs) {
-            const privateChats = [];
-            const groupChats = [];
-
-            for (const doc of docs) {
-                const chat = { id: doc.id, ...doc.data() };
-                if (chat.type === 'private' || !chat.type) { // type 없어도 1:1로 분류
-                    privateChats.push(chat);
-                } else if (chat.type === 'group') {
-                    groupChats.push(chat);
-                }
-            }
-
-            await renderGroupedList(chatListPrivate, privateChats, "1:1");
-            await renderGroupedList(chatListGroup, groupChats, "단체");
-        }
-
         // "오늘/이전" 그룹으로 나누어 렌더링하는 함수
-        async function renderGroupedList(containerElement, chats, chatType) {
-            containerElement.innerHTML = ''; // 렌더링 전 초기화
+        async function renderGroupedList(containerElement, chats, chatType, isGroup) {
+            containerElement.innerHTML = ''; 
 
             if (chats.length === 0) {
                 containerElement.innerHTML = showEmptyState(chatType);
                 return;
             }
 
+            const chatsWithDate = chats.map(chat => ({
+                ...chat,
+                lastUpdatedAt: chat.last_message_timestamp ? new Date(chat.last_message_timestamp) : null
+            }));
+            
+            chatsWithDate.sort((a, b) => {
+                const aTime = a.lastUpdatedAt ? a.lastUpdatedAt.getTime() : 0;
+                const bTime = b.lastUpdatedAt ? b.lastUpdatedAt.getTime() : 0;
+                return bTime - aTime;
+            });
+
             const todayChats = [];
             const previousChats = [];
-            const today = new Date();
-            today.setHours(0, 0, 0, 0); 
+            const now = new Date();
 
-            for (const chat of chats) {
+            const todayString = now.toLocaleDateString('ko-KR', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                timeZone: 'Asia/Seoul'
+            });
+            const todayKST = new Date(todayString + ' 00:00:00');
+
+            const today = todayKST;
+            
+            const yesterday = new Date(today);
+            yesterday.setDate(today.getDate() - 1);
+
+            for (const chat of chatsWithDate) {
                 if (chat.lastUpdatedAt) {
-                    const lastUpdateDate = chat.lastUpdatedAt.toDate();
-                    if (lastUpdateDate >= today) {
+                    if (chat.lastUpdatedAt >= today) {
                         todayChats.push(chat);
                     } else {
                         previousChats.push(chat);
@@ -360,6 +367,8 @@
                 }
             }
 
+            const ulClass = "bg-white"; 
+
             if (todayChats.length > 0) {
                 const header = document.createElement('h2');
                 header.className = "text-sm font-medium text-gray-500 p-4 pb-2";
@@ -367,9 +376,9 @@
                 containerElement.appendChild(header);
 
                 const ul = document.createElement('ul');
-                ul.className = "bg-white"; 
+                ul.className = ulClass; 
                 for (const chat of todayChats) {
-                    ul.appendChild(await createChatItem(chat)); 
+                    ul.appendChild(await createChatItem(chat, isGroup)); 
                 }
                 containerElement.appendChild(ul);
             }
@@ -381,49 +390,66 @@
                 containerElement.appendChild(header);
 
                 const ul = document.createElement('ul');
-                ul.className = "bg-white"; 
+                ul.className = ulClass; 
                 for (const chat of previousChats) {
-                    ul.appendChild(await createChatItem(chat));
+                    ul.appendChild(await createChatItem(chat, isGroup));
                 }
                 containerElement.appendChild(ul);
             }
         }
         
-        // --- ▼▼▼ [교체] 채팅 아이템 HTML 생성 (스와이프 기능 추가) ▼▼▼ ---
-        async function createChatItem(chat) {
-            const otherMemberId = chat.members.find(id => id !== currentUser.uid);
-            let chatName = chat.name || '알 수 없는 채팅';
-            let profileImageUrl = 'https://via.placeholder.com/128';
+        // --- 채팅 아이템 생성 ---
+        async function createChatItem(chat, isGroup) {
+            let chatName = chat.name || '밥풀이';
+            let profileImageUrl = 'Untitled.png'; 
 
-            if ((chat.type === 'private' || !chat.type) && otherMemberId) {
-                try {
-                    const userDoc = await getDoc(doc(db, "users", otherMemberId));
-                    if (userDoc.exists()) {
-                        const userData = userDoc.data();
-                        chatName = userData.nickname || userData.email;
-                        profileImageUrl = userData.profileImageUrl || profileImageUrl;
-                    }
-                } catch (e) { console.warn(e); }
-            }
+            const unreadCount = 0;
             
-            const unreadCount = chat.unreadCount ? (chat.unreadCount[currentUser.uid] || 0) : 0;
-            
-            // li 요소 생성
             const li = document.createElement('li');
-            li.className = 'chat-list-item'; // 스타일(relative, overflow, bg) 적용
+            li.className = 'chat-list-item relative overflow-hidden border-b last:border-b-0'; 
+            li.dataset.roomId = chat.id;
 
-            // 1. 스와이프될 컨텐츠 (기존 a 태그)
+            const link = document.createElement('a');
+            link.href = `/chat.html?roomId=${chat.id}`; 
+            link.className = 'flex items-center w-full p-4 hover:bg-gray-50';
+
             const content = document.createElement('div');
-            content.className = 'swipeable-content'; // 스타일(relative, z-index, bg) 적용
+            content.className = 'swipeable-content'; 
+            
+            const lastUpdateTime = chat.lastUpdatedAt || null; 
+            const formattedTime = formatTimestamp(lastUpdateTime);
+            const messageContent = chat.last_message_content || '대화 내용 없음';
+
+            let nameAndDetailHtml;
+
+            if (isGroup) {
+                // 단체 채팅: 이름 + 멤버 수 표시
+                nameAndDetailHtml = `
+                    <div class="flex items-center space-x-2"> 
+                        <p class="font-semibold text-gray-800 truncate">${chatName}</p>
+                        <div class="flex items-center space-x-1 text-sm text-gray-500 flex-shrink-0">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path d="M17 21v-2a4 4 0 0 0-3-3.87" /><path d="M7 21v-2a4 4 0 0 1 3-3.87" /><circle cx="12" cy="7" r="4" />
+                            </svg>
+                            <span>${chat.member_count !== null ? chat.member_count : '?'}</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // 1:1 채팅: 이름만 표시
+                nameAndDetailHtml = `<p class="font-semibold text-gray-800 truncate">${chatName}</p>`;
+            }
+
+
             content.innerHTML = `
-                <a href="chat.html?chatId=${chat.id}" class="flex items-center p-4 hover:bg-gray-100 transition-colors border-b border-gray-100">
+                <a href="chat.html?roomId=${chat.id}" class="flex items-center p-4 hover:bg-gray-100 transition-colors border-b border-gray-100">
                     <img class="h-14 w-14 rounded-full object-cover flex-shrink-0" src="${profileImageUrl}" alt="Profile">
                     <div class="ml-4 flex-1 overflow-hidden">
-                        <p class="font-semibold text-gray-800 truncate">${chatName}</p>
-                        <p class="text-sm text-gray-500 truncate">${chat.lastMessage || '...'}</p>
+                        ${nameAndDetailHtml}
+                        <p class="text-sm text-gray-500 truncate mt-0.5">${messageContent}</p>
                     </div>
                     <div class="flex flex-col items-end space-y-1.5 flex-shrink-0 ml-2 w-16 text-right">
-                        <span class="text-xs text-gray-400">${formatTimestamp(chat.lastUpdatedAt)}</span>
+                        <span class="text-xs text-gray-400">${formattedTime}</span>
                         ${unreadCount > 0 
                             ? `<span class="bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">${unreadCount > 9 ? '9+' : unreadCount}</span>` 
                             : '<div class="w-5 h-5"></div>' 
@@ -434,23 +460,21 @@
 
             // 2. 뒤에 숨겨질 '나가기' 버튼
             const action = document.createElement('div');
-            action.className = 'swipe-action bg-red-500 flex items-center justify-center'; // 스타일(absolute, z-index) 적용
+            action.className = 'swipe-action bg-red-500 flex items-center justify-center'; 
             action.innerHTML = `
-                <button class="leave-chat-btn text-white font-medium" data-chat-id="${chat.id}" data-chat-name="${chatName}">
+                <button class="leave-chat-btn text-white font-medium" data-room-id="${chat.id}" data-chat-name="${chatName}">
                     나가기
                 </button>
             `;
 
-            // 3. li에 자식으로 추가 (순서 중요: action이 먼저, content가 나중)
             li.appendChild(action);
             li.appendChild(content);
 
             // 4. Hammer.js 스와이프 로직 적용
             const hammer = new Hammer(content);
-            const swipeThreshold = -80; // '나가기' 버튼의 폭
+            const swipeThreshold = -80; 
 
             hammer.on('pan', (ev) => {
-                // 이전에 열린 다른 채팅방 닫기
                 document.querySelectorAll('.swipeable-content').forEach(otherContent => {
                     if (otherContent !== content) {
                         otherContent.style.transition = 'transform 0.2s ease-out';
@@ -459,159 +483,76 @@
                 });
 
                 let newX = ev.deltaX;
-                // 오른쪽 스와이프 방지
                 if (newX > 0) newX = 0; 
-                // 임계값보다 더 스와이프 방지
                 if (newX < swipeThreshold) newX = swipeThreshold;
 
-                content.style.transition = 'none'; // 패닝 중에는 transition 제거
+                content.style.transition = 'none'; 
                 content.style.transform = `translateX(${newX}px)`;
             });
 
             hammer.on('panend', (ev) => {
-                content.style.transition = 'transform 0.2s ease-out'; // transition 복구
+                content.style.transition = 'transform 0.2s ease-out';
                 if (ev.deltaX < (swipeThreshold / 2)) {
-                    // 임계값의 절반 이상 밀었으면 열기
                     content.style.transform = `translateX(${swipeThreshold}px)`;
                 } else {
-                    // 아니면 원위치
                     content.style.transform = 'translateX(0px)';
                 }
             });
             
             return li;
         }
-        // --- ▲▲▲ [교체] ▲▲▲ ---
 
         // --- 빈 화면 표시 ---
-        function showEmptyState(chatType = "채팅") {
+        function showEmptyState(chatType = "채팅", isError = false) {
             const typeText = chatType === "1:1" ? "1:1 채팅" : "단체 채팅";
+            const message = isError 
+                ? `채팅 목록을 불러오는 데 실패했습니다.`
+                : `참여 중인 ${typeText}이 없습니다.`;
+            const subMessage = isError 
+                ? `잠시 후 다시 시도해 주세요.`
+                : `새로운 대화를 시작해보세요.`;
+
             return `
                 <div class="h-full flex flex-col items-center justify-center text-center p-4 mt-16">
                     <div class="bg-gray-200 p-5 rounded-full mb-4 inline-block">
                         <svg class="w-12 h-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </div>
-                    <h2 class="mt-2 text-lg font-medium text-gray-900">참여 중인 ${typeText}이 없습니다.</h2>
-                    <p class="mt-1 text-sm text-gray-500">새로운 대화를 시작해보세요.</p>
+                    <h2 class="mt-2 text-lg font-medium text-gray-900">${message}</h2>
+                    <p class="mt-1 text-sm text-gray-500">${subMessage}</p>
                 </div>`;
         }
 
         // --- 날짜 포맷 ---
-        function formatTimestamp(firebaseTimestamp) {
-            if (!firebaseTimestamp) return '';
+        function formatTimestamp(dateObj) {
+            if (!(dateObj instanceof Date) || isNaN(dateObj.getTime())) return '';
             
-            const date = firebaseTimestamp.toDate();
+            const date = dateObj;
             const now = new Date();
             const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
             const yesterday = new Date(today);
             yesterday.setDate(today.getDate() - 1);
 
             if (date >= today) {
-                // 오늘: "오후 3:21"
                 return date.toLocaleTimeString('ko-KR', { hour: 'numeric', minute: '2-digit', hour12: true });
             } else if (date >= yesterday) {
-                // 어제
                 return '어제';
             } else {
-                // 이전: "10월 31일"
                 return date.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
             }
         }
 
-        // --- ▼▼▼ [추가] 채팅방 나가기 로직 ▼▼▼ ---
-        async function leaveChat(chatId) {
-            if (!currentUser) return;
-            const chatRef = doc(db, "chats", chatId);
-            
-            try {
-                // members 배열에서 현재 유저를 제거합니다.
-                // onSnapshot 리스너가 이 변경을 감지하고 자동으로 목록에서 채팅방을 제거합니다.
-                await updateDoc(chatRef, {
-                    members: arrayRemove(currentUser.uid)
-                });
-                console.log(`Successfully left chat ${chatId}`);
-            } catch (error) {
-                console.error("Error leaving chat: ", error);
-                alert("채팅방 나가기에 실패했습니다.");
-            }
-        }
-
-        // '나가기' 버튼 클릭 이벤트 리스너 (이벤트 위임 사용)
+        // --- '나가기' 버튼 클릭 이벤트 리스너 ---
         document.getElementById('main-content').addEventListener('click', async (e) => {
-            // 클릭한 대상이 'leave-chat-btn' 클래스를 가졌는지 확인
             if (e.target.classList.contains('leave-chat-btn')) {
-                e.preventDefault(); // 기본 동작(a 태그 링크 이동 등) 방지
-                e.stopPropagation(); // 이벤트 버블링 중지
+                e.preventDefault(); 
+                e.stopPropagation(); 
 
-                const chatId = e.target.dataset.chatId;
+                const roomId = e.target.dataset.roomId; // data-room-id 사용
                 const chatName = e.target.dataset.chatName;
 
-                if (confirm(`'${chatName}' 채팅방에서 나가시겠습니까?`)) {
-                    await leaveChat(chatId);
-                    // UI는 onSnapshot에 의해 자동으로 업데이트됩니다.
+                if (confirm(`'${chatName}' 채팅방에서 나가시겠습니까? (방이 삭제됩니다)`)) {
+                    await leaveChat(roomId);
                 }
-            }
-        });
-        // --- ▲▲▲ [추가] ▲▲▲ ---
-        
-        // --- 친구 추가 기능 ---
-        addFriendBtn.addEventListener('click', () => { addFriendModal.classList.remove('hidden'); addFriendModal.classList.add('flex'); });
-        cancelAddFriendBtn.addEventListener('click', () => { addFriendModal.classList.add('hidden'); addFriendModal.classList.remove('flex'); });
-        
-        let searchTimeout;
-        friendEmailInput.addEventListener('input', () => {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(async () => {
-                const searchTerm = friendEmailInput.value.trim();
-                if (!searchTerm) {
-                    profileListContainer.innerHTML = '';
-                    profileListContainer.classList.add('hidden');
-                    return;
-                }
-                const usersRef = collection(db, "users");
-                const q = query(usersRef, where("email", ">=", searchTerm), where("email", "<=", searchTerm + '\uf8ff'));
-                const querySnapshot = await getDocs(q);
-
-                profileListContainer.innerHTML = '';
-                if (querySnapshot.empty) {
-                    profileListContainer.innerHTML = '<p class="text-center text-sm text-gray-500">사용자를 찾을 수 없습니다.</p>';
-                } else {
-                    querySnapshot.forEach(doc => {
-                        if (doc.id === currentUser.uid) return;
-                        const userData = doc.data();
-                        const resultItem = document.createElement('div');
-                        resultItem.className = 'flex items-center justify-between p-2 rounded-lg hover:bg-gray-100';
-                        resultItem.innerHTML = `
-                            <div class="flex items-center">
-                                <img class="h-10 w-10 rounded-full object-cover" src="${userData.profileImageUrl || 'https://via.placeholder.com/128'}" alt="Profile">
-                                <span class="ml-3 font-medium text-gray-700">${userData.nickname || userData.email}</span>
-                            </div>
-                            <button data-user-id="${doc.id}" class="start-chat-btn text-sm text-white bg-orange-500 hover:bg-orange-600 px-3 py-1 rounded-md">채팅</button>
-                        `;
-                        profileListContainer.appendChild(resultItem);
-                    });
-                }
-                profileListContainer.classList.remove('hidden');
-            }, 500);
-        });
-
-        profileListContainer.addEventListener('click', async (e) => {
-            if (e.target.classList.contains('start-chat-btn')) {
-                const friendId = e.target.dataset.userId;
-                const chatId = currentUser.uid > friendId ? `${currentUser.uid}_${friendId}` : `${friendId}_${currentUser.uid}`;
-                const chatRef = doc(db, "chats", chatId);
-                const chatSnap = await getDoc(chatRef);
-                if (!chatSnap.exists()) {
-                    await setDoc(chatRef, {
-                        type: 'private',
-                        members: [currentUser.uid, friendId],
-                        lastMessage: "대화가 시작되었습니다.",
-                        lastUpdatedAt: serverTimestamp(),
-                        createdAt: serverTimestamp(),
-                        unreadCount: { [currentUser.uid]: 0, [friendId]: 1 }
-                    });
-                }
-                window.location.href = `chat.html?chatId=${chatId}`;
             }
         });
         
@@ -621,6 +562,7 @@
             addChatPopup.classList.remove('popup-visible');
             addChatPopup.classList.add('popup-hidden');
         }
+
         addChatBtn.addEventListener('click', (event) => {
             event.stopPropagation();
             const isOpen = addChatPopup.classList.contains('popup-visible');
@@ -648,7 +590,6 @@
             headerSearch.classList.remove('flex');
             chatSearchInput.value = '';
             
-            // 검색 필터링 초기화 (모든 항목 다시 보이게)
             document.querySelectorAll('#main-content li').forEach(item => {
                 item.style.display = '';
             });
@@ -656,20 +597,19 @@
 
         chatSearchInput.addEventListener('input', (e) => {
             const term = e.target.value.toLowerCase().trim();
-            // #main-content 내부의 li만 필터링 (스와이프 구조에서도 잘 동작)
             document.querySelectorAll('#main-content li.chat-list-item').forEach(item => {
                 const chatNameEl = item.querySelector('p.font-semibold');
                 if (chatNameEl) {
                     const chatName = chatNameEl.textContent.toLowerCase();
                     if (chatName.includes(term)) {
-                        item.style.display = ''; // li를 다시 보이게
+                        item.style.display = ''; 
                     } else {
-                        item.style.display = 'none'; // li를 숨김
+                        item.style.display = 'none'; 
                     }
                 }
             });
         });
-  
+
     </script>
 </body>
 </html>
