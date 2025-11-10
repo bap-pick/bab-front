@@ -182,18 +182,16 @@
             <h1>밥픽</h1>
             <div style="width: 24px; height: 24px;"></div>
         </header>
-
+        
         <main class="chat-area">
-            <div class="message-box system-message">
+            <!-- <div class="message-box system-message">
                 <div class="profile-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                 </div>
-                <div class="message-bubble system-bubble">
-                    오늘의 운세에 맞춰 행운의 맛집을 추천해드리는 '밥픽'입니다! 🍀
-                </div>
-            </div>
+                <div class="message-bubble system-bubble"></div>
+            </div> -->
         </main>
 
         <div class="input-area">
@@ -228,7 +226,8 @@
         const auth = getAuth(app);
 
         // fastapi 서버 url
-        const FASTAPI_BASE_URL = "https://bab-back.onrender.com"; 
+        //const FASTAPI_BASE_URL = "https://bab-back.onrender.com"; 
+        const FASTAPI_BASE_URL = 'http://127.0.0.1:8000';
         
         const sendButton = document.getElementById('sendButton');
         const messageInput = document.getElementById('messageInput');
@@ -263,8 +262,22 @@
                 const data = await res.json();
                 currentRoomId = data.chatroom_id;
                 console.log(`채팅방 ID가 설정되었습니다: ${currentRoomId}`);
-                
-                
+
+                if (data.initial_message) {
+                    const initDiv = document.createElement('div');
+                    initDiv.className = 'message-box system-message';
+                    initDiv.innerHTML =  `
+                        <div class="profile-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                        </div>
+                        <div class="message-bubble system-bubble">${data.initial_message}</div>
+                    `;
+                    chatArea.appendChild(initDiv);
+                }
+
             } catch (err) {
                 console.error("채팅방 생성 오류:", err);
             } finally {
