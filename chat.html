@@ -21,7 +21,7 @@
         .chat-container {
             width: 100%;
             height: 100vh;
-            display: flex;
+            display: flex; 
             flex-direction: column;
             background-color: #fff;
             box-shadow: none;
@@ -35,6 +35,7 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid #e5e7eb;
+            flex-shrink: 0;
         }
         .header h1 {
             font-size: 1.25rem;
@@ -42,7 +43,7 @@
             color: #333;
         }
         .chat-area {
-            flex-grow: 1;
+            flex-grow: 1; 
             padding: 1rem;
             overflow-y: auto;
             display: flex;
@@ -77,6 +78,10 @@
             border-radius: 1.25rem;
             line-height: 1.4;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            
+            /* ⭐️⭐️⭐️ 수정된 부분: 텍스트가 넘칠 때 강제 줄바꿈 ⭐️⭐️⭐️ */
+            word-break: break-word;
+            overflow-wrap: break-word;
         }
         .message-bubble.system-bubble {
             background-color: #e5e7eb;
@@ -99,6 +104,7 @@
             align-items: center;
             gap: 0.75rem;
             border-top: 1px solid #e5e7eb;
+            flex-shrink: 0;
         }
         .input-container {
             position: relative;
@@ -179,22 +185,11 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                 </svg>
             </button>
-            <h1>밥픽</h1>
+            <h1 id="headerTitle">밥픽</h1>
             <div style="width: 24px; height: 24px;"></div>
         </header>
 
-        <main class="chat-area">
-            <div class="message-box system-message">
-                <div class="profile-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                </div>
-                <div class="message-bubble system-bubble">
-                    오늘의 운세에 맞춰 행운의 맛집을 추천해드리는 '밥픽'입니다! 🍀
-                </div>
-            </div>
-        </main>
+        <main class="chat-area"></main> 
 
         <div class="input-area">
             <button class="icon-button">
@@ -229,21 +224,35 @@
 
         // fastapi 서버 url
         const FASTAPI_BASE_URL = "https://bab-back.onrender.com"; 
-        
+        //const FASTAPI_BASE_URL = 'http://127.0.0.1:8000'; // 로컬 테스트용
+
         const sendButton = document.getElementById('sendButton');
         const messageInput = document.getElementById('messageInput');
         const chatArea = document.querySelector('.chat-area');
+        const headerTitle = document.getElementById('headerTitle');
 
         // 채팅방 ID와 상태 관리 변수
         let idToken = null;
         let currentRoomId = null;
         let isCreatingRoom = false;
+        
+        // URL에서 roomId를 가져오는 함수
+        function getRoomIdFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('roomId'); 
+        }
+
+        // 스크롤을 맨 아래로 내리는 함수
+        function scrollToBottom(element) {
+            element.scrollTop = element.scrollHeight;
+        }
 
         // 채팅방 생성
         async function createChatRoom() {
-            if (isCreatingRoom || currentRoomId !== null || !idToken) return;
+            if (currentRoomId !== null || isCreatingRoom || !idToken) return;
+            
             isCreatingRoom = true;
-            sendButton.disabled = true; // 채팅방 생성 중 버튼 비활성화
+            sendButton.disabled = true;
 
             try {
                 const res = await fetch(`${FASTAPI_BASE_URL}/chat/create`, {
@@ -252,7 +261,7 @@
                         "Content-Type": "application/json",
                         "Authorization": `Bearer ${idToken}`
                     },
-                    body: JSON.stringify({}) // 빈 모델(name과 is_group이 자동으로 기본값 처리되므로)
+                    body: JSON.stringify({})
                 });
 
                 if (!res.ok) {
@@ -262,9 +271,11 @@
 
                 const data = await res.json();
                 currentRoomId = data.chatroom_id;
-                console.log(`채팅방 ID가 설정되었습니다: ${currentRoomId}`);
+                headerTitle.textContent = data.chatroom_name || '새 채팅'; 
                 
-                
+                chatArea.innerHTML = ''; 
+                addInitialBotMessage(); 
+
             } catch (err) {
                 console.error("채팅방 생성 오류:", err);
             } finally {
@@ -273,34 +284,143 @@
             }
         }
         
-        // 인증 및 초기화
+        // 기존 메시지를 로드하는 함수
+        async function loadExistingMessages(roomId, container) {
+            if (!idToken) return;
+
+            try {
+                const res = await fetch(`${FASTAPI_BASE_URL}/chat/messages/${roomId}`, {
+                    headers: {
+                        "Authorization": `Bearer ${idToken}`
+                    }
+                });
+
+                if (!res.ok) {
+                    if (res.status === 403) {
+                        container.innerHTML = '<p class="text-center text-red-500">이 채팅방에 접근할 권한이 없습니다.</p>';
+                        return;
+                    }
+                    throw new Error(`메시지 로드 실패: ${res.status}`);
+                }
+
+                const data = await res.json();
+                
+                // 기존 초기 메시지 제거
+                container.innerHTML = ''; 
+
+                // 헤더 이름 업데이트 (방 이름이 없으면 ID 사용)
+                headerTitle.textContent = data.chatroom_name || `채팅방 #${roomId}`; 
+
+                const messages = Array.isArray(data) ? data : data.messages || [];
+
+                messages.forEach(msg => {
+                    container.appendChild(createMessageBubble(msg));
+                });
+                
+            } catch (err) {
+                console.error("기존 메시지 로드 중 오류 발생:", err);
+                container.innerHTML = `<p class="text-center text-red-500">메시지를 불러오는 중 오류가 발생했습니다: ${err.message}</p>`;
+            } finally {
+                scrollToBottom(container);
+            }
+        }
+        
+        // 메시지 생성 함수
+        function createMessageBubble(msg) {
+            const messageBox = document.createElement('div');
+            
+            const isAssistant = (msg.role === 'assistant'); 
+            
+            messageBox.className = `message-box ${isAssistant ? 'system-message' : 'user-message'}`; 
+
+            if (isAssistant) {
+                // 어시스턴트 (봇) 메시지
+                messageBox.innerHTML = `
+                    <div class="profile-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                    </div>
+                    <div class="message-bubble system-bubble">
+                        ${marked.parse(msg.content)}
+                    </div>`;
+            } else {
+                // 사용자 메시지
+                messageBox.innerHTML = `
+                    <div class="message-bubble user-bubble">
+                        ${marked.parse(msg.content)}
+                    </div>`;
+            }
+
+            return messageBox;
+        }
+
+        // 인증 및 초기화 로직
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
-                // 로그인되지 않은 경우, 로그인 페이지로 리디렉션
                 window.location.href = 'index.html';
                 return;
             }
 
             idToken = await user.getIdToken();
-            await createChatRoom(); // 인증 후 채팅방 생성 시작
-        });
+            
+            const urlRoomId = getRoomIdFromUrl();
 
-        messageInput.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter' && !event.isComposing) {
-                event.preventDefault(); 
-                sendMessage(); 
-            }
-        });
-
-        messageInput.addEventListener('input', () => {
-            if (messageInput.value.trim() !== '') {
-                sendButton.classList.add('active');
+            if (urlRoomId) {
+                // 기존 채팅방 접속: chatArea를 컨테이너로 전달
+                currentRoomId = urlRoomId;
+                await loadExistingMessages(urlRoomId, chatArea); 
             } else {
-                sendButton.classList.remove('active');
+                // 새 채팅방 생성
+                await createChatRoom(); 
             }
         });
+        
+        // 새 채팅방 생성 시 초기 메시지 추가 함수
+        function addInitialBotMessage() {
+            const initialDiv = document.createElement('div');
+            initialDiv.className = 'message-box system-message';
+            initialDiv.innerHTML = `
+                <div class="profile-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                </div>
+                <div class="message-bubble system-bubble">
+                    오늘의 운세에 맞춰 행운의 맛집을 추천해드리는 '밥픽'입니다! 🍀
+                </div>`;
+            chatArea.appendChild(initialDiv);
+            scrollToBottom(chatArea);
+        }
 
-        sendButton.addEventListener('click', sendMessage);
+        // 로딩 UI 함수
+        function addLoadingMessage() {
+            const botLoadingDiv = document.createElement("div");
+            botLoadingDiv.className = "message-box system-message";
+
+            botLoadingDiv.innerHTML = `
+                <div class="profile-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                </div>
+                <div class="message-bubble system-bubble">
+                    <div class="typing-indicator">
+                        <span></span><span></span><span></span>
+                    </div>
+                </div>
+            `;
+
+            chatArea.appendChild(botLoadingDiv);
+            chatArea.scrollTop = chatArea.scrollHeight;
+            return botLoadingDiv;
+        }
+
+        // 로딩 UI를 실제 LLM 응답으로 변환
+        function replaceLoadingWithResponse(loadingDiv, responseText) {
+            loadingDiv.querySelector(".message-bubble").innerHTML = marked.parse(responseText);
+            chatArea.scrollTop = chatArea.scrollHeight;
+        }
 
         // 메시지 전송 로직
         async function sendMessage() {
@@ -308,8 +428,7 @@
 
             if (!messageText || currentRoomId === null) {
                 if (currentRoomId === null) {
-                    console.error("채팅방 초기화 대기 중");
-                    await createChatRoom(); // 채팅방 생성 재시도
+                    await createChatRoom(); 
                 }
                 return;
             }
@@ -324,17 +443,12 @@
             messageInput.value = '';
             sendButton.classList.remove('active');
 
-            // 로딩 말풍선 추가
             const loadingDiv = addLoadingMessage();
-
-            // LLM 응답 대기
             const botResponseText = await sendMessageToLLM(messageText);
-
-            // 로딩 → 응답으로 교체
             replaceLoadingWithResponse(loadingDiv, botResponseText);
         }
 
-        // 사용자의 메시지를 LLM에 보냄
+        // 사용자의 메시지를 LLM에게 전달
         async function sendMessageToLLM(messageText) {
             try {
                 const res = await fetch(`${FASTAPI_BASE_URL}/chat/send`, {
@@ -345,7 +459,7 @@
                     },
                     
                     body: JSON.stringify({ 
-                        room_id: currentRoomId, // 동적으로 할당된 ID 사용
+                        room_id: currentRoomId, 
                         message: messageText
                     })
                 });
@@ -368,35 +482,23 @@
                 return `Error: API 통신 오류 발생. (${err.message})`;
             }
         }
-        
-        // 로딩 ui
-        function addLoadingMessage() {
-            const botLoadingDiv = document.createElement("div");
-            botLoadingDiv.className = "message-box system-message";
 
-            botLoadingDiv.innerHTML = `
-                <div class="profile-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                    </svg>
-                </div>
-                <div class="message-bubble system-bubble">
-                <div class="typing-indicator">
-                    <span></span><span></span><span></span>
-                </div>
-                </div>
-            `;
+        messageInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' && !event.isComposing) {
+                event.preventDefault(); 
+                sendMessage(); 
+            }
+        });
 
-            chatArea.appendChild(botLoadingDiv);
-            chatArea.scrollTop = chatArea.scrollHeight;
-            return botLoadingDiv;
-        }
+        messageInput.addEventListener('input', () => {
+            if (messageInput.value.trim() !== '') {
+                sendButton.classList.add('active');
+            } else {
+                sendButton.classList.remove('active');
+            }
+        });
 
-        // 로딩 UI를 실제 LLM 응답으로 변환
-        function replaceLoadingWithResponse(loadingDiv, responseText) {
-            loadingDiv.querySelector(".message-bubble").innerHTML = marked.parse(responseText);
-            chatArea.scrollTop = chatArea.scrollHeight;
-        }
+        sendButton.addEventListener('click', sendMessage);
     </script>
 </body>
 </html>
