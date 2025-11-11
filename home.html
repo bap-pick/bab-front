@@ -274,7 +274,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { firebaseConfig } from "./firebase-config.js"; // 실제 배포 시 주석 해제
+        import { firebaseConfig } from "./firebase-config.js";
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -492,6 +492,14 @@
 
                 const restaurants = await response.json();
                 
+                // 추천 식당 목록을 로컬 스토리지에 저장
+                try {
+                    localStorage.setItem('recommendedRestaurants', JSON.stringify(restaurants));
+                    console.log(`추천 식당 목록 ${restaurants.length}개가 로컬 스토리지에 저장되었습니다.`);
+                } catch (e) {
+                    console.error("로컬 스토리지 저장 실패:", e);
+                }
+
                 if (restaurants.length === 0) {
                     carouselEl.innerHTML = '<p class="text-gray-500 p-3">추천 식당 정보를 하나도 가져오지 못했습니다.</p>';
                     return;
@@ -509,7 +517,7 @@
             }
         };
 
-        // Firebase 로그인 인증 및 데이터 로드
+        // 로그인 인증 및 데이터 로드
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
                 window.location.href = 'index.html';
@@ -518,7 +526,7 @@
 
             const idToken = await user.getIdToken();
 
-            // 사용자 프로필 및 기본 오행 비율 로드
+            // 사용자 정보 (프로필 사진, 닉네임, 생년월일) 및 기본 오행 비율 로드
             try {
                 const sajuFields = ['ohengWood', 'ohengFire', 'ohengEarth', 'ohengMetal', 'ohengWater'];
                 const fields = ['nickname', 'birthDate', 'profileImage', ...sajuFields];
