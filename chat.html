@@ -77,9 +77,7 @@
             padding: 0.75rem 1rem;
             border-radius: 1.25rem;
             line-height: 1.4;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-            
-            /* ⭐️⭐️⭐️ 수정된 부분: 텍스트가 넘칠 때 강제 줄바꿈 ⭐️⭐️⭐️ */
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);            
             word-break: break-word;
             overflow-wrap: break-word;
         }
@@ -231,11 +229,12 @@
         const chatArea = document.querySelector('.chat-area');
         const headerTitle = document.getElementById('headerTitle');
 
-        // 채팅방 ID와 상태 관리 변수
         let idToken = null;
         let currentRoomId = null;
         let isCreatingRoom = false;
         
+        let profileImageUrl = 'logo_bapick copy.png'; 
+
         // URL에서 roomId를 가져오는 함수
         function getRoomIdFromUrl() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -337,9 +336,7 @@
                 // 어시스턴트 (봇) 메시지
                 messageBox.innerHTML = `
                     <div class="profile-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
+                        <img class="rounded-full object-cover" src="${profileImageUrl}" alt="Profile">
                     </div>
                     <div class="message-bubble system-bubble">
                         ${marked.parse(msg.content)}
@@ -355,7 +352,7 @@
             return messageBox;
         }
 
-        // 인증 및 초기화 로직
+        // 로그인 상태 확인
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
                 window.location.href = 'index.html';
@@ -367,7 +364,7 @@
             const urlRoomId = getRoomIdFromUrl();
 
             if (urlRoomId) {
-                // 기존 채팅방 접속: chatArea를 컨테이너로 전달
+                // 기존 채팅방 접속
                 currentRoomId = urlRoomId;
                 await loadExistingMessages(urlRoomId, chatArea); 
             } else {
@@ -382,9 +379,7 @@
             initialDiv.className = 'message-box system-message';
             initialDiv.innerHTML = `
                 <div class="profile-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
+                    <img class="rounded-full object-cover" src="${profileImageUrl}" alt="Profile">
                 </div>
                 <div class="message-bubble system-bubble">${data.initial_message}</div>
             `;
@@ -392,16 +387,14 @@
             scrollToBottom(chatArea);
         }
 
-        // 로딩 UI 함수
+        // 로딩 UI 렌더링 함수
         function addLoadingMessage() {
             const botLoadingDiv = document.createElement("div");
             botLoadingDiv.className = "message-box system-message";
 
             botLoadingDiv.innerHTML = `
                 <div class="profile-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                    </svg>
+                    <img class="rounded-full object-cover" src="${profileImageUrl}" alt="Profile">
                 </div>
                 <div class="message-bubble system-bubble">
                     <div class="typing-indicator">

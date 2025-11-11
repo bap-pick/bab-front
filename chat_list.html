@@ -185,10 +185,10 @@
         const auth = getAuth(app);
 
         // api url
-        //const FASTAPI_BASE_URL = "https://bab-back.onrender.com"; 
-        const FASTAPI_BASE_URL = 'http://127.0.0.1:8000'; // 로컬 테스트용
+        const FASTAPI_BASE_URL = "https://bab-back.onrender.com"; 
+        //const FASTAPI_BASE_URL = 'http://127.0.0.1:8000'; // 로컬 테스트용
 
-        // --- UI 요소 ---
+        // UI 요소
         const overlay = document.getElementById('overlay');
         const addChatBtn = document.getElementById('add-chat-btn');
         const addChatPopup = document.getElementById('add-chat-popup');
@@ -214,7 +214,7 @@
         let currentUser = null;
         let searchTimeout;
 
-        // --- 로그인 상태 확인 ---
+        // 로그인 상태 확인
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 currentUser = user;
@@ -224,7 +224,7 @@
             }
         });
 
-        // --- 채팅 목록 호출 및 렌더링 ---
+        // 채팅 목록 호출 및 렌더링
         async function fetchChats(isGroup) {
             if (!currentUser) return;
             
@@ -265,7 +265,7 @@
             }
         }
 
-        // --- 채팅방 나가기 로직 ---
+        // 채팅방 나가기 로직
         async function leaveChat(roomId) {
             if (!currentUser) return;
             
@@ -297,7 +297,6 @@
             }
         }
         
-        // --- 탭 스위칭 로직 ---
         tabPrivate.addEventListener('click', () => {
             chatListPrivate.classList.remove('hidden');
             chatListGroup.classList.add('hidden');
@@ -398,10 +397,10 @@
             }
         }
         
-        // --- 채팅 아이템 생성 ---
+        // 각 채팅방 아이템(li) 생성
         async function createChatItem(chat, isGroup) {
             let chatName = chat.name || '밥풀이';
-            let profileImageUrl = 'Untitled.png'; 
+            let profileImageUrl = 'logo_bapick copy.png'; 
 
             const unreadCount = 0;
             
@@ -458,7 +457,7 @@
                 </a>
             `;
 
-            // 2. 뒤에 숨겨질 '나가기' 버튼
+            // '나가기' 버튼
             const action = document.createElement('div');
             action.className = 'swipe-action bg-red-500 flex items-center justify-center'; 
             action.innerHTML = `
@@ -470,7 +469,7 @@
             li.appendChild(action);
             li.appendChild(content);
 
-            // 4. Hammer.js 스와이프 로직 적용
+            // 나가기 버튼 스와이프 (Hammer.js 적용)
             const hammer = new Hammer(content);
             const swipeThreshold = -80; 
 
@@ -502,7 +501,7 @@
             return li;
         }
 
-        // --- 빈 화면 표시 ---
+        // 빈 화면 표시
         function showEmptyState(chatType = "채팅", isError = false) {
             const typeText = chatType === "1:1" ? "1:1 채팅" : "단체 채팅";
             const message = isError 
@@ -522,7 +521,7 @@
                 </div>`;
         }
 
-        // --- 날짜 포맷 ---
+        // 채팅 전송 시각 포맷
         function formatTimestamp(dateObj) {
             if (!(dateObj instanceof Date) || isNaN(dateObj.getTime())) return '';
             
@@ -541,13 +540,13 @@
             }
         }
 
-        // --- '나가기' 버튼 클릭 이벤트 리스너 ---
+        // '나가기' 버튼 클릭 이벤트 리스너
         document.getElementById('main-content').addEventListener('click', async (e) => {
             if (e.target.classList.contains('leave-chat-btn')) {
                 e.preventDefault(); 
                 e.stopPropagation(); 
 
-                const roomId = e.target.dataset.roomId; // data-room-id 사용
+                const roomId = e.target.dataset.roomId;
                 const chatName = e.target.dataset.chatName;
 
                 if (confirm(`'${chatName}' 채팅방에서 나가시겠습니까? (방이 삭제됩니다)`)) {
@@ -556,7 +555,7 @@
             }
         });
         
-        // --- 하단 팝업 메뉴 기능 ---
+        // 하단 메뉴바 '+' 버튼 기능
         function closeAllPopups() {
             overlay.classList.add('hidden');
             addChatPopup.classList.remove('popup-visible');
@@ -576,7 +575,7 @@
         overlay.addEventListener('click', closeAllPopups);
 
         
-        // --- 헤더 검색 기능 ---
+        // 헤더 검색창 기능
         searchBtn.addEventListener('click', () => {
             headerMain.classList.add('hidden');
             headerSearch.classList.remove('hidden');
