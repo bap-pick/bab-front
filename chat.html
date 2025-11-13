@@ -216,6 +216,11 @@
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
         import { firebaseConfig } from "./firebase-config.js";
 
+        marked.setOptions({
+            breaks: true, // \n <br> 태그로 변환
+            gfm: true     // GitHub Flavored Markdown 활성화
+        });
+
         // Firebase 앱 초기화
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -234,6 +239,7 @@
         let isCreatingRoom = false;
         
         let profileImageUrl = 'logo_bapick copy.png'; 
+        const greetingMessage = "안녕! 나는 오늘의 운세에 맞춰 행운의 맛집을 추천해주는 '밥풀이'야🍀"; 
 
         // URL에서 roomId를 가져오는 함수
         function getRoomIdFromUrl() {
@@ -246,84 +252,6 @@
             element.scrollTop = element.scrollHeight;
         }
 
-        // 채팅방 생성
-        async function createChatRoom() {
-            if (currentRoomId !== null || isCreatingRoom || !idToken) return;
-            
-            isCreatingRoom = true;
-            sendButton.disabled = true;
-
-            try {
-                const res = await fetch(`${FASTAPI_BASE_URL}/chat/create`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${idToken}`
-                    },
-                    body: JSON.stringify({})
-                });
-
-                if (!res.ok) {
-                    const errorData = await res.json();
-                    throw new Error(errorData.detail || `[${res.status}] API 요청 실패`);
-                }
-
-                const data = await res.json();
-                currentRoomId = data.chatroom_id;
-                headerTitle.textContent = data.chatroom_name || '새 채팅'; 
-                
-                chatArea.innerHTML = ''; 
-                addInitialBotMessage(data); 
-
-            } catch (err) {
-                console.error("채팅방 생성 오류:", err);
-            } finally {
-                isCreatingRoom = false;
-                sendButton.disabled = false;
-            }
-        }
-        
-        // 기존 메시지를 로드하는 함수
-        async function loadExistingMessages(roomId, container) {
-            if (!idToken) return;
-
-            try {
-                const res = await fetch(`${FASTAPI_BASE_URL}/chat/messages/${roomId}`, {
-                    headers: {
-                        "Authorization": `Bearer ${idToken}`
-                    }
-                });
-
-                if (!res.ok) {
-                    if (res.status === 403) {
-                        container.innerHTML = '<p class="text-center text-red-500">이 채팅방에 접근할 권한이 없습니다.</p>';
-                        return;
-                    }
-                    throw new Error(`메시지 로드 실패: ${res.status}`);
-                }
-
-                const data = await res.json();
-                
-                // 기존 초기 메시지 제거
-                container.innerHTML = ''; 
-
-                // 헤더 이름 업데이트 (방 이름이 없으면 ID 사용)
-                headerTitle.textContent = data.chatroom_name || `채팅방 #${roomId}`; 
-
-                const messages = Array.isArray(data) ? data : data.messages || [];
-
-                messages.forEach(msg => {
-                    container.appendChild(createMessageBubble(msg));
-                });
-                
-            } catch (err) {
-                console.error("기존 메시지 로드 중 오류 발생:", err);
-                container.innerHTML = `<p class="text-center text-red-500">메시지를 불러오는 중 오류가 발생했습니다: ${err.message}</p>`;
-            } finally {
-                scrollToBottom(container);
-            }
-        }
-        
         // 메시지 생성 함수
         function createMessageBubble(msg) {
             const messageBox = document.createElement('div');
@@ -352,6 +280,153 @@
             return messageBox;
         }
 
+        // 초기 메시지 렌더링 
+        async function appendNewBotMessage(roomId, container) {
+            if (!idToken || !roomId) return;
+            
+            try {
+                const res = await fetch(`${FASTAPI_BASE_URL}/chat/messages/${roomId}`, {
+                    headers: { "Authorization": `Bearer ${idToken}` }
+                });
+
+                if (!res.ok) { throw new Error("메시지 추가 로드 실패"); }
+                
+                const data = await res.json();
+                const messages = Array.isArray(data) ? data : data.messages || [];
+
+                // DB에 저장된 메시지 중 두 번째 메시지 (오행 추천 메시지) 추가
+                if (messages.length > 1) {
+                    const secondMessage = messages[1]; 
+                    container.appendChild(createMessageBubble(secondMessage));
+                } else {
+                    console.warn("DB에 상세 추천 메시지가 없습니다. (메시지 수: 1)");
+                    const warningMsg = { role: 'assistant', content: "경고: 상세 추천 메시지를 가져올 수 없습니다. 다시 시도해 주세요." };
+                    container.appendChild(createMessageBubble(warningMsg));
+                }
+
+            } catch (err) {
+                console.error("새로운 봇 메시지 추가 중 오류 발생:", err);
+                const errorMsg = { role: 'assistant', content: `[추가 로드 오류]: ${err.message}` };
+                container.appendChild(createMessageBubble(errorMsg));
+            } finally {
+                scrollToBottom(container);
+            }
+        }
+
+
+        // 채팅방 생성
+        async function createChatRoom() {
+            if (currentRoomId !== null || isCreatingRoom || !idToken) return;
+            
+            isCreatingRoom = true;
+            sendButton.disabled = true;
+            messageInput.disabled = true; // 로딩 중 입력 비활성화
+
+            chatArea.innerHTML = ''; 
+
+            // 1. 인사 메시지 즉시 렌더링
+            const headlineMessage = { role: 'assistant', content: greetingMessage }; 
+            chatArea.appendChild(createMessageBubble(headlineMessage));
+            scrollToBottom(chatArea);
+
+            // 2. 로딩 UI 즉시 렌더링 (상세 추천 메시지 대기)
+            const loadingDiv = addLoadingMessage();
+            
+            let success = false; // API 성공 여부 플래그
+            
+            try {
+                // 3. 채팅방 생성 api 호출
+                const res = await fetch(`${FASTAPI_BASE_URL}/chat/create`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${idToken}`
+                    },
+                    body: JSON.stringify({})
+                });
+
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    throw new Error(errorData.detail || `[${res.status}] API 요청 실패`);
+                }
+
+                const data = await res.json();
+                currentRoomId = data.chatroom_id; 
+                headerTitle.textContent = data.chatroom_name || '새 채팅'; 
+                
+                // 4. 로딩 UI 제거
+                if (loadingDiv.parentNode) {
+                    loadingDiv.parentNode.removeChild(loadingDiv);
+                }
+                
+                success = true; // 성공 플래그 설정
+                
+            } catch (err) {
+                console.error("채팅방 생성 오류:", err);
+                // API 오류 발생 시 로딩 UI 제거 및 오류 메시지 표시
+                if (loadingDiv.parentNode) {
+                    loadingDiv.parentNode.removeChild(loadingDiv);
+                }
+                const errorMsg = { role: 'assistant', content: `채팅방 생성 중 오류가 발생했습니다: ${err.message}` };
+                chatArea.appendChild(createMessageBubble(errorMsg));
+            } finally {
+                isCreatingRoom = false;
+                sendButton.disabled = false;
+                messageInput.disabled = false; // 완료 후 입력 활성화
+                
+                if (success) {
+                    await appendNewBotMessage(currentRoomId, chatArea); 
+                }
+            }
+        }
+        
+        // 기존 채팅방에 접속할 경우, 이전 메시지를 로드하는 함수 
+        async function loadExistingMessages(roomId, container) {
+            if (!idToken || !roomId || String(roomId).toLowerCase() === 'null') {
+                console.error("loadExistingMessages: Invalid or missing room ID. Cannot fetch messages.");
+                container.innerHTML = ''; 
+                return;
+            }
+
+            // 기존 채팅방 로드 시 입력 비활성화
+            messageInput.disabled = true;
+
+            try {
+                const res = await fetch(`${FASTAPI_BASE_URL}/chat/messages/${roomId}`, {
+                    headers: {
+                        "Authorization": `Bearer ${idToken}`
+                    }
+                });
+
+                if (!res.ok) {
+                    if (res.status === 403) {
+                        container.innerHTML = '<p class="text-center text-red-500">이 채팅방에 접근할 권한이 없습니다.</p>';
+                        return;
+                    }
+                    throw new Error(`메시지 로드 실패: ${res.status}`);
+                }
+
+                const data = await res.json();
+                
+                container.innerHTML = ''; 
+
+                headerTitle.textContent = data.chatroom_name || `채팅방 #${roomId}`; 
+
+                const messages = Array.isArray(data) ? data : data.messages || [];
+
+                messages.forEach(msg => {
+                    container.appendChild(createMessageBubble(msg));
+                });
+                
+            } catch (err) {
+                console.error("기존 메시지 로드 중 오류 발생:", err);
+                container.innerHTML = `<p class="text-center text-red-500">메시지를 불러오는 중 오류가 발생했습니다: ${err.message}</p>`;
+            } finally {
+                scrollToBottom(container);
+                messageInput.disabled = false; // 로드 완료 후 입력 활성화
+            }
+        }
+
         // 로그인 상태 확인
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
@@ -366,27 +441,13 @@
             if (urlRoomId) {
                 // 기존 채팅방 접속
                 currentRoomId = urlRoomId;
-                await loadExistingMessages(urlRoomId, chatArea); 
+                await loadExistingMessages(urlRoomId, chatArea);
             } else {
                 // 새 채팅방 생성
                 await createChatRoom(); 
             }
         });
         
-        // 새 채팅방 생성 시 초기 메시지 추가 함수
-        function addInitialBotMessage(data) {
-            const initialDiv = document.createElement('div');
-            initialDiv.className = 'message-box system-message';
-            initialDiv.innerHTML = `
-                <div class="profile-icon">
-                    <img class="rounded-full object-cover" src="${profileImageUrl}" alt="Profile">
-                </div>
-                <div class="message-bubble system-bubble">${data.initial_message}</div>
-            `;
-            chatArea.appendChild(initialDiv);
-            scrollToBottom(chatArea);
-        }
-
         // 로딩 UI 렌더링 함수
         function addLoadingMessage() {
             const botLoadingDiv = document.createElement("div");
@@ -418,26 +479,39 @@
         async function sendMessage() {
             const messageText = messageInput.value.trim();
 
-            if (!messageText || currentRoomId === null) {
-                if (currentRoomId === null) {
-                    await createChatRoom(); 
+            if (currentRoomId === null) {
+                if (messageText) {
+                    // 채팅방이 없으면 일단 생성
+                    await createChatRoom();
+                    if(currentRoomId !== null) {
+                        await sendMessage(); 
+                        return;
+                    }
+                    alert("채팅방이 생성되었습니다. 다시 메시지를 보내주세요.");
                 }
                 return;
             }
 
+            if (!messageText) return;
+
             // 사용자 메시지 표시
             const userMessageDiv = document.createElement('div');
             userMessageDiv.className = 'message-box user-message';
-            userMessageDiv.innerHTML = `<div class="message-bubble user-bubble">${messageText}</div>`;
+            userMessageDiv.innerHTML = `<div class="message-bubble user-bubble">${marked.parse(messageText)}</div>`;
             chatArea.appendChild(userMessageDiv);
-            chatArea.scrollTop = chatArea.scrollHeight;
+            scrollToBottom(chatArea);
 
             messageInput.value = '';
             sendButton.classList.remove('active');
+            messageInput.disabled = true; // 입력 중 비활성화
 
             const loadingDiv = addLoadingMessage();
             const botResponseText = await sendMessageToLLM(messageText);
+            
+            // LLM 응답으로 로딩 UI 교체
             replaceLoadingWithResponse(loadingDiv, botResponseText);
+            
+            messageInput.disabled = false; // 완료 후 활성화
         }
 
         // 사용자의 메시지를 LLM에게 전달
