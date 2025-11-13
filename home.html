@@ -300,14 +300,14 @@
             const savedLocation = localStorage.getItem('savedBapickLocation');
             if (savedLocation) {
                 const locationData = JSON.parse(savedLocation);
-                // 주소와 장소 이름 중 더 적절한 값을 표시 (주소가 있으면 주소를 우선)
+                // 저장된 위치의 주소 또는 장소 이름을 input 필드에 표시 (주소 우선)
                 locationTextEl.value = locationData.address || locationData.name;
             } else {
                 // 저장된 위치가 없으면, 기존의 GPS 기반 위치 찾기 실행
                 updateLocation();
             }
         }
-
+        
         // GPS 기반 현재 위치를 가져와 주소로 변환하는 함수
         async function updateLocation() {
             if (navigator.geolocation) {
@@ -452,22 +452,35 @@
             `;
         };
 
-        // 근처 식당 목록 조회 api 호출
+        // 근처 식당 조회 api 호출
         const fetchNearbyRestaurants = async (idToken, restaurantIds) => {
             const carouselEl = document.getElementById('restaurant-carousel');
+            let lat = null;
+            let lon = null;
 
             try {
-                const pos = await new Promise((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition(resolve, reject);
-                });
-                const lat = pos.coords.latitude;
-                const lon = pos.coords.longitude;
-                locationTextEl.value = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+                // 1. 로컬 스토리지에서 저장된 위치를 먼저 시도
+                const savedLocation = localStorage.getItem('savedBapickLocation');
+                if (savedLocation) {
+                    const locationData = JSON.parse(savedLocation);
+                    lat = parseFloat(locationData.lat); 
+                    lon = parseFloat(locationData.lon || locationData.lng); 
+                }
+
+                // 2. 저장된 위치가 없거나 유효하지 않으면 GPS 획득 시도
+                if (lat === null || lon === null || isNaN(lat) || isNaN(lon)) {
+                    const pos = await new Promise((resolve, reject) => {
+                        navigator.geolocation.getCurrentPosition(resolve, reject);
+                    });
+                    lat = pos.coords.latitude;
+                    lon = pos.coords.longitude;
+                }
 
                 const response = await fetch(`${FASTAPI_BASE_URL}/restaurants/nearby?lat=${lat}&lon=${lon}&limit=5`, {
                     method: 'GET',
                     headers: { 'Authorization': `Bearer ${idToken}` },
                 });
+                
                 if (!response.ok) {
                     if (response.status === 404) {
                         throw new Error('주변 식당 정보를 가져오지 못했습니다.');
@@ -541,7 +554,7 @@
                 };
                 updateSajuStats(sajuStats);
 
-                // 저장된 위치 정보 로드 또는 GPS 위치 업데이트
+                // 위치 설정
                 loadSavedLocation();
 
             } catch (err) {
