@@ -63,8 +63,6 @@
             function initMapWithGPS() {
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(onSuccessGPS, onErrorGPS);
-                } else {
-                    initializeMap(37.566826, 126.9786567);
                 }
             }
 
@@ -109,7 +107,7 @@
                             name: firstPlace.place_name,
                             address: firstPlace.road_address_name || firstPlace.address_name,
                             lat: firstPlace.y,
-                            lng: firstPlace.x
+                            lon: firstPlace.x
                         };
                         
                     } else if (status === kakao.maps.services.Status.ZERO_RESULT) {

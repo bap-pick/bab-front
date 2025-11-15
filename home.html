@@ -164,15 +164,15 @@
                 <div class="lg:col-span-2">
                     <div class="p-6 bg-white backdrop-blur-sm rounded-2xl shadow-lg h-full overflow-hidden">
                         <div class="pt-2 flex justify-between items-center">
-                            <h3 id="nearby-restaurants-heading" class="text-xl lg:text-2xl font-bold text-gray-800">나의 근처 맛집</h3>
-                            <a href="restaurant_list.html"
-                                class="text-base font-semibold text-gray-500 hover:text-[#FF7242]">
+                            <h3 id="nearby-restaurants-heading" class="text-xl lg:text-2xl font-bold text-gray-800">
+                                나의 근처 맛집
+                            </h3>
+                            <a href="restaurant_list.html" class="text-base font-semibold text-gray-500 hover:text-[#FF7242]">
                                 전체보기 &gt;
                             </a>
                         </div>
                         <div class="relative mt-4 lg:mt-10">
-                            <div id="restaurant-carousel"
-                                class="flex overflow-x-auto scroll-smooth scrollbar-hide space-x-4 py-2">
+                            <div id="restaurant-carousel" class="flex overflow-x-auto scroll-smooth scrollbar-hide space-x-4 py-2">
                                 <p id="nearby-restaurants-loading" class="text-gray-500">주변 맛집 정보를 불러오는 중...</p>
                             </div>
                         </div>
@@ -183,6 +183,7 @@
         </div>
     </main>
 
+    <!-- 하단 메뉴바 -->
     <footer class="fixed bottom-0 left-0 right-0 z-30">
         <nav
             class="flex justify-around items-center h-16 bg-white rounded-t-2xl shadow-[0_-2px_10px_rgba(0,0,0,0.05)] max-w-screen-xl mx-auto">
@@ -223,8 +224,7 @@
         </nav>
     </footer>
 
-    <button id="add-chat-btn"
-        class="fixed bottom-6 left-1/2 -translate-x-1/2 w-16 h-16 bg-[#FF7242] hover:bg-orange-600 text-white rounded-full flex items-center justify-center shadow-lg transition-transform transform hover:scale-110 z-40">
+    <button id="add-chat-btn" class="fixed bottom-6 left-1/2 -translate-x-1/2 w-16 h-16 bg-[#FF7242] hover:bg-orange-600 text-white rounded-full flex items-center justify-center shadow-lg transition-transform transform hover:scale-110 z-40">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -274,7 +274,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { firebaseConfig } from "./firebase-config.js"; // 실제 배포 시 주석 해제
+        import { firebaseConfig } from "./firebase-config.js";
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -300,14 +300,14 @@
             const savedLocation = localStorage.getItem('savedBapickLocation');
             if (savedLocation) {
                 const locationData = JSON.parse(savedLocation);
-                // 주소와 장소 이름 중 더 적절한 값을 표시 (주소가 있으면 주소를 우선)
+                // 저장된 위치의 주소 또는 장소 이름을 input 필드에 표시 (주소 우선)
                 locationTextEl.value = locationData.address || locationData.name;
             } else {
                 // 저장된 위치가 없으면, 기존의 GPS 기반 위치 찾기 실행
                 updateLocation();
             }
         }
-
+        
         // GPS 기반 현재 위치를 가져와 주소로 변환하는 함수
         async function updateLocation() {
             if (navigator.geolocation) {
@@ -386,20 +386,53 @@
 
             if (!res.ok) {
                 if (res.status === 404) {
-                    throw new Error("오행 분석 데이터가 아직 준비되지 않았습니다. 마이페이지에서 사주 정보 입력 여부를 확인해 주세요.");
+                    throw new Error("오행 분석에 필요한 데이터가 아직 준비되지 않았습니다.");
                 }
-                throw new Error(`추천 분석 API 오류: ${res.status} ${res.statusText}`);
+                throw new Error(`API 오류: ${res.status} ${res.statusText}`);
             }
             return res.json();
         }
 
-        // 식당 정보를 받아 캐러셀 카드로 렌더링하는 함수 (w-56으로 너비 축소)
+        // 근처 식당 정보 렌더링
         const renderRestaurantCard = (restaurant) => {
-            // 임시 이미지 URL을 생성 (실제 데이터에 'imageUrl'이 있다면 그것을 사용)
-            const imageUrl = restaurant.imageUrl || `https://source.unsplash.com/random/400x300/?food,restaurant,${Math.random()}`;
-            
-            // w-64 (256px)에서 w-56 (224px)로 너비 축소
-            // [재수정] 이미지 높이 h-48 -> h-64로 변경하여 카드 세로 길이 더 증가 (12rem -> 16rem)
+            const defaultImageUrl = 'Untitled.png'; 
+            let imageUrl = defaultImageUrl;
+
+            // 이미지 렌더링: image가 문자열인 동시에 비어있지 않은 경우 첫 번째 이미지 렌더링
+            if (typeof restaurant.image === 'string' && restaurant.image.trim() !== '') {
+                // 쉼표로 분리 후 앞뒤 공백 제거
+                const images = restaurant.image.split(',').map(url => url.trim()).filter(url => url);
+                
+                // 첫 번째 이미지 사용
+                if (images.length > 0) {
+                    imageUrl = images[0];
+                }
+            }
+
+            // 조건부 렌더링
+            const ratingValue = restaurant.rating || 0; 
+            const reviewCount = restaurant.review_count || 0;
+            let statsHtml = '';
+
+            // 1) 평점이 있으면 평점과 리뷰 개수 모두 표시
+            if (ratingValue > 0) {
+                statsHtml = `
+                    <div class="flex items-center text-sm text-gray-500 mt-2">
+                        <span class="material-symbols-outlined text-yellow-500 text-base mr-1 fill-1">star</span>
+                        <span class="font-semibold">${ratingValue.toFixed(1)}</span>
+                        <span class="ml-2 text-gray-400">리뷰 ${reviewCount}개</span>
+                    </div>
+                `;
+            } 
+            // 2) 평점이 없으면 리뷰 개수만 표시
+            else {
+                statsHtml = `
+                    <div class="flex items-center text-sm text-gray-500 mt-2">
+                        <span class="text-gray-400">리뷰 ${reviewCount}개</span>
+                    </div>
+                `;
+            }
+
             return `
                 <a href="detail.html?id=${restaurant.id}" class="flex-shrink-0 w-56 bg-white rounded-lg shadow-xl overflow-hidden transform transition-transform duration-300 hover:scale-[1.03] hover:shadow-2xl">
                     <div class="relative w-full h-64"> 
@@ -407,73 +440,83 @@
                         <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                     </div>
                     <div class="p-4">
+                        <p class="text-xs text-orange-500 mb-1">${restaurant.distance_km}km 거리</p>
                         <h4 class="font-bold text-lg text-gray-900 truncate">${restaurant.name}</h4>
                         <p class="text-sm text-gray-600 truncate mt-1">${restaurant.category}</p>
-                        <div class="flex items-center text-sm text-gray-500 mt-2">
-                            <span class="material-symbols-outlined text-yellow-500 text-base mr-1 fill-1">star</span>
-                            <span class="font-semibold">4.5</span>
-                            <span class="ml-2 text-gray-400">리뷰 120개</span>
-                        </div>
+                        
+                        ${statsHtml}
+                        
                         <p class="text-xs text-gray-400 mt-2 truncate">${restaurant.address}</p>
                     </div>
                 </a>
             `;
         };
 
-        // 오늘의 오행에 따른 추천 식당 목록을 API에서 가져와서 렌더링하는 함수
-        const fetchRecommendedRestaurants = async (idToken) => {
+        // 근처 식당 조회 api 호출
+        const fetchNearbyRestaurants = async (idToken, restaurantIds) => {
             const carouselEl = document.getElementById('restaurant-carousel');
-
-            if (!carouselEl || !idToken) {
-                return;
-            }
-
-            // 1. 로딩 메시지 표시
-            carouselEl.innerHTML = `<p id="nearby-restaurants-loading" class="text-gray-500 p-3">주변 맛집 정보를 불러오는 중...</p>`;
+            let lat = null;
+            let lon = null;
 
             try {
-                const response = await fetch(`${FASTAPI_BASE_URL}/saju/restaurants`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${idToken}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                if (response.status === 404) {
-                    carouselEl.innerHTML = '<p class="text-gray-500 p-3">사용자 정보 또는 오행 분석 정보가 없어 추천 식당을 찾을 수 없습니다.</p>';
-                    return;
+                // 1. 로컬 스토리지에서 저장된 위치를 먼저 시도
+                const savedLocation = localStorage.getItem('savedBapickLocation');
+                if (savedLocation) {
+                    const locationData = JSON.parse(savedLocation);
+                    lat = parseFloat(locationData.lat); 
+                    lon = parseFloat(locationData.lon || locationData.lng); 
                 }
+
+                // 2. 저장된 위치가 없거나 유효하지 않으면 GPS 획득 시도
+                if (lat === null || lon === null || isNaN(lat) || isNaN(lon)) {
+                    const pos = await new Promise((resolve, reject) => {
+                        navigator.geolocation.getCurrentPosition(resolve, reject);
+                    });
+                    lat = pos.coords.latitude;
+                    lon = pos.coords.longitude;
+                }
+
+                const response = await fetch(`${FASTAPI_BASE_URL}/restaurants/nearby?lat=${lat}&lon=${lon}&limit=5`, {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${idToken}` },
+                });
+                
                 if (!response.ok) {
-                    throw new Error('추천 식당 목록을 불러오는 데 실패했습니다.');
+                    if (response.status === 404) {
+                        throw new Error('주변 식당 정보를 가져오지 못했습니다.');
+                    }
+                    throw new Error(`식당 목록 API 오류: ${response.status} ${response.statusText}`);
                 }
 
                 const data = await response.json();
-                const restaurants = data.restaurants;
+                const restaurants = data.restaurants || [];
 
-                // localStorage에 추천 식당 데이터 저장
-                localStorage.setItem('RecommendedRestaurants', JSON.stringify(restaurants));
+                // 추천 식당 목록을 로컬 스토리지에 저장
+                try {
+                    localStorage.setItem('recommendedRestaurants', JSON.stringify(restaurants));
+                    console.log(`추천 식당 목록 ${restaurants.length}개가 로컬 스토리지에 저장되었습니다.`);
+                } catch (e) {
+                    console.error("로컬 스토리지 저장 실패:", e);
+                }
 
                 if (restaurants.length === 0) {
-                    carouselEl.innerHTML = '<p class="text-gray-500 p-3">현재 오행에 맞는 추천 식당이 없습니다.</p>';
+                    carouselEl.innerHTML = '<p class="text-gray-500 p-3">현재 위치 기준 식당이 없습니다.</p>';
                     return;
                 }
 
                 // 로딩 메시지 제거 및 식당 목록 렌더링
                 carouselEl.innerHTML = '';
-
                 restaurants.forEach(rest => {
                     carouselEl.insertAdjacentHTML('beforeend', renderRestaurantCard(rest));
                 });
-
+                
             } catch (err) {
                 console.error("Restaurant fetch failed:", err);
-                const message = err.message || '식당 정보를 불러오는 중 서버 오류가 발생했습니다.';
-                carouselEl.innerHTML = `<p class="text-gray-500 p-3">${message}</p>`;
+                carouselEl.innerHTML = `<p class="text-gray-500 p-3">${err.message || '식당 정보를 불러오는 중 오류가 발생했습니다.'}</p>`;
             }
         };
 
-        // Firebase 로그인 인증 및 데이터 로드
+        // 로그인 인증 및 데이터 로드
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
                 window.location.href = 'index.html';
@@ -482,7 +525,7 @@
 
             const idToken = await user.getIdToken();
 
-            // 사용자 프로필 및 기본 오행 비율 로드
+            // 사용자 정보 (프로필 사진, 닉네임, 생년월일) 및 기본 오행 비율 로드
             try {
                 const sajuFields = ['ohengWood', 'ohengFire', 'ohengEarth', 'ohengMetal', 'ohengWater'];
                 const fields = ['nickname', 'birthDate', 'profileImage', ...sajuFields];
@@ -511,7 +554,7 @@
                 };
                 updateSajuStats(sajuStats);
 
-                // 저장된 위치 정보 로드 또는 GPS 위치 업데이트
+                // 위치 설정
                 loadSavedLocation();
 
             } catch (err) {
@@ -538,8 +581,7 @@
                 };
                 updateSajuStats(mappedStats);
 
-                // 오행 비율 분석이 성공하면, 식당 추천 API 호출
-                await fetchRecommendedRestaurants(idToken);
+                await fetchNearbyRestaurants(idToken);
             } catch (err) {
                 console.error("Recommendation fetch failed:", err);
                 recommendationTypeEl.textContent = '정보 없음';

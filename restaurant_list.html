@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>주변 맛집 전체보기 (UI 확인용)</title>
+    <title>주변 맛집 전체보기</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
     <link rel="stylesheet"
@@ -12,6 +12,9 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
+        }
+        .fill-1 {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
     </style>
 </head>
@@ -23,7 +26,7 @@
             <a href="javascript:history.back()" class="p-2 -ml-2">
                 <span class="material-symbols-outlined">arrow_back_ios_new</span>
             </a>
-            <h1 class="text-lg font-bold text-gray-800">주천 맛집 전체보기</h1>
+            <h1 class="text-lg font-bold text-gray-800">주변 맛집 전체보기</h1>
             <div class="w-6"></div>
         </div>
     </header>
@@ -37,9 +40,9 @@
     (function () {
         const listContainer = document.getElementById('restaurant-list-container');
         
-        // localStorage에서 추천 식당 데이터를 불러옴
+        // 로컬스트로지에 저장된 주변 식당 목록
+        const savedData = localStorage.getItem('recommendedRestaurants');
         let restaurantsToDisplay = [];
-        const savedData = localStorage.getItem('RecommendedRestaurants');
 
         if (savedData) {
             try {
@@ -49,35 +52,71 @@
             }
         } 
         
+        // 데이터가 없을 경우 메시지 표시
         if (restaurantsToDisplay.length === 0) {
-            // 데이터가 없다면 메시지 표시
             listContainer.innerHTML = '<p class="text-gray-500 p-4">추천 맛집 정보가 없습니다. 홈 화면에서 오행 분석을 진행해 주세요.</p>';
             return;
         }
 
         listContainer.innerHTML = '';
 
-        restaurantsToDisplay.forEach(restaurant => {
-            //const distanceText = restaurant.distance ? ` • ${restaurant.distance}km` : '';
-            const locationText = restaurant.address || '주소 정보 없음';
-            const oheng = restaurant.recommended_oheng || 'N/A'; 
-            const recommendationHeader = `${oheng} 기운 보충`;
-            const reason = restaurant.recommendation_reason || '추천 이유 정보 없음';
+        // 식당 카드 생성
+        const renderRestaurantCard = (restaurant) => {
+            const defaultImageUrl = 'Untitled.png'; 
+            let imageUrl = defaultImageUrl;
 
-            const cardHTML = `
-                <a href="detail.html?id=${restaurant.id}" class="block bg-white p-3 rounded-xl shadow-sm hover:shadow-md transition-shadow">
-                    <div class="flex items-center">
-                        <div class="ml-4 flex-1">
-                            <p class="text-xs font-semibold text-[#FF7242] mb-1">${recommendationHeader}</p> 
-                            <p class="text-xs text-gray-400 mt-1 truncate">${reason}</p>
-                            <h4 class="font-bold text-gray-800">${restaurant.name}</h4>
-                            <p class="text-sm text-gray-500">${restaurant.category}</p>
-                            <p class="text-xs text-gray-400 mt-1">${locationText}</p>
-                        </div>
+            // 이미지 처리 로직
+            if (typeof restaurant.image === 'string' && restaurant.image.trim() !== '') {
+                const images = restaurant.image.split(',').map(url => url.trim()).filter(url => url);
+                if (images.length > 0) {
+                    imageUrl = images[0];
+                }
+            }
+
+            const ratingValue = restaurant.rating || 0; 
+            const reviewCount = restaurant.review_count || 0;
+            const locationText = restaurant.address || '주소 정보 없음';
+            let statsHtml = '';
+
+            // 평점/리뷰 조건부 생성 (평점이 있다면 평점과 리뷰 수를 표시, 평점이 없다면 리뷰 수만 표시)
+            if (ratingValue > 0) {
+                statsHtml = `
+                    <div class="flex items-center text-sm text-gray-500 mt-1">
+                        <span class="material-symbols-outlined text-yellow-500 text-base mr-1 fill-1">star</span>
+                        <span class="font-semibold">${ratingValue.toFixed(1)}</span>
+                        <span class="ml-2 text-gray-400">리뷰 ${reviewCount}개</span>
+                    </div>
+                `;
+            } else {
+                statsHtml = `
+                    <div class="flex items-center text-sm text-gray-500 mt-1">
+                        <span class="text-gray-400">리뷰 ${reviewCount}개</span>
+                    </div>
+                `;
+            }
+
+            return `
+                <a href="detail.html?id=${restaurant.id}" class="flex bg-white p-3 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                    
+                    <div class="flex-shrink-0 w-24 rounded-lg overflow-hidden"> 
+                        <img class="w-full h-full object-cover" src="${imageUrl}" alt="${restaurant.name}" onerror="this.onerror=null;this.src='${defaultImageUrl}';">
+                    </div>
+
+                    <div class="ml-4 flex-1 min-w-0">
+                        <p class="text-xs text-orange-500 mb-1">${restaurant.distance_km}km 거리</p>
+                        <h4 class="font-bold text-lg text-gray-800 truncate">${restaurant.name}</h4>
+                        <p class="text-sm text-gray-500 truncate mt-1">${restaurant.category}</p>
+                        
+                        ${statsHtml}
+                        
+                        <p class="text-xs text-gray-400 mt-1 truncate">${locationText}</p>
                     </div>
                 </a>
             `;
-            listContainer.innerHTML += cardHTML;
+        };
+
+        restaurantsToDisplay.forEach(restaurant => {
+            listContainer.innerHTML += renderRestaurantCard(restaurant);
         });
     })();
     </script>
