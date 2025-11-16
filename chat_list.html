@@ -78,17 +78,18 @@
     <div class="w-full h-full bg-white max-w-2xl mx-auto flex flex-col">
         <div id="overlay" class="fixed inset-0 bg-black bg-opacity-20 z-40 hidden transition-opacity"></div>
 
-        <div id="add-friend-modal"
-            class="fixed inset-0 bg-black bg-opacity-40 z-50 hidden items-center justify-center p-4">
+        <div id="add-friend-modal" class="fixed inset-0 bg-black bg-opacity-40 z-50 hidden items-center justify-center p-4">
             <div class="bg-white rounded-lg shadow-xl w-full max-w-sm">
 
                 <div class="p-6">
                     <h3 class="text-xl font-semibold text-gray-800 mb-2">친구 추가</h3>
-                    <p class="text-gray-500 mb-4">추가할 친구의 이메일을 검색하세요.</p>
+                    <p class="text-gray-500 mb-4">추가할 친구의 닉네임을 검색하세요.</p>
                     <div class="relative">
-                        <input id="friend-email-input" type="email" placeholder="친구 이메일"
-                            class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400">
+                        <input id="friend-nickname-input" type="text" placeholder="친구 닉네임" class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400">
                     </div>
+                    <button id="search-friend-btn" class="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 font-medium flex-shrink-0">
+                        검색
+                    </button>
                     <div id="profile-list-container" class="mt-4 hidden space-y-2 max-h-48 overflow-y-auto">
                     </div>
                 </div>
@@ -97,38 +98,13 @@
                 <div class="p-6">
                     <h4 class="text-lg font-semibold text-gray-800 mb-3">받은 친구 요청</h4>
 
-                    <div id="friend-request-list" class="space-y-3 max-h-48 overflow-y-auto">
+                     <div id="friend-request-list" class="space-y-3 max-h-48 overflow-y-auto">
 
-                        <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50">
-                            <div class="flex items-center space-x-3">
-                                <img class="h-10 w-10 rounded-full object-cover"
-                                    src="https://picsum.photos/100?random=2" alt="Profile">
-                                <span class="font-medium text-gray-700">밥푸리</span>
-                            </div>
-                            <div class="space-x-2 flex-shrink-0">
-                                <button
-                                    class="text-sm text-white bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded-md">수락</button>
-                                <button
-                                    class="text-sm text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded-md">거절</button>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50">
-                            <div class="flex items-center space-x-3">
-                                <img class="h-10 w-10 rounded-full object-cover"
-                                    src="https://picsum.photos/100?random=3" alt="Profile">
-                                <span class="font-medium text-gray-700">냠냠</span>
-                            </div>
-                            <div class="space-x-2 flex-shrink-0">
-                                <button
-                                    class="text-sm text-white bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded-md">수락</button>
-                                <button
-                                    class="text-sm text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded-md">거절</button>
-                            </div>
-                        </div>
-                        <p id="no-requests-text" class="text-sm text-gray-500 hidden">
-                            받은 친구 요청이 없습니다.
+                        <p id="no-requests-text" class="text-sm text-gray-500 hidden text-center p-2">
+                             받은 친구 요청이 없습니다.
                         </p>
-                    </div>
+        
+                        </div>
                 </div>
 
                 <div class="bg-gray-50 px-6 py-3 flex justify-end rounded-b-lg">
@@ -296,8 +272,8 @@
         const auth = getAuth(app);
 
         // api url
-        const FASTAPI_BASE_URL = "https://bab-back.onrender.com";
-        //const FASTAPI_BASE_URL = 'http://127.0.0.1:8000'; // 로컬 테스트용
+        //const FASTAPI_BASE_URL = "https://bab-back.onrender.com";
+        const FASTAPI_BASE_URL = 'http://127.0.0.1:8000'; // 로컬 테스트용
 
         // UI 요소
         const overlay = document.getElementById('overlay');
@@ -306,7 +282,7 @@
         const addFriendBtn = document.getElementById('add-friend-btn');
         const addFriendModal = document.getElementById('add-friend-modal');
         const cancelAddFriendBtn = document.getElementById('cancel-add-friend-btn');
-        const friendEmailInput = document.getElementById('friend-email-input');
+        const friendEmailInput = document.getElementById('friend-nickname-input');
         const profileListContainer = document.getElementById('profile-list-container');
 
         const tabPrivate = document.getElementById('tab-private');
@@ -320,25 +296,244 @@
         const headerSearch = document.getElementById('header-search');
         const chatSearchInput = document.getElementById('chat-search-input');
 
+        const searchInput = document.getElementById('friend-nickname-input');
+        const searchButton = document.getElementById('search-friend-btn');
+
         const startPrivateChatBtn = document.getElementById('start-private-chat-btn');
 
         let currentUser = null;
         let searchTimeout;
-        // ▼▼▼ [추가] 친구 추가 모달 열기/닫기 이벤트 ▼▼▼
+
+        // 친구 추가 모달 열기/닫기 이벤트
         addFriendBtn.addEventListener('click', () => {
             addFriendModal.classList.remove('hidden');
             addFriendModal.classList.add('flex');
 
-            // 여기에 나중에 개발자가 FastAPI에서 
-            // '받은 친구 요청 목록'을 불러오는 함수를 실행할 거예요.
-            // 예: loadFriendRequests(); 
+            // 받은 친구 요청 목록 조회 함수 추가
+            loadFriendRequests(); 
         });
 
         cancelAddFriendBtn.addEventListener('click', () => {
             addFriendModal.classList.add('hidden');
             addFriendModal.classList.remove('flex');
         });
-        // ▲▲▲ [추가] ▲▲▲
+
+        // =========================================================================
+        // 1. 유틸리티 함수: Debounce (API 호출 과부하 방지)
+        // =========================================================================
+        function debounce(func, delay) {
+            let timeoutId;
+            return function(...args) {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    func.apply(this, args);
+                }, delay);
+            };
+        }
+
+        // =========================================================================
+        // 2. 검색 결과 단일 사용자 프로필 HTML 렌더링
+        // =========================================================================
+        // =========================================================================
+
+        function renderUserSearchResult(user) {
+            // 프로필 이미지가 없을 경우를 위한 기본 이미지
+            const defaultProfileImg = "https://via.placeholder.com/100?text=Profile";
+            
+            let buttonHtml = '';
+            
+            // -----------------------------------------------------------------
+            // 🌟 관계 상태(relation_status)에 따른 버튼/상태 메시지 결정 로직 추가
+            // -----------------------------------------------------------------
+            if (user.relation_status === "friend") {
+                // 1. 이미 친구인 경우
+                buttonHtml = `<span class="text-sm text-green-500 font-medium px-3 py-1 rounded-md bg-green-100">친구</span>`;
+            } else if (user.relation_status === "sent_request") {
+                // 2. 내가 이미 요청을 보낸 경우 (요청 완료)
+                buttonHtml = `<span class="text-sm text-gray-500 font-medium px-3 py-1 rounded-md bg-gray-100">요청 완료</span>`;
+            } else if (user.relation_status === "received_request") {
+                // 3. 상대방이 나에게 요청을 보낸 경우 (받은 요청 목록에서 처리해야 함)
+                // 여기서는 별도 처리 없이 버튼을 표시하지 않거나, 이미 존재하는 요청 목록으로 안내할 수 있습니다.
+                // 현재는 '요청받음' 메시지를 표시합니다.
+                buttonHtml = `<span class="text-sm text-orange-500 font-medium px-3 py-1 rounded-md bg-orange-100">요청받음</span>`; 
+            } else {
+                // 4. 관계가 없는 경우 (요청 버튼 표시)
+                buttonHtml = `<button data-uid="${user.firebase_uid}" 
+                                    data-nickname="${user.nickname}"
+                                    class="send-friend-request-btn text-sm text-white bg-orange-500 hover:bg-orange-600 px-3 py-1 rounded-md">
+                                친구 요청
+                            </button>`;
+            }
+            // -----------------------------------------------------------------
+
+            const profileItem = document.createElement('div');
+            profileItem.className = "flex items-center justify-between p-2 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors";
+            profileItem.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <img class="h-10 w-10 rounded-full object-cover"
+                        src="${user.profile_image || defaultProfileImg}" alt="Profile">
+                    <span class="font-medium text-gray-700">${user.nickname}</span>
+                </div>
+                <div class="flex-shrink-0">
+                    ${buttonHtml}  </div>
+            `;
+            return profileItem;
+        }
+    
+        // =========================================================================
+        // 3. 사용자 검색 API 호출 및 결과 렌더링 (핵심 함수)
+        // =========================================================================
+        async function searchUsers(query) {
+            profileListContainer.innerHTML = ''; 
+            profileListContainer.classList.add('hidden');
+
+            if (query.trim().length < 2) {
+                profileListContainer.classList.remove('hidden');
+                profileListContainer.innerHTML = '<p class="text-sm text-gray-500 p-2">검색어는 최소 두 글자 이상이어야 합니다.</p>';
+                return;
+            }
+            
+            try {
+                //const idToken = await getIdToken(); 
+                const token = await currentUser.getIdToken();
+
+                const res = await fetch(`${FASTAPI_BASE_URL}/friends/search?query=${encodeURIComponent(query)}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+
+                const data = await res.json();
+                const users = data.users || [];
+                
+                if (users.length > 0) {
+                    users.forEach(user => {
+                        profileListContainer.appendChild(renderUserSearchResult(user));
+                    });
+                    profileListContainer.classList.remove('hidden');
+                } else {
+                    profileListContainer.classList.remove('hidden');
+                    profileListContainer.innerHTML = '<p class="text-sm text-gray-500 p-2">검색 결과가 없습니다.</p>';
+                }
+
+                // 새로 렌더링된 버튼에 이벤트 리스너 연결
+                attachFriendRequestListeners();
+
+            } catch (error) {
+                console.error("사용자 검색 실패:", error);
+                profileListContainer.classList.remove('hidden');
+                profileListContainer.innerHTML = '<p class="text-sm text-red-500 p-2">검색 중 오류가 발생했습니다.</p>';
+            }
+        }
+
+        // =========================================================================
+        // 4. 친구 요청 전송 로직 (TODO: 백엔드 API 구현 완료 후 확인 필요)
+        // =========================================================================
+        async function sendFriendRequest(receiverUid, receiverNickname, buttonElement) {
+            if (!confirm(`${receiverNickname}님께 친구 요청을 보내시겠습니까?`)) {
+                return;
+            }
+
+            try {
+        //const idToken = await getIdToken();
+                const token = await currentUser.getIdToken();
+
+                // POST /friends/request (친구 요청 생성 API) 호출
+                const res = await fetch(`${FASTAPI_BASE_URL}/friends/request`, { 
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        to_user: receiverUid 
+                    })
+                });
+
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    // 409 Conflict 등 이미 요청이 있는 경우를 처리할 수 있습니다.
+                    throw new Error(errorData.detail || `친구 요청 실패: ${res.status}`);
+                }
+
+                // 성공 시 UI 업데이트
+                alert(`${receiverNickname}님께 친구 요청을 성공적으로 보냈습니다.`);
+                buttonElement.disabled = true;
+                // 🌟 '요청 보냄' 대신 '요청 완료'로 변경하고 스타일 업데이트
+                buttonElement.textContent = '요청 완료'; 
+                buttonElement.classList.remove('bg-orange-500', 'hover:bg-orange-600', 'text-white');
+                buttonElement.classList.add('bg-gray-100', 'text-gray-500', 'font-medium'); // 요청 완료 스타일
+
+            } catch (error) {
+                console.error("친구 요청 실패:", error);
+                alert(`친구 요청 실패: ${error.message}`);
+            }
+        }
+
+        // =========================================================================
+        // 5. 동적으로 생성된 버튼에 이벤트 리스너 연결
+        // =========================================================================
+        function attachFriendRequestListeners() {
+            // .send-friend-request-btn 클래스를 가진 모든 버튼을 선택
+            document.querySelectorAll('.send-friend-request-btn').forEach(button => {
+                // 이벤트를 이미 연결했는지 확인하고 중복을 방지 (매우 중요)
+                if (!button.dataset.listenerAttached) {
+                    button.addEventListener('click', async (event) => {
+                        const btn = event.currentTarget;
+                        const receiverUid = btn.getAttribute('data-uid');
+                        const receiverNickname = btn.getAttribute('data-nickname');
+                        await sendFriendRequest(receiverUid, receiverNickname, btn);
+                    });
+                    button.dataset.listenerAttached = 'true'; // 연결 표시
+                }
+            });
+        }
+
+        // =========================================================================
+        // 6. 메인 이벤트 리스너 설정 (DOM Load 후 실행)
+        // =========================================================================
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // 300ms 딜레이를 가진 디바운스 검색 함수
+            const debouncedSearch = debounce(searchUsers, 300);
+
+            // 1. INPUT 이벤트: 입력 중 자동 검색 (debounce 적용)
+            if (searchInput) {
+                searchInput.addEventListener('input', (event) => {
+                    const query = event.target.value;
+                    if (query.trim() === '') {
+                        profileListContainer.innerHTML = '';
+                        profileListContainer.classList.add('hidden');
+                    } else {
+                        debouncedSearch(query);
+                    }
+                });
+            }
+
+            // 2. SEARCH BUTTON 이벤트: 버튼 클릭 시 즉시 검색
+            if (searchButton) {
+                searchButton.addEventListener('click', () => {
+                    const query = searchInput.value;
+                    // 디바운스 없이 바로 검색 함수 호출
+                    searchUsers(query);
+                });
+            }
+
+            // 3. 모달 닫기 버튼 이벤트
+            document.getElementById('cancel-add-friend-btn')?.addEventListener('click', () => {
+                addFriendModal?.classList.add('hidden');
+                // 모달 닫을 때 검색 결과 및 입력 필드 초기화
+                searchInput.value = '';
+                profileListContainer.innerHTML = '';
+                profileListContainer.classList.add('hidden');
+            });
+        });
 
         // 로그인 상태 확인
         onAuthStateChanged(auth, (user) => {
@@ -734,7 +929,134 @@
                 }
             });
         });
+        // ... (기존 변수 및 인증 코드) ...
 
+        const friendRequestList = document.getElementById('friend-request-list');
+        const noRequestsText = document.getElementById('no-requests-text');
+
+        // 7. 받은 친구 요청 목록을 불러오는 함수
+        async function loadFriendRequests() {
+            // 로딩 상태 표시
+            friendRequestList.innerHTML = '<p class="text-sm text-gray-500 p-2 text-center">요청 목록을 불러오는 중...</p>';
+            if (!currentUser) return; // 로그인 확인
+
+            try {
+                const token = await currentUser.getIdToken();
+                const res = await fetch(`${FASTAPI_BASE_URL}/friends/requests`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+                
+                const data = await res.json();
+                const requests = data.requests || [];
+
+                friendRequestList.innerHTML = ''; // 로딩 메시지 삭제
+                
+                if (requests.length === 0) {
+                    noRequestsText.classList.remove('hidden');
+                    friendRequestList.appendChild(noRequestsText);
+                } else {
+                    noRequestsText.classList.add('hidden');
+                    requests.forEach(req => {
+                        friendRequestList.appendChild(renderFriendRequest(req));
+                    });
+                }
+                attachRequestHandleListeners(); // 요청 처리 버튼에 이벤트 연결
+
+            } catch (error) {
+                console.error("친구 요청 목록 로드 실패:", error);
+                friendRequestList.innerHTML = '<p class="text-sm text-red-500 p-2 text-center">요청 로드 중 오류 발생.</p>';
+            }
+        }
+
+        // 8. 받은 친구 요청 항목 HTML 렌더링 (requester_uid 사용)
+        function renderFriendRequest(req) {
+            const defaultProfileImg = "https://via.placeholder.com/100?text=Profile";
+            const item = document.createElement('div');
+            item.className = "flex items-center justify-between p-2 rounded-lg bg-gray-50";
+            item.dataset.requesterUid = req.from_user_uid; // 요청 보낸 사람의 UID 저장
+
+            item.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <img class="h-10 w-10 rounded-full object-cover"
+                        src="${req.from_user_profile_image || defaultProfileImg}" alt="Profile">
+                    <span class="font-medium text-gray-700">${req.from_user_nickname}</span>
+                </div>
+                <div class="space-x-2 flex-shrink-0">
+                    <button data-action="accept" data-requester-uid="${req.from_user_uid}" 
+                            class="handle-request-btn text-sm text-white bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded-md">수락</button>
+                    <button data-action="reject" data-requester-uid="${req.from_user_uid}"
+                            class="handle-request-btn text-sm text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded-md">거절</button>
+                </div>
+            `;
+            return item;
+        }
+
+        // 9. 요청 처리 API 호출 및 UI 업데이트 (requester_uid 사용)
+        async function handleFriendRequest(requesterUid, action, buttonElement) {
+            if (!currentUser) return;
+            
+            buttonElement.disabled = true;
+            buttonElement.textContent = '처리 중...';
+
+            try {
+                const token = await currentUser.getIdToken();
+                const res = await fetch(`${FASTAPI_BASE_URL}/friends/handle`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        requester_uid: requesterUid, // request_id 대신 requester_uid 전송
+                        action: action 
+                    })
+                });
+
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    throw new Error(errorData.detail || `요청 처리 실패: ${res.status}`);
+                }
+                
+                alert(action === 'accept' ? '친구가 되었습니다!' : '요청을 거절했습니다.');
+                
+                // 성공적으로 처리되면 해당 요청 항목을 목록에서 제거
+                const listItem = buttonElement.closest(`div[data-requester-uid="${requesterUid}"]`);
+                if (listItem) {
+                    listItem.remove();
+                }
+                // 요청 목록을 다시 로드하여 최신 상태 반영
+                loadFriendRequests(); 
+
+            } catch (error) {
+                console.error(`요청 처리 실패 (${action}):`, error);
+                alert(`요청 처리 실패: ${error.message}`);
+                buttonElement.disabled = false;
+                buttonElement.textContent = action === 'accept' ? '수락' : '거절';
+            }
+        }
+
+        // 10. 요청 처리 버튼에 이벤트 리스너 연결 (requester_uid 사용)
+        function attachRequestHandleListeners() {
+            document.querySelectorAll('.handle-request-btn').forEach(button => {
+                if (!button.dataset.listenerAttached) {
+                    button.addEventListener('click', async (event) => {
+                        const btn = event.currentTarget;
+                        const requesterUid = btn.getAttribute('data-requester-uid'); // data-requester-uid 속성 사용
+                        const action = btn.getAttribute('data-action');
+                        await handleFriendRequest(requesterUid, action, btn);
+                    });
+                    button.dataset.listenerAttached = 'true';
+                }
+            });
+        }
     </script>
 </body>
 
