@@ -131,11 +131,15 @@
         /* 식당 카드 스타일 */
         .restaurant-cards-container {
             display: flex;
-            flex-direction: column;
-            gap: 0.1rem;
-            max-width: 80%;
+            flex-direction: row;
+            gap: 1rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+            max-width: 100%;
         }
         .restaurant-card {
+             width: 240px;
+             flex-shrink: 0;
             background-color: #e5e7eb;
             border-radius: 1.25rem;
             text-decoration: none;
@@ -238,8 +242,8 @@
         const auth = getAuth(app);
 
         // fastapi 서버 url
-        const FASTAPI_BASE_URL = "https://bab-back.onrender.com"; 
-        //const FASTAPI_BASE_URL = 'http://127.0.0.1:8000'; // 로컬 테스트용
+        //const FASTAPI_BASE_URL = "https://bab-back.onrender.com"; 
+        const FASTAPI_BASE_URL = 'http://127.0.0.1:8000'; // 로컬 테스트용
         
         const sendButton = document.getElementById('sendButton');
         const messageInput = document.getElementById('messageInput');
@@ -322,9 +326,9 @@
                 // 2. 카드 컨테이너 HTML 요소
                 const cardsContainer = document.createElement('div');
                 cardsContainer.className = `message-box ${replyMessage.role === 'assistant' ? 'system-message' : 'user-message'}`; 
-                
+                //요기 바구면 가로로 가능함
                 const cardsContentWrapper = document.createElement('div');
-                cardsContentWrapper.className = 'restaurant-cards-container flex flex-col space-y-4'; 
+                cardsContentWrapper.className = 'restaurant-cards-container flex flex-row space-x-4 overflow-x-auto';
                 
                 // 3. 각 식당 데이터에 대해 카드 HTML을 생성해 추가
                 cardData.restaurants.forEach((restaurant, index) => {
