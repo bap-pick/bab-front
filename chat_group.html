@@ -13,11 +13,10 @@
             font-family: 'Noto Sans KR', sans-serif;
         }
 
-        /* ✅ 체크박스 커스텀 스타일 */
         .custom-checkbox {
             appearance: none;
             -webkit-appearance: none;
-            border-radius: 9999px; /* 완전한 원형 */
+            border-radius: 9999px;
             border-width: 1px;
         }
 
@@ -26,11 +25,24 @@
             background-color: #FF7242;
             border-color: #FF7242;
         }
+
+        .spinner {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #FF7242;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="bg-white">
     <div class="max-w-lg mx-auto h-screen flex flex-col">
-        <!-- 상단 헤더 -->
         <header class="flex items-center justify-between p-4 border-b border-gray-200">
             <button onclick="history.back()">
                 <svg class="w-6 h-6 text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -38,10 +50,23 @@
                 </svg>
             </button>
             <h1 class="text-lg font-bold">대화상대 선택</h1>
-            <button id="confirm-btn" class="text-gray-400 font-semibold" disabled>확인</button>
+            <button id="confirm-btn" class="text-gray-400 font-semibold flex items-center gap-2" disabled>
+                <span>확인</span>
+                <div id="loading-spinner" class="spinner hidden"></div>
+            </button>
         </header>
 
-        <!-- 검색창 -->
+        <div id="group-name-section" class="hidden p-4 border-b border-gray-200 bg-orange-50">
+            <label class="block text-sm font-medium text-gray-700 mb-2">그룹 채팅 이름</label>
+            <input 
+                type="text" 
+                id="group-name-input" 
+                placeholder="그룹 이름을 입력하세요 (선택사항)"
+                class="w-full py-2 px-4 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400"
+            >
+            <p class="text-xs text-gray-500 mt-1">* 입력하지 않으면 자동으로 멤버 이름으로 설정됩니다</p>
+        </div>
+
         <div class="p-4 border-b border-gray-200">
             <div class="relative">
                 <input type="text" id="search-input" placeholder="이름으로 검색" 
@@ -55,111 +80,201 @@
             </div>
         </div>
 
-        <!-- 친구 목록 -->
-        <main id="friends-list" class="flex-1 overflow-y-auto p-4"></main>
+        <main id="friends-list" class="flex-1 overflow-y-auto p-4">
+            <div class="flex justify-center items-center h-full">
+                <div class="spinner" style="width: 40px; height: 40px; border-width: 3px;"></div>
+            </div>
+        </main>
     </div>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // 친구 데이터 (예시)
-        const mockFriends = [
-            { id: 1, name: '마디나', profileImg: 'https://placehold.co/40x40/4A5568/FFFFFF?text=마' },
-            { id: 2, name: '덕새', profileImg: 'https://placehold.co/40x40/4A5568/FFFFFF?text=덕' },
-            { id: 3, name: '너구리', profileImg: 'https://placehold.co/40x40/4A5568/FFFFFF?text=너' },
-        ];
+    <script type="module">
+        // Firebase SDK import 
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+        import { firebaseConfig } from "./firebase-config.js"; 
+
+        // Firebase 앱 초기화
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // FastAPI 서버 URL
+        const FASTAPI_BASE_URL = 'http://127.0.0.1:8000'; // 로컬 테스트용
+        //const FASTAPI_BASE_URL = "https://bab-back.onrender.com"; 
+
+        let idToken = null;
+        let allFriends = [];
+        let currentUserUid = null; 
+        let selectedFriends = new Set();
+        const defaultProfileImg = "https://bit.ly/3K2rlSh";
 
         const friendsListContainer = document.getElementById('friends-list');
         const searchInput = document.getElementById('search-input');
         const confirmBtn = document.getElementById('confirm-btn');
+        const groupNameSection = document.getElementById('group-name-section');
+        const groupNameInput = document.getElementById('group-name-input');
+        const loadingSpinner = document.getElementById('loading-spinner');
 
-        let selectedFriends = new Set();
+        // 로그인 상태 확인 및 초기화
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                alert('로그인이 필요합니다.');
+                window.location.href = 'index.html';
+                return;
+            }
+
+            currentUserUid = user.uid; // 현재 사용자 UID 저장
+            idToken = await user.getIdToken();
+            await loadFriends();
+        });
+
+        // 친구 목록 조회
+        async function loadFriends() {
+            try {
+                const res = await fetch(`${FASTAPI_BASE_URL}/friends/list`, {
+                    headers: { "Authorization": `Bearer ${idToken}` }
+                });
+
+                if (!res.ok) throw new Error('친구 목록 로드 실패');
+
+                const data = await res.json(); 
+
+                // API 응답이 배열인지 객체인지 확인
+                if (Array.isArray(data)) {
+                    allFriends = data;
+                } else if (data.friends && Array.isArray(data.friends)) {
+                    allFriends = data.friends;
+                } else {
+                    allFriends = [];
+                }
+                
+                renderFriends(allFriends);
+            } catch (err) {
+                console.error('친구 목록 로드 오류:', err);
+                friendsListContainer.innerHTML = `
+                    <div class="text-center text-red-500 mt-4">
+                        <p>친구 목록을 불러올 수 없습니다. 서버 상태를 확인하세요.</p>
+                        <button onclick="location.reload()" class="mt-2 text-orange-500 underline">다시 시도</button>
+                    </div>
+                `;
+            }
+        }
 
         // 친구 목록 렌더링
-        const renderFriends = (friends) => {
+        function renderFriends(friends) {
             friendsListContainer.innerHTML = '';
+            
             if (friends.length === 0) {
-                friendsListContainer.innerHTML = '<p class="text-center text-gray-500 mt-4">검색 결과가 없습니다.</p>';
+                friendsListContainer.innerHTML = '<p class="text-center text-gray-500 mt-4">친구가 없습니다.</p>';
                 return;
             }
 
             friends.forEach(friend => {
                 const friendElement = document.createElement('label');
                 friendElement.className = 'flex items-center p-2 rounded-lg hover:bg-gray-50 cursor-pointer';
+                
+                const profileImg = friend.profile_image || defaultProfileImg;
+                
                 friendElement.innerHTML = `
-                    <img src="${friend.profileImg}" class="w-10 h-10 rounded-full mr-4" alt="${friend.name}">
-                    <span class="flex-1 text-gray-800">${friend.name}</span>
-                    <input type="checkbox" class="custom-checkbox w-5 h-5 border-gray-300 focus:ring-transparent" data-id="${friend.id}">
+                    <img src="${profileImg}" class="w-10 h-10 rounded-full mr-4 object-cover" alt="${friend.nickname}">
+                    <span class="flex-1 text-gray-800">${friend.nickname}</span>
+                    <input type="checkbox" class="custom-checkbox w-5 h-5 border-gray-300 focus:ring-transparent" data-uid="${friend.firebase_uid}" ${selectedFriends.has(friend.firebase_uid) ? 'checked' : ''}>
                 `;
                 friendsListContainer.appendChild(friendElement);
             });
-        };
+        }
 
-        // 확인 버튼 상태 업데이트
-        const updateConfirmButton = () => {
+        function updateConfirmButton() {
             const count = selectedFriends.size;
-            confirmBtn.textContent = '확인';
+            
             if (count > 0) {
                 confirmBtn.disabled = false;
+                confirmBtn.querySelector('span').textContent = `확인 (${count})`;
                 confirmBtn.classList.remove('text-gray-400');
                 confirmBtn.classList.add('text-orange-500');
+                
+                // 1명 이상 선택 시 그룹 이름 입력 섹션 표시
+                groupNameSection.classList.remove('hidden');
             } else {
                 confirmBtn.disabled = true;
+                confirmBtn.querySelector('span').textContent = '확인';
                 confirmBtn.classList.add('text-gray-400');
                 confirmBtn.classList.remove('text-orange-500');
+                groupNameSection.classList.add('hidden');
             }
-        };
+        }
 
-        // 검색 기능
+        // 검색 기능 (로컬 필터링)
         searchInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value.toLowerCase();
-            const filteredFriends = mockFriends.filter(friend => friend.name.toLowerCase().includes(searchTerm));
+            const filteredFriends = allFriends.filter(friend => 
+                friend.nickname.toLowerCase().includes(searchTerm)
+            );
             renderFriends(filteredFriends);
         });
 
-        // 체크박스 선택
+        // 체크박스 선택 이벤트 핸들러
         friendsListContainer.addEventListener('change', (e) => {
             if (e.target.type === 'checkbox') {
-                const friendId = parseInt(e.target.dataset.id);
+                const friendUid = e.target.dataset.uid;
                 if (e.target.checked) {
-                    selectedFriends.add(friendId);
+                    selectedFriends.add(friendUid);
                 } else {
-                    selectedFriends.delete(friendId);
+                    selectedFriends.delete(friendUid);
                 }
                 updateConfirmButton();
+                const searchTerm = searchInput.value.toLowerCase();
+                const filteredFriends = allFriends.filter(friend => 
+                    friend.nickname.toLowerCase().includes(searchTerm)
+                );
+                renderFriends(filteredFriends);
             }
         });
 
-        // ✅ 확인 버튼 → 채팅방 생성 + 자동 저장
-        confirmBtn.addEventListener('click', () => {
-            if (selectedFriends.size > 0) {
-                const selectedIds = Array.from(selectedFriends);
-                const selectedNames = mockFriends
-                    .filter(f => selectedIds.includes(f.id))
-                    .map(f => f.name);
+        // 그룹 채팅방 생성
+        confirmBtn.addEventListener('click', async () => {
+            if (selectedFriends.size === 0) return;
 
-                // 새 채팅방 객체 생성
-                const newChatRoom = {
-                    id: Date.now(),
-                    members: selectedNames,
-                    createdAt: new Date().toISOString(),
-                    lastMessage: ""
-                };
+            // 로딩 상태
+            confirmBtn.disabled = true;
+            loadingSpinner.classList.remove('hidden');
+            confirmBtn.querySelector('span').textContent = '생성 중';
 
-                // localStorage에 저장
-                const savedRooms = JSON.parse(localStorage.getItem('chatRooms')) || [];
-                savedRooms.push(newChatRoom);
-                localStorage.setItem('chatRooms', JSON.stringify(savedRooms));
+            try {
+                const groupName = groupNameInput.value.trim() || null;
+                const invitedUids = Array.from(selectedFriends);
 
-                alert(`✅ 새 채팅방 생성 완료!\n멤버: ${selectedNames.join(', ')}`);
+                const res = await fetch(`${FASTAPI_BASE_URL}/chat/create`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${idToken}`
+                    },
+                    body: JSON.stringify({
+                        name: groupName,
+                        is_group: invitedUids.length >= 1, 
+                        invited_uids: invitedUids
+                    })
+                });
 
-                // (선택) 채팅방 목록 페이지로 이동
-                // window.location.href = "chat_list.html";
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    throw new Error(errorData.detail || '채팅방 생성 실패');
+                }
+
+                const data = await res.json();
+                
+                // 생성된 채팅방으로 이동 (data.chatroom_id 필요)
+                window.location.href = `chat.html?roomId=${data.chatroom_id}`;
+
+            } catch (err) {
+                console.error('채팅방 생성 오류:', err);
+                alert(`채팅방 생성 실패: ${err.message}`);
+                
+                // 로딩 해제
+                loadingSpinner.classList.add('hidden');
+                updateConfirmButton(); // 버튼 텍스트와 disabled 상태 복구
             }
         });
-
-        // 초기 목록 렌더링
-        renderFriends(mockFriends);
-    });
     </script>
 </body>
 </html>

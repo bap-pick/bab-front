@@ -208,8 +208,7 @@
             </div>
 
             <footer class="fixed bottom-0 left-0 right-0 z-30">
-                <nav
-                    class="flex justify-around items-center h-16 bg-white rounded-t-2xl shadow-[0_-2px_10px_rgba(0,0,0,0.05)] max-w-screen-xl mx-auto">
+                <nav class="flex justify-around items-center h-16 bg-white rounded-t-2xl shadow-[0_-2px_10px_rgba(0,0,0,0.05)] max-w-screen-xl mx-auto">
                     <a href="home.html"
                         class="flex flex-col items-center justify-center w-1/5 h-full text-gray-500 hover:text-[#FF7242] text-xs">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -340,8 +339,8 @@
             }
             
             if (count === 2) {
-                const img1 = memberProfiles[0] || defaultProfileImg;
-                const img2 = memberProfiles[1] || defaultProfileImg;
+                const img1 = memberProfiles[0].profile_image || defaultProfileImg;
+                const img2 = memberProfiles[1].profile_image || defaultProfileImg;
                 
                 return `
                     <div class="relative w-14 h-14 flex-shrink-0">
@@ -354,9 +353,9 @@
             }
             
             if (count === 3) {
-                const img1 = memberProfiles[0] || defaultProfileImg;
-                const img2 = memberProfiles[1] || defaultProfileImg;
-                const img3 = memberProfiles[2] || defaultProfileImg;
+                const img1 = memberProfiles[0].profile_image || defaultProfileImg;
+                const img2 = memberProfiles[1].profile_image || defaultProfileImg;
+                const img3 = memberProfiles[2].profile_image || defaultProfileImg;
                 
                 return `
                     <div class="relative w-14 h-14 flex-shrink-0">
