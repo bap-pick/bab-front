@@ -68,9 +68,16 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden;
             color: #6b7280;
             flex-shrink: 0;
             margin-right: 0.75rem;
+        }
+        .profile-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
         }
         .message-bubble {
             max-width: 80%;
@@ -138,8 +145,8 @@
             max-width: 100%;
         }
         .restaurant-card {
-             width: 240px;
-             flex-shrink: 0;
+            width: 240px;
+            flex-shrink: 0;
             background-color: #e5e7eb;
             border-radius: 1.25rem;
             text-decoration: none;
@@ -199,7 +206,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                 </svg>
             </button>
-            <h1 id="headerTitle">밥픽</h1>
+            <h1 id="headerTitle"></h1>
             <div style="width: 24px; height: 24px;"></div>
         </header>
 
@@ -226,444 +233,508 @@
                 </button>
             </div>
         </div>
-    <script type="module">
-        // Firebase SDK import 
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { firebaseConfig } from "./firebase-config.js";
+  <script type="module">
+    // Firebase SDK import 
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+    import { firebaseConfig } from "./firebase-config.js";
 
-        marked.setOptions({
-            breaks: true,
-            gfm: true
-        });
+    marked.setOptions({
+        breaks: true,
+        gfm: true
+    });
 
-        // Firebase 앱 초기화
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
+    // Firebase 앱 초기화
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    
+    // FastAPI 서버 URL
+    //const FASTAPI_BASE_URL = 'http://127.0.0.1:8000'; // 로컬 테스트용
+    const FASTAPI_BASE_URL = "https://bab-back.onrender.com"; 
+    
+    const sendButton = document.getElementById('sendButton');
+    const messageInput = document.getElementById('messageInput');
+    const chatArea = document.querySelector('.chat-area');
+    const headerTitle = document.getElementById('headerTitle');
 
-        // fastapi 서버 url
-        //const FASTAPI_BASE_URL = "https://bab-back.onrender.com"; 
-        const FASTAPI_BASE_URL = 'http://127.0.0.1:8000'; // 로컬 테스트용
-        
-        const sendButton = document.getElementById('sendButton');
-        const messageInput = document.getElementById('messageInput');
-        const chatArea = document.querySelector('.chat-area');
-        const headerTitle = document.getElementById('headerTitle');
+    let idToken = null;
+    let currentUserUid = null;
+    let currentRoomId = null;
+    let isCreatingRoom = false;
+    let currentChatroomIsGroup = false;
+    
+    let profileImageUrl = 'logo_bapick copy.png'; 
+    const greetingMessage = "안녕! 나는 오늘의 운세에 맞춰 행운의 맛집을 추천해주는 '밥풀이'야🍀"; 
 
-        let idToken = null;
-        let currentRoomId = null;
-        let isCreatingRoom = false;
-        
-        let profileImageUrl = 'logo_bapick copy.png'; 
-        const greetingMessage = "안녕! 나는 오늘의 운세에 맞춰 행운의 맛집을 추천해주는 '밥풀이'야🍀"; 
+    let websocket = null;
+    let isWebSocketConnected = false;
 
-        // URL에서 roomId를 가져오는 함수
-        function getRoomIdFromUrl() {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get('roomId'); 
+    // WebSocket 연결 함수
+    function connectWebSocket(roomId, token) {
+        if (websocket) {
+            websocket.close();
         }
 
-        // 스크롤을 맨 아래로 내리는 함수
-        function scrollToBottom(element) {
-            element.scrollTop = element.scrollHeight;
-        }
+        const wsUrl = FASTAPI_BASE_URL.replace('http://', 'ws://').replace('https://', 'wss://');
+        websocket = new WebSocket(`${wsUrl}/chat/ws/${roomId}?token=${token}`);
 
-        // 메시지 렌더링
-        function renderMessage(msg) {
-            const messageBox = document.createElement('div');
+        websocket.onopen = () => {
+            console.log('WebSocket 연결됨');
+            isWebSocketConnected = true;
+        };
+
+        websocket.onmessage = (event) => {
+            handleWebSocketMessage(event);
+        };
+
+        websocket.onerror = (error) => {
+            console.error('WebSocket 오류:', error);
+        };
+
+        websocket.onclose = () => {
+            console.log('WebSocket 연결 종료');
+            isWebSocketConnected = false;
+        };
+    }
+
+    function handleWebSocketMessage(event) {
+        try {
+            const data = JSON.parse(event.data);
             
-            const isAssistant = (msg.role === 'assistant'); 
-            
-            messageBox.className = `message-box ${isAssistant ? 'system-message' : 'user-message'}`; 
-
-            if (isAssistant) {
-                // 어시스턴트 (봇) 메시지
-                messageBox.innerHTML = `
-                    <div class="profile-icon">
-                        <img class="rounded-full object-cover" src="${profileImageUrl}" alt="Profile">
-                    </div>
-                    <div class="message-bubble system-bubble">
-                        ${marked.parse(msg.content)}
-                    </div>`;
-            } else {
-                // 사용자 메시지
-                messageBox.innerHTML = `
-                    <div class="message-bubble user-bubble">
-                        ${marked.parse(msg.content)}
-                    </div>`;
-            }
-
-            return messageBox;
-        }
-
-        // 식당 카드 렌더링
-        function renderRestaurantCard(restaurant, index) {
-            const menuSnippet = restaurant.menu_snippet ? restaurant.menu_snippet.join(', ') : '메뉴 정보 없음';
-            
-            const imageUrl = restaurant.image_url || 'logo_bapick copy.png';
-
-            return `
-                <a href="detail.html?id=${restaurant.id}" target="_blank" class="restaurant-card overflow-hidden">
-                    <img src="${imageUrl}" alt="${restaurant.name} 이미지" class="w-full h-32 object-cover rounded-t-lg">
-                    <div class="p-3">
-                        <h3 class="font-bold text-lg text-gray-900 truncate">${index + 1}. ${restaurant.name}</h3>
-                        <p class="text-sm text-gray-500 mb-1 truncate">${restaurant.category}</p>
-                        <p class="text-sm text-gray-500 mb-1 truncate">${restaurant.address}</p>
-                        <div class="text-xs text-gray-700 mt-1">
-                            <span class="font-semibold">메뉴:</span> ${menuSnippet}
-                        </div>
-                    </div>
-                </a>
-            `;
-        }
-
-        // 식당 카드 컨테이너를 생성하고 DOM에 추가
-        function appendRestaurantcards(replyMessage, container) {
-            try {
-                // 1. JSON 문자열 파싱
-                const cardData = JSON.parse(replyMessage.content);
-
-                // 2. 카드 컨테이너 HTML 요소
-                const cardsContainer = document.createElement('div');
-                cardsContainer.className = `message-box ${replyMessage.role === 'assistant' ? 'system-message' : 'user-message'}`; 
-                //요기 바구면 가로로 가능함
-                const cardsContentWrapper = document.createElement('div');
-                cardsContentWrapper.className = 'restaurant-cards-container flex flex-row space-x-4 overflow-x-auto';
+            if (data.type === 'new_message') {
+                const msg = data.message;
                 
-                // 3. 각 식당 데이터에 대해 카드 HTML을 생성해 추가
-                cardData.restaurants.forEach((restaurant, index) => {
-                    const cardHtml = renderRestaurantCard(restaurant, index); 
-                    cardsContentWrapper.insertAdjacentHTML('beforeend', cardHtml);
-                });
-
-                // 4. 프로필 사진 추가
-                if (replyMessage.role === 'assistant') {
-                    const profileIcon = Object.assign(document.createElement('div'), {
-                        className: 'profile-icon', 
-                        innerHTML: `<img class="rounded-full object-cover" src="${profileImageUrl}" alt="Profile">`
+                // 자신이 보낸 메시지는 이미 화면에 표시했으므로 무시
+                if (msg.sender_id === currentUserUid && msg.role === 'user') {
+                    return;
+                }
+                
+                // 로딩 UI 제거 (봇 응답이 오면)
+                if (msg.role === 'assistant') {
+                    const loadingDivs = document.querySelectorAll('.typing-indicator');
+                    loadingDivs.forEach(div => {
+                        const messageBox = div.closest('.message-box');
+                        if (messageBox && messageBox.parentNode) {
+                            messageBox.parentNode.removeChild(messageBox);
+                        }
                     });
-                    cardsContainer.appendChild(profileIcon);
                 }
                 
-                cardsContainer.appendChild(cardsContentWrapper);
-                container.appendChild(cardsContainer); // chatArea (container)에 추가
-                
-            } catch (e) {
-                console.error("Card JSON 파싱 및 렌더링 오류:", e, "원본 Content:", replyMessage.content);
-                container.appendChild(renderMessage(replyMessage)); 
-            }
-        }
-
-        // 초기 메시지 렌더링 (오행 기반 메뉴 추천 메시지)
-        async function renderInitialMessage(roomId, container) {
-            if (!idToken || !roomId) return;
-            
-            try {
-                const res = await fetch(`${FASTAPI_BASE_URL}/chat/messages/${roomId}`, {
-                    headers: { "Authorization": `Bearer ${idToken}` }
-                });
-
-                if (!res.ok) { throw new Error("메시지 추가 로드 실패"); }
-                
-                const data = await res.json();
-                const messages = Array.isArray(data) ? data : data.messages || [];
-
-                if (messages.length > 1) {
-                    const secondMessage = messages[1]; 
-                    container.appendChild(renderMessage(secondMessage));
+                // 메시지 타입에 따라 렌더링
+                if (msg.message_type === 'restaurant_cards') {
+                    appendRestaurantcards(msg, chatArea);
                 } else {
-                    console.warn("DB에 상세 추천 메시지가 없습니다. (메시지 수: 1)");
-                    const warningMsg = { role: 'assistant', content: "오행 맞춤 추천 메시지를 가져올 수 없습니다. 다시 시도해 주세요." };
-                    container.appendChild(renderMessage(warningMsg));
+                    chatArea.appendChild(renderMessage(msg));
                 }
-
-            } catch (err) {
-                console.error("새로운 봇 메시지 추가 중 오류 발생:", err);
-                const errorMsg = { role: 'assistant', content: `[추가 로드 오류]: ${err.message}` };
-                container.appendChild(renderMessage(errorMsg));
-            } finally {
-                scrollToBottom(container);
-            }
-        }
-
-
-        // 채팅방 생성
-        async function createChatRoom() {
-            if (currentRoomId !== null || isCreatingRoom || !idToken) return;
-            
-            isCreatingRoom = true;
-            sendButton.disabled = true;
-            messageInput.disabled = true;
-
-            chatArea.innerHTML = ''; 
-
-            // 1. 인사 메시지 즉시 렌더링
-            const headlineMessage = { role: 'assistant', content: greetingMessage }; 
-            chatArea.appendChild(renderMessage(headlineMessage));
-            scrollToBottom(chatArea);
-
-            // 2. 로딩 UI 즉시 렌더링
-            const loadingDiv = renderLoadingMessage();
-            
-            let success = false; // API 호출 성공 여부 플래그
-            
-            try {
-                // 3. 채팅방 생성 API 호출
-                const res = await fetch(`${FASTAPI_BASE_URL}/chat/create`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${idToken}`
-                    },
-                    body: JSON.stringify({})
+                
+                scrollToBottom(chatArea);
+            } else if (data.type === 'error') {
+                console.error('서버 에러:', data.message);
+                
+                // 로딩 UI 제거
+                const loadingDivs = document.querySelectorAll('.typing-indicator');
+                loadingDivs.forEach(div => {
+                    const messageBox = div.closest('.message-box');
+                    if (messageBox && messageBox.parentNode) {
+                        messageBox.parentNode.removeChild(messageBox);
+                    }
                 });
-
-                if (!res.ok) {
-                    const errorData = await res.json();
-                    throw new Error(errorData.detail || `[${res.status}] API 요청 실패`);
-                }
-
-                // 4. 채팅방 생성 - 방 ID와 이름
-                const data = await res.json();
-                currentRoomId = data.chatroom_id; 
-                headerTitle.textContent = data.chatroom_name || '새 채팅'; 
                 
-                // 5. 로딩 UI 제거
-                if (loadingDiv.parentNode) {
-                    loadingDiv.parentNode.removeChild(loadingDiv);
-                }
-                
-                success = true; // 성공 플래그 설정
-                
-            } catch (err) {
-                console.error("채팅방 생성 오류:", err);
-                // API 오류 발생 시 로딩 UI 제거 및 오류 메시지 표시
-                if (loadingDiv.parentNode) {
-                    loadingDiv.parentNode.removeChild(loadingDiv);
-                }
-                const errorMsg = { role: 'assistant', content: `채팅방 생성 중 오류가 발생했습니다: ${err.message}` };
+                const errorMsg = { role: 'assistant', content: data.message };
                 chatArea.appendChild(renderMessage(errorMsg));
-            } finally {
-                isCreatingRoom = false;
-                sendButton.disabled = false;
-                messageInput.disabled = false;
-                
-                if (success) {
-                    await renderInitialMessage(currentRoomId, chatArea); 
-                }
+                scrollToBottom(chatArea);
             }
+        } catch (err) {
+            console.error('WebSocket 메시지 파싱 오류:', err);
         }
-        
-        // 기존 채팅방에 접속할 경우, 기존 메시지를 로드하는 함수 
-        async function loadMessages(roomId, container) {
-            if (!idToken || !roomId || String(roomId).toLowerCase() === 'null') {
-                console.error("기존 메시지 로드 오류: 존재하지 않는 방이거나, 토큰이 존재하지 않음");
-                container.innerHTML = ''; 
-                return;
-            }
+    }
 
-            messageInput.disabled = true;
+    // URL에서 roomId를 가져오는 함수
+    function getRoomIdFromUrl() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('roomId'); 
+    }
 
-            try {
-                const res = await fetch(`${FASTAPI_BASE_URL}/chat/messages/${roomId}`, {
-                    headers: {
-                        "Authorization": `Bearer ${idToken}`
-                    }
-                });
+    // 스크롤을 맨 아래로 내리는 함수
+    function scrollToBottom(element) {
+        element.scrollTop = element.scrollHeight;
+    }
 
-                if (!res.ok) {
-                    if (res.status === 403) {
-                        container.innerHTML = '<p class="text-center text-red-500">이 채팅방에 접근할 권한이 없습니다.</p>';
-                        return;
-                    }
-                    throw new Error(`메시지 로드 실패: ${res.status}`);
-                }
+    // 메시지 렌더링 (수정됨)
+    function renderMessage(msg) {
+        const messageBox = document.createElement('div');
+        const isAssistant = (msg.role === 'assistant');
+        // sender_id로 본인 메시지인지 판단
+        const isMyMessage = msg.sender_id === currentUserUid && !isAssistant;
+        messageBox.className = `message-box ${isMyMessage ? 'user-message' : 'system-message'}`; 
 
-                const data = await res.json();
-        
-                container.innerHTML = ''; 
-                headerTitle.textContent = data.chatroom_name || `채팅방 #${roomId}`; 
-                const messages = Array.isArray(data) ? data : data.messages || [];
+        const defaultProfileIconHtml = `<span class="text-sm font-semibold">${(msg.sender_name || '알').slice(0, 1)}</span>`;
+        const profileImgHtml = msg.sender_profile_url 
+            ? `<img class="rounded-full object-cover" src="${msg.sender_profile_url}" alt="${msg.sender_name || '알 수 없음'} 프로필">`
+            : defaultProfileIconHtml;
 
-                messages.forEach(msg => {
-                    const isCardMessage = msg.message_type === 'restaurant_cards' || (msg.role === 'assistant' && msg.content && msg.content.trim().startsWith('{"restaurants":'));
-
-                    if (isCardMessage) {
-                        // 식당 목록 렌더링
-                        appendRestaurantcards(msg, container);
-                    } else {
-                        // 일반 텍스트 메시지 렌더링
-                        container.appendChild(renderMessage(msg));
-                    }
-                });
-
-            } catch (err) {
-                console.error("기존 메시지 로드 중 오류 발생:", err);
-                container.innerHTML = `<p class="text-center text-red-500">메시지를 불러오는 중 오류가 발생했습니다: ${err.message}</p>`;
-            } finally {
-                scrollToBottom(container);
-                messageInput.disabled = false; // 로드 완료 후 입력 활성화
-            }
-        }
-
-        // 로그인 상태 확인
-        onAuthStateChanged(auth, async (user) => {
-            if (!user) {
-                window.location.href = 'index.html';
-                return;
-            }
-
-            idToken = await user.getIdToken();
-            const urlRoomId = getRoomIdFromUrl();
-
-            if (urlRoomId) {
-                // 기존 채팅방 접속
-                currentRoomId = urlRoomId;
-                await loadMessages(urlRoomId, chatArea);
-            } else {
-                // 새 채팅방 생성
-                await createChatRoom(); 
-            }
-        });
-        
-        // 로딩 UI 렌더링 함수
-        function renderLoadingMessage() {
-            const botLoadingDiv = document.createElement("div");
-            botLoadingDiv.className = "message-box system-message";
-
-            botLoadingDiv.innerHTML = `
+        if (isAssistant) {
+            // 어시스턴트 (봇) 메시지
+            messageBox.innerHTML = `
                 <div class="profile-icon">
                     <img class="rounded-full object-cover" src="${profileImageUrl}" alt="Profile">
                 </div>
                 <div class="message-bubble system-bubble">
-                    <div class="typing-indicator">
-                        <span></span><span></span><span></span>
-                    </div>
+                    ${marked.parse(msg.content)}
+                </div>`;
+        } else if (isMyMessage) {
+            // 본인 메시지
+            messageBox.innerHTML = `
+                <div class="message-bubble user-bubble">
+                    ${marked.parse(msg.content)}
+                </div>`;
+        } else {
+            // 다른 사용자 메시지 (그룹 채팅)
+            const senderName = msg.sender_name || '알 수 없음';
+            messageBox.innerHTML = `
+                <div class="profile-icon">
+                    ${profileImgHtml}
                 </div>
-            `;
-
-            chatArea.appendChild(botLoadingDiv);
-            chatArea.scrollTop = chatArea.scrollHeight;
-            return botLoadingDiv;
+                <div class="message-bubble system-bubble">
+                    <div class="text-xs text-gray-600 mb-1">${senderName}</div>
+                    ${marked.parse(msg.content)}
+                </div>`;
         }
 
-        // 메시지 전송
-        async function sendMessage() {
-            const messageText = messageInput.value.trim();
+        return messageBox;
+    }
 
-            if (currentRoomId === null) {
-                if (messageText) {
-                    await createChatRoom();
-                    if (currentRoomId !== null) {
-                        await sendMessage();
-                        return;
-                    }
-                    alert("채팅방이 생성되었습니다. 다시 메시지를 보내주세요.");
-                }
-                return;
+    // 식당 카드 렌더링
+    function renderRestaurantCard(restaurant, index) {
+        const menuSnippet = restaurant.menu_snippet ? restaurant.menu_snippet.join(', ') : '메뉴 정보 없음';
+        const imageUrl = restaurant.image_url || 'logo_bapick copy.png';
+
+        return `
+            <a href="detail.html?id=${restaurant.id}" class="restaurant-card overflow-hidden">
+                <img src="${imageUrl}" alt="${restaurant.name} 이미지" class="w-full h-32 object-cover rounded-t-lg">
+                <div class="p-3">
+                    <h3 class="font-bold text-lg text-gray-900 truncate">${index + 1}. ${restaurant.name}</h3>
+                    <p class="text-sm text-gray-500 mb-1 truncate">${restaurant.category}</p>
+                    <p class="text-sm text-gray-500 mb-1 truncate">${restaurant.address}</p>
+                    <div class="text-xs text-gray-700 mt-1">
+                        <span class="font-semibold">메뉴:</span> ${menuSnippet}
+                    </div>
+                </div>
+            </a>
+        `;
+    }
+
+    // 식당 카드 컨테이너를 생성하고 DOM에 추가
+    function appendRestaurantcards(replyMessage, container) {
+        try {
+            const cardData = JSON.parse(replyMessage.content);
+            const cardsContainer = document.createElement('div');
+            cardsContainer.className = `message-box ${replyMessage.role === 'assistant' ? 'system-message' : 'user-message'}`; 
+            
+            const cardsContentWrapper = document.createElement('div');
+            cardsContentWrapper.className = 'restaurant-cards-container flex flex-row space-x-4 overflow-x-auto';
+
+            cardData.restaurants.forEach((restaurant, index) => {
+                const cardHtml = renderRestaurantCard(restaurant, index); 
+                cardsContentWrapper.insertAdjacentHTML('beforeend', cardHtml);
+            });
+
+            if (replyMessage.role === 'assistant') {
+                const profileIcon = Object.assign(document.createElement('div'), {
+                    className: 'profile-icon', 
+                    innerHTML: `<img class="rounded-full object-cover" src="${profileImageUrl}" alt="Profile">`
+                });
+                cardsContainer.appendChild(profileIcon);
+            }
+            
+            cardsContainer.appendChild(cardsContentWrapper);
+            container.appendChild(cardsContainer);
+            
+        } catch (e) {
+            console.error("Card JSON 파싱 및 렌더링 오류:", e);
+            container.appendChild(renderMessage(replyMessage)); 
+        }
+    }
+
+    // 초기 메시지 렌더링
+    async function renderInitialMessage(roomId, container) {
+        if (!idToken || !roomId) return;
+        
+        try {
+            const res = await fetch(`${FASTAPI_BASE_URL}/chat/messages/${roomId}`, {
+                headers: { "Authorization": `Bearer ${idToken}` }
+            });
+
+            if (!res.ok) { throw new Error("메시지 추가 로드 실패"); }
+            
+            const data = await res.json();
+            const messages = Array.isArray(data) ? data : data.messages || [];
+
+            if (messages.length > 1) {
+                const secondMessage = messages[1]; 
+                container.appendChild(renderMessage(secondMessage));
+            } else {
+                console.warn("DB에 상세 추천 메시지가 없습니다.");
+                const warningMsg = { role: 'assistant', content: "오행 맞춤 추천 메시지를 가져올 수 없습니다." };
+                container.appendChild(renderMessage(warningMsg));
             }
 
-            if (!messageText) return;
+        } catch (err) {
+            console.error("초기 메시지 로드 오류:", err);
+            const errorMsg = { role: 'assistant', content: `[추가 로드 오류]: ${err.message}` };
+            container.appendChild(renderMessage(errorMsg));
+        } finally {
+            scrollToBottom(container);
+        }
+    }
 
-            // 사용자 메시지 화면에 표시
-            const userMessageDiv = document.createElement('div');
-            userMessageDiv.className = 'message-box user-message';
-            userMessageDiv.innerHTML = `<div class="message-bubble user-bubble">${marked.parse(messageText)}</div>`;
-            chatArea.appendChild(userMessageDiv);
-            scrollToBottom(chatArea);
+    // 채팅방 생성
+    async function createChatRoom() {
+        if (currentRoomId !== null || isCreatingRoom || !idToken) return;
+        
+        isCreatingRoom = true;
+        sendButton.disabled = true;
+        messageInput.disabled = true;
 
-            messageInput.value = '';
-            sendButton.classList.remove('active');
-            messageInput.disabled = true; 
+        chatArea.innerHTML = ''; 
 
-            const loadingDiv = renderLoadingMessage();
+        const headlineMessage = { role: 'assistant', content: greetingMessage }; 
+        chatArea.appendChild(renderMessage(headlineMessage));
+        scrollToBottom(chatArea);
+
+        const loadingDiv = renderLoadingMessage();
+        let success = false;
+        
+        try {
+            const res = await fetch(`${FASTAPI_BASE_URL}/chat/create`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${idToken}`
+                },
+                body: JSON.stringify({})
+            });
+
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.detail || `API 요청 실패`);
+            }
+
+            const data = await res.json();
+            currentRoomId = data.chatroom_id; 
+            headerTitle.textContent = data.name || '새 채팅'; 
             
-            // 백엔드 API 호출
-            const responseData = await sendMessageToLLM(messageText);
-            
-            // 로딩 제거
+            connectWebSocket(currentRoomId, idToken);
+
             if (loadingDiv.parentNode) {
                 loadingDiv.parentNode.removeChild(loadingDiv);
             }
-            const replies = [];
-
-            if (responseData && Array.isArray(responseData.replies)) {
-                replies.push(...responseData.replies); 
-            } else if (responseData && responseData.reply) {
-                replies.push(responseData.reply);
-            } else {
-                // 서버 응답 구조 오류 처리
-                console.error("서버 응답 구조 오류: replies 또는 reply 객체가 없습니다.", responseData);
-                messageInput.disabled = false;
-                return;
-            }
             
-            replies.forEach(reply => {
-                if (reply.message_type === 'restaurant_cards') {
-                    // 식당 목록
-                    appendRestaurantcards(reply, chatArea);
+            success = true;
+            
+        } catch (err) {
+            console.error("채팅방 생성 오류:", err);
+            if (loadingDiv.parentNode) {
+                loadingDiv.parentNode.removeChild(loadingDiv);
+            }
+            const errorMsg = { role: 'assistant', content: `채팅방 생성 중 오류: ${err.message}` };
+            chatArea.appendChild(renderMessage(errorMsg));
+        } finally {
+            isCreatingRoom = false;
+            sendButton.disabled = false;
+            messageInput.disabled = false;
+            
+            if (success) {
+                await renderInitialMessage(currentRoomId, chatArea); 
+            }
+        }
+    }
+    
+    // 기존 메시지 로드
+    async function loadMessages(roomId, container) {
+        if (!idToken || !roomId || String(roomId).toLowerCase() === 'null') {
+            console.error("메시지 로드 오류: 유효하지 않은 방 또는 토큰");
+            container.innerHTML = ''; 
+            return;
+        }
+
+        messageInput.disabled = true;
+
+        try {
+            const res = await fetch(`${FASTAPI_BASE_URL}/chat/messages/${roomId}`, {
+                headers: { "Authorization": `Bearer ${idToken}` }
+            });
+
+            if (!res.ok) {
+                if (res.status === 403) {
+                    container.innerHTML = '<p class="text-center text-red-500">접근 권한이 없습니다.</p>';
+                    return;
+                }
+                throw new Error(`메시지 로드 실패: ${res.status}`);
+            }
+
+            const data = await res.json();
+            let roomName;
+            currentChatroomIsGroup = data.is_group || false;
+
+            if (currentChatroomIsGroup) {
+                messageInput.placeholder = "@밥풀이를 입력하면 봇이 응답합니다";
+                roomName = `단체채팅방`
+            } else {
+                messageInput.placeholder = "메시지를 입력하세요...";
+                roomName = `밥풀이`
+            }
+
+            container.innerHTML = ''; 
+            headerTitle.textContent = data.chatroom_name || roomName; 
+            const messages = Array.isArray(data) ? data : data.messages || [];
+
+            messages.forEach(msg => {
+                const isCardMessage = msg.message_type === 'restaurant_cards' || 
+                                    (msg.role === 'assistant' && msg.content && msg.content.trim().startsWith('{"restaurants":'));
+
+                if (isCardMessage) {
+                    appendRestaurantcards(msg, container);
                 } else {
-                    // 일반 텍스트 메시지
-                    chatArea.appendChild(renderMessage(reply));
+                    container.appendChild(renderMessage(msg));
                 }
             });
 
-            scrollToBottom(chatArea);
+        } catch (err) {
+            console.error("메시지 로드 오류:", err);
+            container.innerHTML = `<p class="text-center text-red-500">메시지 로드 오류: ${err.message}</p>`;
+        } finally {
+            scrollToBottom(container);
+            messageInput.disabled = false;
+            connectWebSocket(roomId, idToken);
+        }
+    }
+
+    // 로그인 상태 확인
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+            window.location.href = 'index.html';
+            return;
+        }
+
+        idToken = await user.getIdToken();
+        currentUserUid = user.uid;
+        
+        const urlRoomId = getRoomIdFromUrl();
+
+        if (urlRoomId) {
+            currentRoomId = urlRoomId;
+            await loadMessages(urlRoomId, chatArea);
+        } else {
+            await createChatRoom(); 
+        }
+    });
+    
+    // 로딩 UI 렌더링
+    function renderLoadingMessage() {
+        const botLoadingDiv = document.createElement("div");
+        botLoadingDiv.className = "message-box system-message";
+
+        botLoadingDiv.innerHTML = `
+            <div class="profile-icon">
+                <img class="rounded-full object-cover" src="${profileImageUrl}" alt="Profile">
+            </div>
+            <div class="message-bubble system-bubble">
+                <div class="typing-indicator">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+        `;
+
+        chatArea.appendChild(botLoadingDiv);
+        chatArea.scrollTop = chatArea.scrollHeight;
+        return botLoadingDiv;
+    }
+
+    // 메시지 전송
+    async function sendMessage() {
+        const messageText = messageInput.value.trim();
+
+        if (currentRoomId === null) {
+            if (messageText) {
+                await createChatRoom();
+                if (currentRoomId !== null) {
+                    await sendMessage();
+                    return;
+                }
+                alert("채팅방이 생성되었습니다. 다시 메시지를 보내주세요.");
+            }
+            return;
+        }
+
+        if (!messageText) return;
+
+        if (!isWebSocketConnected) {
+            alert("서버와 연결이 끊어졌습니다. 페이지를 새로고침해주세요.");
+            return;
+        }
+        
+        // 사용자 메시지 화면에 표시
+        const userMessageDiv = document.createElement('div');
+        userMessageDiv.className = 'message-box user-message';
+        userMessageDiv.innerHTML = `<div class="message-bubble user-bubble">${marked.parse(messageText)}</div>`;
+        chatArea.appendChild(userMessageDiv);
+        scrollToBottom(chatArea);
+
+        messageInput.value = '';
+        sendButton.classList.remove('active');
+        messageInput.disabled = true;
+
+        // 로딩 UI 표시 여부
+        const shouldShowLoading = !currentChatroomIsGroup || messageText.includes('@밥풀이');
+        
+        let loadingDiv = null;
+        if (shouldShowLoading) {
+            loadingDiv = renderLoadingMessage();
+        }
+
+        // WebSocket으로 메시지 전송
+        try {
+            websocket.send(JSON.stringify({
+                type: 'message',
+                content: messageText
+            }));
+        } catch (err) {
+            console.error('메시지 전송 오류:', err);
+            
+            if (loadingDiv && loadingDiv.parentNode) {
+                loadingDiv.parentNode.removeChild(loadingDiv);
+            }
+            
+            const errorMsg = { role: 'assistant', content: '메시지 전송 중 오류가 발생했습니다.' };
+            chatArea.appendChild(renderMessage(errorMsg));
+        } finally {
             messageInput.disabled = false;
         }
+    }
 
-
-        // 사용자의 메시지를 LLM에게 전달
-        async function sendMessageToLLM(messageText) {
-            try {
-                const res = await fetch(`${FASTAPI_BASE_URL}/chat/send`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${idToken}` 
-                    },
-                    
-                    body: JSON.stringify({ 
-                        room_id: currentRoomId, 
-                        message: messageText
-                    })
-                });
-
-                if (res.status === 401) {
-                    window.location.href = 'index.html';
-                    throw new Error("인증이 만료되었습니다. 다시 로그인해주세요.");
-                }
-
-                if (!res.ok) {
-                    const errorData = await res.json();
-                    throw new Error(errorData.detail || `API 요청 실패: ${res.status}`);
-                }
-
-                const data = await res.json();
-                
-                return data;
-            } catch (err) {
-                console.error("API 통신 오류:", err);
-                return `Error: API 통신 오류 발생. (${err.message})`;
-            }
+    messageInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' && !event.isComposing) {
+            event.preventDefault(); 
+            sendMessage(); 
         }
+    });
 
-        messageInput.addEventListener('keydown', (event) => {
-            if (event.key === 'Enter' && !event.isComposing) {
-                event.preventDefault(); 
-                sendMessage(); 
-            }
-        });
+    messageInput.addEventListener('input', () => {
+        if (messageInput.value.trim() !== '') {
+            sendButton.classList.add('active');
+        } else {
+            sendButton.classList.remove('active');
+        }
+    });
 
-        messageInput.addEventListener('input', () => {
-            if (messageInput.value.trim() !== '') {
-                sendButton.classList.add('active');
-            } else {
-                sendButton.classList.remove('active');
-            }
-        });
+    sendButton.addEventListener('click', sendMessage);
 
-        sendButton.addEventListener('click', sendMessage);
-    </script>
+    window.addEventListener('beforeunload', () => {
+        if (websocket) {
+            websocket.close();
+        }
+    });
+</script>
 </body>
 </html>
