@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>위치 설정</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=85cfe1eb44a56817dcedc87a46b5070b&libraries=services,places"></script>
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="flex flex-col h-screen">
+
+    <header class="grid grid-cols-3 items-center bg-white p-4 shadow-md z-10">
+        <div class="justify-self-start">
+            <a href="javascript:history.back()" class="text-gray-600 hover:bg-gray-100 rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-arrow-left"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+            </a>
+        </div>
+        <div class="justify-self-center text-lg font-bold">위치 설정</div>
+        <!-- 현재 위치 불러오기 -->
+        <div class="justify-self-end">
+            <button id="gps-btn" class="p-2 text-orange-600 hover:bg-orange-50 rounded-full" title="현재 위치로 설정">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-crosshair"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg>
+            </button>
+        </div>
+    </header>
+    
+    <div class="bg-white p-4 border-b z-10">
+        <div class="flex gap-2">
+            <input type="text" id="address-input" placeholder="장소, 주소 검색"
+                    class="flex-grow p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#FF7242] focus:outline-none">
+            <button id="search-btn"
+                    class="bg-[#FF7242] text-white font-bold py-2 px-4 rounded-md hover:bg-orange-600">검색</button>
+        </div>
+    </div>
+
+    <main class="flex-grow">
+        <div id="map"></div>
+    </main>
+    
+    <div class="fixed bottom-0 left-0 right-0 p-4 bg-white bg-opacity-80 backdrop-blur-sm shadow-[0_-2px_10px_rgba(0,0,0,0.1)] z-10">
+        <button id="save-location-btn" class="w-full bg-[#FF7242] text-white font-bold py-3 px-4 rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-400 transition-colors">
+            위치 저장
+        </button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mapContainer = document.getElementById('map');
+            let map, marker;
+            let currentLocationData = null; 
+
+            function initMapWithGPS() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(onSuccessGPS, onErrorGPS);
+                }
+            }
+
+            function onSuccessGPS(position) {
+                initializeMap(position.coords.latitude, position.coords.longitude);
+            }
+
+            function onErrorGPS(error) {
+                alert("현재 위치를 가져올 수 없습니다. 기본 위치로 지도를 표시합니다.");
+                initializeMap(37.566826, 126.9786567);
+            }
+
+            function initializeMap() {
+                const savedLocationJson = localStorage.getItem('savedBapickLocation');
+                let initialLat = 37.566826; // 서울 시청
+                let initialLon = 126.978656;
+                let initialZoom = 6; // 기본 줌 레벨
+
+                if (savedLocationJson) {
+                    try {
+                        const savedLocation = JSON.parse(savedLocationJson);
+                        initialLat = parseFloat(savedLocation.lat);
+                        initialLon = parseFloat(savedLocation.lon);
+                        initialZoom = 3; // 저장된 위치일 경우 확대
+                    } catch (e) {
+                        console.error("Error parsing saved location", e);
+                    }
+                }
+
+                const mapOption = {
+                    center: new kakao.maps.LatLng(initialLat, initialLon),
+                    level: initialZoom 
+                };
+                map = new kakao.maps.Map(document.getElementById('map'), mapOption);
+                marker = new kakao.maps.Marker({
+                    position: mapOption.center
+                });
+                marker.setMap(map);
+                
+                // 저장된 위치가 있을 경우, 해당 위치를 currentLocationData로 설정
+                if (savedLocationJson) {
+                    currentLocationData = JSON.parse(savedLocationJson);
+                }
+            }
+
+            // 현재 위치를 기준으로 설정하고, currentLocationData 업데이트
+            async function setCurrentLocation() {
+                const saveButton = document.getElementById('save-location-btn');
+
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        async (position) => { 
+                            const lat = position.coords.latitude;
+                            const lon = position.coords.longitude;
+                            const locPosition = new kakao.maps.LatLng(lat, lon);
+                            
+                            map.panTo(locPosition);
+                            marker.setPosition(locPosition);
+                            map.setLevel(3);
+
+                            // Reverse geocoding: 좌표와 가장 가까운 주소 반환(Nominatim API 사용)
+                            try {
+                                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=ko`);
+                                if (!response.ok) {
+                                    throw new Error('Reverse geocoding API request failed');
+                                }
+                                const data = await response.json();
+                                const address = data.address;
+                            
+                                // 상세 주소
+                                const city = address.city || address.province || '';
+                                const city_district = address.city_district || address.county || ''; // 구/군
+                                const suburb = address.suburb || address.neighbourhood || address.village || ''; // 동/읍/면
+                                const road = address.road || ''; // 도로명
+                                const house_number = address.house_number || ''; // 건물 번호
+
+                                let detailed_address_parts = [];
+                                
+                                // 시/구/동 (광역 단위)
+                                if (city) detailed_address_parts.push(city);
+                                if (city_district && city_district !== city) detailed_address_parts.push(city_district); // 구/군
+                                if (suburb && suburb !== city_district) detailed_address_parts.push(suburb); // 동/읍/면
+
+                                // 도로명 + 번지/건물번호
+                                let road_part = road;
+                                if (house_number) road_part += ` ${house_number}`;
+                                if (road_part) detailed_address_parts.push(road_part.trim());
+
+                                // 최종 주소와 이름 설정
+                                if (detailed_address_parts.length > 0) {
+                                    fullAddress = detailed_address_parts.join(' ');                                    
+                                    locationName = fullAddress; 
+                                    
+                                    // gps 위치에 특정 건물/시설 이름이 있다면 사용
+                                    const parts = data.display_name.split(', ');
+                                    const primaryName = parts.length > 0 ? parts[0] : null; 
+                                    // primaryName가 주소(시/도, 도로명)와 중복되지 않은 경우에만 사용
+                                    if (primaryName && !primaryName.includes(city) && !primaryName.includes(road)) {
+                                        locationName = primaryName;
+                                    }
+                                } else {
+                                    fullAddress = data.display_name;
+                                    locationName = data.display_name.split(', ').slice(0, 2).join(', ');
+                                }
+                            } catch (error) {
+                                console.error("Reverse geocoding error (Nominatim API):", error);
+                            }
+                            
+                            currentLocationData = {
+                                name: locationName,
+                                address: fullAddress, 
+                                lat: lat,
+                                lon: lon
+                            };
+                        },
+                        (error) => {
+                            // GPS 실패 처리
+                            console.error(`Geolocation error: ${error.code} - ${error.message}`);
+                            alert('GPS 현재 위치를 찾을 수 없습니다. (권한 거부 또는 오류)');
+                            saveButton.textContent = '위치 저장';
+                            saveButton.disabled = false;
+                        },
+                        {
+                            enableHighAccuracy: true, 
+                            maximumAge: 30000, 
+                            timeout: 10000 
+                        }
+                    );
+                } else {
+                    alert('이 브라우저는 GPS Geolocation 기능을 지원하지 않습니다.');
+                    saveButton.textContent = '위치 저장';
+                    saveButton.disabled = false;
+                }
+            }
+
+            function searchPlaces() {
+                const keyword = document.getElementById('address-input').value;
+                if (!keyword.trim()) {
+                    alert('키워드를 입력해주세요.');
+                    return;
+                }
+
+                const ps = new kakao.maps.services.Places();
+                ps.keywordSearch(keyword, (data, status) => {
+                    if (status === kakao.maps.services.Status.OK) {
+                        const firstPlace = data[0];
+                        const coords = new kakao.maps.LatLng(firstPlace.y, firstPlace.x);
+                        
+                        map.setCenter(coords);
+                        marker.setPosition(coords);
+                        
+                        currentLocationData = {
+                            name: firstPlace.place_name,
+                            address: firstPlace.road_address_name || firstPlace.address_name,
+                            lat: firstPlace.y,
+                            lon: firstPlace.x
+                        };
+                        
+                    } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
+                        alert('검색 결과가 존재하지 않습니다.');
+                        currentLocationData = null;
+                    } else {
+                        alert('검색 중 오류가 발생했습니다.');
+                        currentLocationData = null;
+                    }
+                });
+            }
+
+            document.getElementById('save-location-btn').addEventListener('click', () => {
+                if (currentLocationData) {
+                    localStorage.setItem('savedBapickLocation', JSON.stringify(currentLocationData));
+                    alert(`'${currentLocationData.name}' 위치가 저장되었습니다!`);
+                    
+                    // returnTo 쿼리 파라미터 확인 후 이동 경로 설정
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const returnTo = urlParams.get('returnTo');
+                    const menu = urlParams.get('menu');
+                    
+                    if (returnTo === 'chat' && menu) {
+                        // 채팅 화면으로 이동
+                        window.location.href = `chat.html?returnTo=chat&menu=${menu}`; 
+                    } else {
+                        // 기존 로직 (홈 화면으로 이동)
+                        window.location.href = 'home.html';
+                    }
+                } else {
+                    alert('위치를 검색하거나, 우측 상단 GPS 버튼을 눌러 현재 위치를 설정해주세요.');
+                }
+            });
+
+            document.getElementById('search-btn').addEventListener('click', searchPlaces);
+            document.getElementById('address-input').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    searchPlaces();
+                }
+            });
+
+            document.getElementById('gps-btn').addEventListener('click', setCurrentLocation);
+
+            initMapWithGPS();
+        });
+    </script>
+</body>
+</html>
