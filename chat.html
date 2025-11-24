@@ -6,6 +6,7 @@
     <title>Chat App UI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=85cfe1eb44a56817dcedc87a46b5070b&libraries=services,places"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
         body {
@@ -520,9 +521,9 @@
             msg.message_type === 'restaurant_cards' ||
             (msg.role === 'assistant' && msg.content && msg.content.trim().startsWith('{"restaurants":'));
 
-        if (isCardMessage) {
-            appendRestaurantcards(msg, chatArea);
-        } else if (msg.message_type === 'location_select') {
+        if (msg.message_type === 'location_select') {
+            isExpectingAddress = true; 
+
             const messageBox = createTextMessage(msg);
             const bubbleDiv = messageBox.querySelector('.message-bubble');
 
@@ -530,7 +531,11 @@
             bubbleDiv.appendChild(buttonsDiv);
 
             chatArea.appendChild(messageBox);
+        } else if (isCardMessage) {
+            isExpectingAddress = false;
+            appendRestaurantcards(msg, chatArea);
         } else {
+            isExpectingAddress = false;
             chatArea.appendChild(createTextMessage(msg));
         }
     }
@@ -788,6 +793,30 @@
             chatArea.appendChild(createTextMessage(userMsg));
         }
 
+        const isSpecialTag = messageText.startsWith('[LOCATION_SELECTED:');
+
+        if (isExpectingAddress && !isSpecialTag) {
+            // 위치 입력을 기대하는 상태이고, 특수 태그가 아닌 일반 텍스트라면 주소로 간주
+            messageInput.disabled = true; 
+            
+            const success = await geocodeAddressAndSend(messageText);
+            
+            messageInput.disabled = false; 
+            
+            // 성공적으로 주소 변환 및 특수 메시지 전송 완료
+            if (success) {
+                messageInput.value = ''; 
+                sendButton.classList.remove('active');
+                isExpectingAddress = false;
+                return; 
+            } 
+            
+            // 실패 시 재입력 유도를 위해 입력창만 초기화하고 상태는 유지
+            messageInput.value = ''; 
+            sendButton.classList.remove('active');
+            return;
+        }
+
         // 메시지 전송 후 초기화
         scrollToBottom(chatArea);
         messageInput.value = '';
@@ -914,6 +943,52 @@
         }
     });
 
+    /* =========================================================
+    * 위치 관련 유틸리티 및 상태
+    * ======================================================= */
+    let isExpectingAddress = false; // 사용자의 다음 메시지가 주소인지 여부 (메뉴 선택 후 주소 입력을 기대하는 상태)
+    let kakaoPlaces = null;
+
+    // Kakao Places 초기화 함수
+    function initializeKakaoPlaces() {
+        if (typeof kakao !== 'undefined' && kakao.maps && kakao.maps.services) {
+            kakaoPlaces = new kakao.maps.services.Places();
+        } else {
+            console.warn("Kakao Maps SDK (services, places) is not yet loaded.");
+        }
+    }
+
+    // 주소 문자열을 좌표로 변환하고 특수 메시지를 서버에 전송하는 함수
+    async function geocodeAddressAndSend(addressText) {
+        if (!kakaoPlaces) {
+            alert("지도 초기화 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+            return false;
+        }
+        
+        return new Promise((resolve) => {
+            // Kakao Places의 keywordSearch를 사용하여 주소를 검색
+            kakaoPlaces.keywordSearch(addressText, async (data, status) => {
+                if (status === kakao.maps.services.Status.OK) {
+                    const firstPlace = data[0];
+                    const lat = firstPlace.y; // 위도
+                    const lon = firstPlace.x; // 경도
+                    
+                    await sendLocationSelection(lat, lon, 'MANUAL_LOCATION'); 
+                    
+                    resolve(true); // 성공적으로 전송 완료
+                } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
+                    alert(`'${addressText}'에 대한 검색 결과를 찾을 수 없습니다. 정확한 주소 또는 장소명을 입력해주세요.`);
+                    resolve(false); // 전송 실패
+                } else {
+                    alert('주소/장소 검색 중 오류가 발생했습니다. 다시 시도해 주세요.');
+                    resolve(false); // 전송 실패
+                }
+            }, {
+                size: 1, 
+            });
+        });
+    }
+
     
     /* =========================================================
     * 로그인 상태 확인 및 초기화
@@ -929,6 +1004,7 @@
         
         const urlRoomId = getRoomIdFromUrl();
 
+        initializeKakaoPlaces();
         if (urlRoomId) {
             currentRoomId = urlRoomId;
             await loadMessages(urlRoomId, chatArea);
