@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>맛집 검색</title>
+    <title>모든 스크랩</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap"
@@ -37,7 +37,6 @@
             pointer-events: auto;
         }
 
-        /* (기타 스타일은 유지) */
         .sheet-visible {
             transform: translateY(0);
         }
@@ -45,36 +44,25 @@
 </head>
 
 <body class="bg-gray-50">
-
     <div class="h-full flex flex-col">
-
-        <!-- Header: 뒤로가기 버튼 a 태그로 변경 -->
         <header class="grid grid-cols-3 items-center p-4 border-b border-gray-200 flex-shrink-0 bg-white">
-            <!-- 1. 뒤로가기 버튼 (왼쪽) -->
             <div class="justify-self-start">
-                <!-- <button>에서 <a> 태그로 변경하고 href 추가 -->
                 <a href="scrap.index.html" id="header-back-button" class="p-1 block rounded-full text-gray-600 hover:bg-gray-100 focus:outline-none">
-                    <!-- 뒤로가기 (chevron-left) 아이콘 SVG -->
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
                     </svg>
                 </a>
             </div>
-            
-            <!-- 2. 제목 (중앙) -->
-            <h1 class="text-xl font-bold text-center text-gray-800">스크랩</h1>
-            
-            <!-- 3. 옵션 버튼 (오른쪽) -->
+
+            <!-- 컬렉션 이름 -->
+            <h1 class="text-xl font-bold text-center text-gray-800"></h1>
+
             <div class="justify-self-end relative">
-                <!-- ... 버튼 -->
-                <button id="header-options-button"
-                    class="p-1 rounded-full text-gray-600 hover:bg-gray-100 focus:outline-none">
+                <button id="header-options-button" class="p-1 rounded-full text-gray-600 hover:bg-gray-100 focus:outline-none">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
                     </svg>
                 </button>
-
-                <!-- ... 버튼 클릭 시 나타날 팝업 메뉴 -->
                 <div id="options-popup" class="popup-hidden absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-xl z-10 border border-gray-100 overflow-hidden">
                     <button id="delete-collection-button" class="block w-full text-left px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 focus:outline-none">
                         컬렉션 삭제
@@ -83,78 +71,195 @@
             </div>
         </header>
 
-        <!-- (메인 컨텐츠 영역은 여기에 이어집니다) -->
-        
+        <!-- 스크랩 식당 목록 -->
+        <main id="list-content" class="flex-1 overflow-y-auto p-4">
+            <p class="text-center text-gray-500 mt-4">스크랩 목록을 불러오는 중...</p>
+        </main>
     </div>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+        import { firebaseConfig } from "./firebase-config.js";
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        const FASTAPI_BASE_URL = "https://bab-back.onrender.com"; 
+        //const FASTAPI_BASE_URL = 'http://127.0.0.1:8000'; // 로컬 테스트용
         
-        // --- 1. URL에서 꼬리표(파라미터) 읽기 ---
-        const urlParams = new URLSearchParams(window.location.search);
-        const collectionId = urlParams.get('id'); // 'all', '1' 등
-        const collectionName = urlParams.get('name'); // '모든 스크랩', '가고싶은 곳' 등
+        let currentUser = null;
+        const defaultImageUrl = 'Untitled.png'; 
 
-        // --- 2. 헤더 제목 요소 찾기 ---
-        const headerTitle = document.querySelector('header h1');
+        async function loadScrapsForCollection(token, collectionId) {
+            const listContent = document.getElementById('list-content');
+            const headerTitle = document.querySelector('header h1');
+            let collectionName = '모든 스크랩';
+            let apiEndpoint = `${FASTAPI_BASE_URL}/scraps/me`;
 
-        // --- 3. URL에서 읽어온 이름으로 헤더 제목 변경 ---
-        if (collectionName) {
-            // URL에서 읽은 값이 있으면 그걸로 제목 설정
-            headerTitle.textContent = collectionName;
-        } else {
-            // URL에 꼬리표가 없으면 기본값 설정
-            headerTitle.textContent = '컬렉션';
-        }
+            // 로딩 UI 표시
+            headerTitle.textContent = collectionId ? '' : '모든 스크랩';
+            listContent.innerHTML = '<p class="text-center text-gray-500 mt-4">스크랩 목록을 불러오는 중...</p>';
 
-        // --- 4. UI 요소들 찾기 ---
-        const optionsButton = document.getElementById('header-options-button');
-        const optionsPopup = document.getElementById('options-popup');
-        const deleteButton = document.getElementById('delete-collection-button');
 
-        // --- 5. "모든 스크랩"일 경우 '...' 버튼 숨기기 (삭제 못하게) ---
-        if (collectionId === 'all') {
-            if (optionsButton) {
-                optionsButton.style.display = 'none'; // '...' 버튼 숨김
+            if (collectionId && collectionId !== 'null') {
+                // 컬렉션 이름 불러오기
+                try {
+                    const collectionsRes = await fetch(`${FASTAPI_BASE_URL}/scraps/collections/me`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    if (collectionsRes.ok) {
+                        const collections = await collectionsRes.json();
+                        
+                        // URL ID와 일치하는 컬렉션 찾기
+                        const targetCollection = collections.find(c => String(c.id) === collectionId);
+                        if (targetCollection) {
+                            collectionName = targetCollection.name;
+                        }
+                    }
+                } catch (e) {
+                    console.warn('컬렉션 이름을 가져오는 데 실패했습니다.', e);
+                }
+                
+                apiEndpoint += `?collection_id=${collectionId}`;
+                
+                const optionsButton = document.getElementById('header-options-button');
+                if (optionsButton) {
+                    optionsButton.style.display = 'flex'; // 혹은 'block'
+                }
+            } else {
+                const optionsButton = document.getElementById('header-options-button');
+                if (optionsButton) {
+                    optionsButton.style.display = 'none';
+                }
             }
-            // "모든 스크랩"일 때는 아래 이벤트 리스너를 연결할 필요가 없으므로
-            // 여기서 함수 실행을 멈춥니다. (이게 오류를 막는 핵심입니다!)
-            return; 
+            
+            headerTitle.textContent = collectionName;
+            document.title = `${collectionName} - 내 스크랩`;
+            
+            // 3. 스크랩 목록 조회 
+            try {
+                const response = await fetch(apiEndpoint, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.status === 404) {
+                    listContent.innerHTML = '<p class="text-center text-gray-500 mt-4">스크랩한 식당이 없습니다.</p>';
+                    return;
+                }
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // 식당 목록 렌더링
+                listContent.innerHTML = '';
+                if (data.length === 0) {
+                    listContent.innerHTML = '<p class="text-center text-gray-500 mt-4">스크랩한 식당이 없습니다.</p>';
+                } else {
+                    const scrapCardsHtml = data.map(item => {
+                        let imageUrl = defaultImageUrl;
+                        if (typeof item.image === 'string' && item.image.trim() !== '') {
+                            const images = item.image.split(',').map(url => url.trim()).filter(url => url);
+                            if (images.length > 0) {
+                                imageUrl = images[0];
+                            }
+                        }
+
+                        return `
+                            <a href="/detail.html?id=${item.id}" class="block"> 
+                                <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100">
+                                    <div class="relative aspect-square">
+                                        <img src="${imageUrl}" alt="${item.name} 대표 이미지" class="absolute inset-0 w-full h-full object-cover">
+                                    </div>
+
+                                    <div class="p-3">
+                                        <h3 class="text-sm font-bold text-gray-800 truncate">${item.name}</h3>
+                                        <p class="text-xs text-gray-500 truncate">${item.category}</p>
+                                    </div>
+                                </div>
+                            </a>
+                        `;
+                    }).join('');
+                    
+                    listContent.innerHTML = `
+                        <div class="grid grid-cols-2 gap-4">
+                            ${scrapCardsHtml}
+                        </div>
+                    `;
+                }
+
+            } catch (error) {
+                console.error('스크랩 목록 API 호출 중 오류 발생:', error);
+                listContent.innerHTML = `<p class="text-center text-red-500 mt-4">목록 로드 중 오류: ${error.message}</p>`;
+            }
         }
 
-        // --- 6. (id=all이 아닐 경우) '...' 버튼 클릭 시 팝업 토글 ---
-        optionsButton.addEventListener('click', (event) => {
-            event.stopPropagation(); 
-            optionsPopup.classList.toggle('popup-hidden');
-            optionsPopup.classList.toggle('popup-visible');
-        });
 
-        // 팝업 외부 클릭 시 팝업 닫기
-        window.addEventListener('click', () => {
-            if (optionsPopup.classList.contains('popup-visible')) {
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const collectionId = urlParams.get('id'); // ID가 없으면 null (모든 스크랩)
+            const headerTitle = document.querySelector('header h1');
+
+            // Firebase 인증 상태 확인
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    currentUser = user;
+                    const idToken = await user.getIdToken();
+
+                    await loadScrapsForCollection(idToken, collectionId);
+                } else {
+                    // 로그인되지 않은 경우, 로그인 페이지로 리다이렉션
+                    window.location.href = 'index.html';
+                }
+            });
+
+            const optionsButton = document.getElementById('header-options-button');
+            const optionsPopup = document.getElementById('options-popup');
+            const deleteButton = document.getElementById('delete-collection-button');
+
+            if (!collectionId) {
+                if (optionsButton) {
+                    optionsButton.style.display = 'none';
+                }
+                return;
+            }
+
+            optionsButton.addEventListener('click', (event) => {
+                event.stopPropagation();
+                optionsPopup.classList.toggle('popup-hidden');
+                optionsPopup.classList.toggle('popup-visible');
+            });
+
+            // 팝업 외부 클릭 시 팝업 닫기
+            window.addEventListener('click', () => {
+                if (optionsPopup.classList.contains('popup-visible')) {
+                    optionsPopup.classList.remove('popup-visible');
+                    optionsPopup.classList.add('popup-hidden');
+                }
+            });
+
+            // 팝업 내부 클릭 시 닫히지 않도록
+            optionsPopup.addEventListener('click', (event) => {
+                event.stopPropagation();
+            });
+
+            // '컬렉션 삭제' 버튼 클릭 이벤트
+            deleteButton.addEventListener('click', () => {
+                console.log(`컬렉션 (ID: ${collectionId}) 삭제 버튼 클릭됨`);
+
+                // 팝업 닫기
                 optionsPopup.classList.remove('popup-visible');
                 optionsPopup.classList.add('popup-hidden');
-            }
+            });
         });
-
-        // 팝업 내부 클릭 시 닫히지 않도록
-        optionsPopup.addEventListener('click', (event) => {
-             event.stopPropagation();
-        });
-
-        // '컬렉션 삭제' 버튼 클릭 이벤트
-        deleteButton.addEventListener('click', () => {
-            console.log(`'${collectionName}' (ID: ${collectionId}) 컬렉션 삭제 버튼 클릭됨`);
-            
-            // TODO: 여기에 collectionId를 사용한 실제 삭제 API 호출
-            
-            // 팝업 닫기
-            optionsPopup.classList.remove('popup-visible');
-            optionsPopup.classList.add('popup-hidden');
-        });
-    });
-</script>
-
+    </script>
 </body>
 
 </html>
