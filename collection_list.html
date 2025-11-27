@@ -22,7 +22,7 @@
             -moz-osx-font-smoothing: grayscale;
         }
 
-        /* 팝업메뉴 트랜지션 스타일 */
+        /* 팝업메뉴 트랜지션 스타일: 이제 팝업 대신 버튼이 직접 사용되므로 불필요하지만 CSS는 유지합니다. */
         .popup-hidden {
             opacity: 0;
             transform: scale(0.95) translateY(-10px);
@@ -54,24 +54,18 @@
                 </a>
             </div>
 
-            <!-- 컬렉션 이름 -->
             <h1 class="text-xl font-bold text-center text-gray-800"></h1>
 
             <div class="justify-self-end relative">
-                <button id="header-options-button" class="p-1 rounded-full text-gray-600 hover:bg-gray-100 focus:outline-none">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                <button id="delete-collection-button" 
+                        class="p-1 rounded-full text-red-600 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50">
+                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                     </svg>
                 </button>
-                <div id="options-popup" class="popup-hidden absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-xl z-10 border border-gray-100 overflow-hidden">
-                    <button id="delete-collection-button" class="block w-full text-left px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 focus:outline-none">
-                        컬렉션 삭제
-                    </button>
-                </div>
             </div>
         </header>
 
-        <!-- 스크랩 식당 목록 -->
         <main id="list-content" class="flex-1 overflow-y-auto p-4">
             <p class="text-center text-gray-500 mt-4">스크랩 목록을 불러오는 중...</p>
         </main>
@@ -94,6 +88,7 @@
         async function loadScrapsForCollection(token, collectionId) {
             const listContent = document.getElementById('list-content');
             const headerTitle = document.querySelector('header h1');
+            
             let collectionName = '모든 스크랩';
             let apiEndpoint = `${FASTAPI_BASE_URL}/scraps/me`;
 
@@ -122,17 +117,7 @@
                 }
                 
                 apiEndpoint += `?collection_id=${collectionId}`;
-                
-                const optionsButton = document.getElementById('header-options-button');
-                if (optionsButton) {
-                    optionsButton.style.display = 'flex'; // 혹은 'block'
-                }
-            } else {
-                const optionsButton = document.getElementById('header-options-button');
-                if (optionsButton) {
-                    optionsButton.style.display = 'none';
-                }
-            }
+            } 
             
             headerTitle.textContent = collectionName;
             document.title = `${collectionName} - 내 스크랩`;
@@ -205,8 +190,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const collectionId = urlParams.get('id'); // ID가 없으면 null (모든 스크랩)
-            const headerTitle = document.querySelector('header h1');
-
+            
             // Firebase 인증 상태 확인
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
@@ -220,43 +204,13 @@
                 }
             });
 
-            const optionsButton = document.getElementById('header-options-button');
-            const optionsPopup = document.getElementById('options-popup');
             const deleteButton = document.getElementById('delete-collection-button');
 
-            if (!collectionId) {
-                if (optionsButton) {
-                    optionsButton.style.display = 'none';
-                }
-                return;
-            }
-
-            optionsButton.addEventListener('click', (event) => {
-                event.stopPropagation();
-                optionsPopup.classList.toggle('popup-hidden');
-                optionsPopup.classList.toggle('popup-visible');
-            });
-
-            // 팝업 외부 클릭 시 팝업 닫기
-            window.addEventListener('click', () => {
-                if (optionsPopup.classList.contains('popup-visible')) {
-                    optionsPopup.classList.remove('popup-visible');
-                    optionsPopup.classList.add('popup-hidden');
-                }
-            });
-
-            // 팝업 내부 클릭 시 닫히지 않도록
-            optionsPopup.addEventListener('click', (event) => {
-                event.stopPropagation();
-            });
-
-            // '컬렉션 삭제' 버튼 클릭 이벤트
+            // '컬렉션 삭제' 버튼 클릭 이벤트 (아이콘 클릭)
             deleteButton.addEventListener('click', () => {
+                // 실제 삭제 로직을 여기에 구현해야 합니다. (예: fetch 요청)
+                alert(`컬렉션 (ID: ${collectionId || '없음'}) 삭제를 요청했습니다. 이 기능은 백엔드 구현이 필요합니다.`);
                 console.log(`컬렉션 (ID: ${collectionId}) 삭제 버튼 클릭됨`);
-
-                // 팝업 닫기
-                optionsPopup.classList.remove('popup-visible');
-                optionsPopup.classList.add('popup-hidden');
             });
         });
     </script>
