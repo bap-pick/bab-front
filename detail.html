@@ -35,7 +35,7 @@
         }
 
         header.scrolled {
-            box-shadow: 0 4px_6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07);
         }
 
         .tab-btn.active {
@@ -73,34 +73,51 @@
     </style>
 </head>
 
-<!-- 스크랩 버튼 클릭 시 바텀 시트 (컬렉션에 추가) -->
-<div id="collection-overlay" class="fixed inset-0 bg-black bg-opacity-30 z-40 hidden transition-opacity duration-300"></div>
+<body class="bg-gray-100">
+    <div id="collection-overlay" class="fixed inset-0 bg-black bg-opacity-30 z-40 hidden transition-opacity duration-300"></div>
 
-<div id="collection-sheet" class="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-2xl shadow-xl transition-transform duration-300 ease-in-out transform translate-y-full">
-    <div class="p-5 pt-4">
-        <div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-4"></div>
-        <h2 class="text-xl font-bold text-center text-gray-800 mb-2">컬렉션에 추가</h2>
-        <ul id="sheet-collection-list" class="max-h-60 overflow-y-auto divide-y divide-gray-100"></ul>
-        <div class="mt-4 pt-4 border-t border-gray-200">
-            <button id="sheet-add-new-btn"
-                class="w-full flex items-center justify-center gap-2 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                </svg>
-                새 컬렉션 만들기
-            </button>
+    <div id="collection-sheet" class="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-2xl shadow-xl transition-transform duration-300 ease-in-out transform translate-y-full">
+        <div class="p-5 pt-4">
+            <div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-4"></div>
+            <h2 class="text-xl font-bold text-center text-gray-800 mb-2">컬렉션에 추가</h2>
+            <ul id="sheet-collection-list" class="max-h-60 overflow-y-auto divide-y divide-gray-100"></ul>
+            <div class="mt-4 pt-4 border-t border-gray-200">
+                <button id="sheet-add-new-btn"
+                    class="w-full flex items-center justify-center gap-2 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                    새 컬렉션 만들기
+                </button>
+            </div>
         </div>
     </div>
-</div>
 
-<body class="bg-gray-100">
+    <div id="create-collection-sheet" class="fixed bottom-0 left-0 right-0 z-50 bg-white rounded-t-2xl shadow-xl transition-transform duration-300 ease-in-out transform translate-y-full">
+        <div class="p-5 pt-4">
+            <div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-4"></div>
+            <h2 class="text-xl font-bold text-center text-gray-800 mb-6">새 컬렉션</h2>
+            <div class="space-y-4">
+                <div>
+                    <label for="collection-name" class="block text-sm font-medium text-gray-700 mb-1">컬렉션 이름</label>
+                    <input type="text" id="collection-name" placeholder="컬렉션 이름 입력"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF7A5A]">
+                </div>
+                <button id="create-collection-btn"
+                    class="w-full px-4 py-3 bg-[#FF7A5A] text-white font-semibold rounded-lg hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-400 transition-colors">
+                    만들기
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div class="max-w-md mx-auto h-full flex flex-col bg-white shadow-lg">
 
         <header id="page-header"
             class="grid grid-cols-3 items-center p-4 bg-white sticky top-0 z-20 transition-shadow duration-300">
             <div class="justify-self-start">
                 <button id="back-button" class="p-2 text-gray-600 hover:bg-gray-100 rounded-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"stroke="currentColor" stroke-width="2.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
                     </svg>
                 </button>
@@ -138,7 +155,6 @@
                 </div>
             </div>
 
-            <!-- 탭 (상세정보/메뉴/편의시설) -->
             <div class="px-5 border-b border-gray-200">
                 <nav class="flex -mb-px">
                     <button class="tab-btn active py-4 px-1 text-center border-b-2 font-medium text-sm flex-1" data-tab="info">
@@ -154,7 +170,6 @@
             </div>
 
             <div class="p-5">
-                <!-- 식당 상세정보 -->
                 <div id="info-panel" class="tab-panel space-y-5">
                     <div class="flex items-start">
                         <div class="flex-shrink-0 w-8 text-center">
@@ -190,7 +205,6 @@
                             <div id="restaurant-time" class="text-gray-600 space-y-1"></div>
                         </div>
                     </div>
-                    <!-- 지도 -->
                     <div id="map" class="w-full h-56 rounded-lg border border-gray-200 overflow-hidden mt-4"></div>
                 </div>
 
@@ -213,7 +227,7 @@
         const auth = getAuth(app);
 
         const FASTAPI_BASE_URL = 'https://bab-back.onrender.com';
-        //const FASTAPI_BASE_URL = 'http://127.0.0.1:8000'; // 로컬 테스트용
+        // const FASTAPI_BASE_URL = 'http://127.0.0.1:8000'; // 로컬 테스트용
 
         let currentRestaurant = null;
         let currentUser = null;
@@ -234,9 +248,16 @@
         const tabButtons = document.querySelectorAll('.tab-btn');
         const tabPanels = document.querySelectorAll('.tab-panel');
 
+        // 컬렉션 관련 DOM 요소
         const collectionOverlay = document.getElementById('collection-overlay');
         const collectionSheet = document.getElementById('collection-sheet');
         const collectionListEl = document.getElementById('sheet-collection-list');
+        const sheetAddNewBtn = document.getElementById('sheet-add-new-btn'); // 새 컬렉션 만들기 버튼
+
+        // [신규] 생성 시트 관련 요소
+        const createCollectionSheet = document.getElementById('create-collection-sheet');
+        const createCollectionNameInput = document.getElementById('collection-name');
+        const createCollectionBtn = document.getElementById('create-collection-btn'); // 만들기 버튼
 
         // 헤더 스크롤 이벤트 리스너
         document.querySelector('main').addEventListener('scroll', (e) => {
@@ -380,7 +401,7 @@
 
             if (typeof currentRestaurant.image === 'string' && currentRestaurant.image.trim() !== '') {
                 images = currentRestaurant.image.split(',').map(url => url.trim());
-            } 
+            }
 
             const swiperWrapper = document.querySelector('.swiper-wrapper');
             const swiperContainer = document.querySelector('#image-swiper');
@@ -403,15 +424,15 @@
                     slide.className = 'swiper-slide';
                     slide.innerHTML = `<img src="${imageUrl}" alt="식당 이미지" class="w-full h-full object-cover rounded-xl">`;
                     swiperWrapper.appendChild(slide);
-            });
+                });
 
-            new Swiper('#image-swiper', {
-                loop: true,
-                pagination: {
-                el: '.swiper-pagination',
-                type: 'fraction',
-                },
-            });
+                new Swiper('#image-swiper', {
+                    loop: true,
+                    pagination: {
+                        el: '.swiper-pagination',
+                        type: 'fraction',
+                    },
+                });
 
             // 가게 이미지가 없는 경우
             } else {
@@ -712,7 +733,7 @@
             }
         }
 
-        // 오버레이 클릭 이벤트 리스너: 오버레이(어두운 배경) 클릭 시 바텀 시트 닫기 이벤트 실행
+        // 오버레이 클릭 이벤트 리스너
         collectionOverlay.addEventListener('click', closeCollectionSheet);
 
         // 바텀 시트 open
@@ -728,15 +749,86 @@
             collectionOverlay.classList.remove('hidden');
             collectionSheet.classList.add('sheet-visible');
             collectionSheet.classList.remove('translate-y-full');
+            
+            // 생성 시트는 닫힘 상태 유지
+            createCollectionSheet.classList.remove('sheet-visible');
+            createCollectionSheet.classList.add('translate-y-full');
         }
 
-        // 바텀 시트 close
+        // 바텀 시트 close (모든 시트 닫기)
         function closeCollectionSheet() {
             collectionOverlay.classList.add('hidden');
+            
+            // 목록 시트 닫기
             collectionSheet.classList.remove('sheet-visible');
             collectionSheet.classList.add('translate-y-full');
+            
+            // 생성 시트 닫기
+            createCollectionSheet.classList.remove('sheet-visible');
+            createCollectionSheet.classList.add('translate-y-full');
         }
 
+        // [신규] '새 컬렉션 만들기' 버튼 클릭 시 -> 목록 시트 닫고 생성 시트 열기
+        sheetAddNewBtn.addEventListener('click', () => {
+            // 1. 목록 시트 숨기기
+            collectionSheet.classList.remove('sheet-visible');
+            collectionSheet.classList.add('translate-y-full');
+            
+            // 2. 생성 시트 보이기 (오버레이는 유지)
+            createCollectionSheet.classList.remove('translate-y-full');
+            createCollectionSheet.classList.add('sheet-visible');
+            
+            // 3. 인풋 초기화 및 포커스
+            createCollectionNameInput.value = '';
+            setTimeout(() => createCollectionNameInput.focus(), 300);
+        });
+
+        // [신규] '만들기' 버튼 클릭 시 -> API 호출 및 처리
+        createCollectionBtn.addEventListener('click', async () => {
+            const name = createCollectionNameInput.value.trim();
+            if (!name) {
+                alert('컬렉션 이름을 입력해주세요.');
+                return;
+            }
+
+            if (!currentUser) return;
+
+            try {
+                const idToken = await currentUser.getIdToken(true);
+                
+                // 컬렉션 생성 API 호출
+                const response = await fetch(`${FASTAPI_BASE_URL}/scraps/collections`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${idToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name: name })
+                });
+
+                if (response.ok) {
+                    alert('새 컬렉션이 생성되었습니다.');
+                    
+                    // 1. 생성 시트 닫기
+                    createCollectionSheet.classList.remove('sheet-visible');
+                    createCollectionSheet.classList.add('translate-y-full');
+
+                    // 2. 목록 다시 불러오기 (새로 만든게 리스트에 포함되도록)
+                    await fetchAndRenderCollections();
+                    
+                    // 3. 목록 시트 다시 열기 (사용자가 바로 선택할 수 있게)
+                    collectionSheet.classList.remove('translate-y-full');
+                    collectionSheet.classList.add('sheet-visible');
+                    
+                } else {
+                    const errorData = await response.json();
+                    alert(`생성 실패: ${errorData.detail || '오류가 발생했습니다.'}`);
+                }
+            } catch (error) {
+                console.error('컬렉션 생성 중 오류:', error);
+                alert('시스템 오류가 발생했습니다.');
+            }
+        });
 
         // 로그인 인증
         onAuthStateChanged(auth, (user) => {
