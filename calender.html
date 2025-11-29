@@ -117,18 +117,16 @@
     </div>
 
     <div class="h-full flex flex-col">
-        <header class="grid grid-cols-3 items-center p-4 border-b border-gray-200">
-            <div></div>
+        <header class="text-center p-4 border-b border-gray-200">
             <h1 class="text-xl font-bold text-center">캘린더</h1>
-            <div class="justify-self-end"></div>
         </header>
 
         <main class="flex-1 overflow-y-auto">
-            <div class="max-w-lg mx-auto p-4 lg:max-w-screen-xl">
+            <div class="max-w-lg mx-auto p-4 lg:max-w-screen-xl lg:pt-4">
                 <div class="lg:grid lg:grid-cols-5 lg:gap-8">
                     <div class="lg:col-span-2">
                         <div class="flex flex-col items-center">
-                            <div class="flex items-center justify-between w-full mb-4">
+                            <div class="flex items-center justify-between w-full mb-4 lg:mb-4">
                                 <button id="monthYearBtn"class="text-lg font-semibold cursor-pointer p-2 rounded-md hover:bg-gray-100"></button>
                                 <div class="flex space-x-2">
                                     <button id="prevMonth" class="text-gray-500 p-2 rounded-full hover:bg-gray-200">
@@ -143,7 +141,7 @@
                                     </button>
                                 </div>
                             </div>
-                            <div class="grid grid-cols-7 text-center text-sm font-medium text-gray-400 w-full">
+                            <div class="grid grid-cols-7 text-center text-sm font-medium text-gray-400 w-full lg:mb-2">
                                 <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
                             </div>
                             <div id="calendarGrid" class="grid grid-cols-7 justify-items-center w-full mt-2 gap-y-2">
@@ -151,11 +149,11 @@
                         </div>
                     </div>
 
-                    <hr class="w-full my-6 border-gray-300 lg:hidden">
+                    <hr class="w-full mt-6 mb-4 border-gray-300 lg:hidden">
 
                     <div class="lg:col-span-3">
                         <div class="space-y-4">
-                            <h2 class="text-lg font-bold">예약 현황</h2>
+                            <h2 class="py-2 lg:mb-4 text-lg font-bold">예약 현황</h2>
                             <div id="reservationsContainer" class="space-y-4"></div>
                             <button id="add-reservation-btn"
                                 class="w-full flex items-center justify-center p-3 mt-4 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors">
