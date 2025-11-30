@@ -46,6 +46,7 @@
 <body class="bg-gray-50">
     <div class="h-full flex flex-col">
         <header class="grid grid-cols-3 items-center p-4 border-b border-gray-200 flex-shrink-0 bg-white">
+            <!-- 뒤로가기 버튼 -->
             <div class="justify-self-start">
                 <a href="scrap.index.html" id="header-back-button" class="p-1 block rounded-full text-gray-600 hover:bg-gray-100 focus:outline-none">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -54,11 +55,13 @@
                 </a>
             </div>
 
+            <!-- 컬렉션 제목 / 모든 스크랩 -->
             <h1 class="text-xl font-bold text-center text-gray-800"></h1>
 
+            <!-- 컬렉션 삭제 버튼 -->
             <div class="justify-self-end relative">
-                <button id="delete-collection-button" 
-                        class="p-1 rounded-full text-red-600 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50">
+                <button id="delete-collection-button" hidden
+                    class="p-1 rounded-full text-red-600 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50">
                     <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
                     </svg>
@@ -103,8 +106,8 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        const FASTAPI_BASE_URL = "https://bab-back.onrender.com"; 
-        //const FASTAPI_BASE_URL = 'http://127.0.0.1:8000'; // 로컬 테스트용
+        //const FASTAPI_BASE_URL = "https://bab-back.onrender.com"; 
+        const FASTAPI_BASE_URL = 'http://127.0.0.1:8000'; // 로컬 테스트용
         
         let currentUser = null;
         const defaultImageUrl = 'Untitled.png'; 
@@ -112,7 +115,8 @@
         async function loadScrapsForCollection(token, collectionId) {
             const listContent = document.getElementById('list-content');
             const headerTitle = document.querySelector('header h1');
-            
+            const deleteButton = document.getElementById('delete-collection-button');
+
             let collectionName = '모든 스크랩';
             let apiEndpoint = `${FASTAPI_BASE_URL}/scraps/me`;
 
@@ -120,8 +124,11 @@
             headerTitle.textContent = collectionId ? '' : '모든 스크랩';
             listContent.innerHTML = '<p class="text-center text-gray-500 mt-4">스크랩 목록을 불러오는 중...</p>';
 
-
             if (collectionId && collectionId !== 'null') {
+                // 컬렉션 페이지일 경우 삭제 버튼 표시
+                deleteButton.hidden = false; // 삭제 버튼 표시
+                apiEndpoint += `?collection_id=${collectionId}`;
+
                 // 컬렉션 이름 불러오기
                 try {
                     const collectionsRes = await fetch(`${FASTAPI_BASE_URL}/scraps/collections/me`, {
@@ -134,14 +141,20 @@
                         const targetCollection = collections.find(c => String(c.id) === collectionId);
                         if (targetCollection) {
                             collectionName = targetCollection.name;
+                        } else {
+                            // ID는 있으나 컬렉션이 없는 경우 (권한 없거나 삭제됨)
+                            listContent.innerHTML = '<p class="text-center text-red-500 mt-4">존재하지 않는 컬렉션입니다.</p>';
+                            headerTitle.textContent = '오류';
+                            deleteButton.hidden = true; // 삭제 버튼 숨김
+                            return; 
                         }
                     }
                 } catch (e) {
                     console.warn('컬렉션 이름을 가져오는 데 실패했습니다.', e);
                 }
-                
-                apiEndpoint += `?collection_id=${collectionId}`;
-            } 
+            } else {
+                deleteButton.hidden = true;
+            }
             
             headerTitle.textContent = collectionName;
             document.title = `${collectionName} - 내 스크랩`;
@@ -183,7 +196,7 @@
 
                         return `
                             <a href="/detail.html?id=${item.id}" class="block"> 
-                                <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100">
+                                <div class="bg-white rounded-xl shadow-md overflow-hidden cursor-pointer transition-transform transform hover:scale-105">
                                     <div class="relative aspect-square">
                                         <img src="${imageUrl}" alt="${item.name} 대표 이미지" class="absolute inset-0 w-full h-full object-cover">
                                     </div>
@@ -198,7 +211,7 @@
                     }).join('');
                     
                     listContent.innerHTML = `
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                             ${scrapCardsHtml}
                         </div>
                     `;
@@ -215,6 +228,8 @@
             const urlParams = new URLSearchParams(window.location.search);
             const collectionId = urlParams.get('id'); // ID가 없으면 null (모든 스크랩)
             
+            const deleteButton = document.getElementById('delete-collection-button');
+
             // Firebase 인증 상태 확인
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
@@ -222,19 +237,44 @@
                     const idToken = await user.getIdToken();
 
                     await loadScrapsForCollection(idToken, collectionId);
+
+                    // 컬렉션 삭제 버튼 클릭 이벤트 리스너 설정
+                    deleteButton.onclick = async () => {
+                        if (!collectionId || collectionId === 'null') {
+                            return; // '모든 스크랩' 페이지에서는 동작하지 않음
+                        }
+
+                        if (!confirm(`${document.querySelector('header h1').textContent} 컬렉션을 정말 삭제하시겠습니까? 컬렉션 내 식당 스크랩은 유지됩니다.`)) {
+                            return;
+                        }
+
+                        try {
+                            const response = await fetch(`${FASTAPI_BASE_URL}/scraps/collections/${collectionId}`, {
+                                method: 'DELETE',
+                                headers: {
+                                    'Authorization': `Bearer ${idToken}`,
+                                    'Content-Type': 'application/json'
+                                }
+                            });
+
+                            if (!response.ok) {
+                                const errorData = await response.json();
+                                throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+                            }
+
+                            alert("컬렉션이 성공적으로 삭제되었습니다.");
+                            // 성공 시 컬렉션 메인 페이지로 리다이렉션
+                            window.location.href = 'scrap.index.html';
+
+                        } catch (error) {
+                            console.error('컬렉션 삭제 API 호출 중 오류 발생:', error);
+                            alert(`컬렉션 삭제 실패: ${error.message}`);
+                        }
+                    };
                 } else {
                     // 로그인되지 않은 경우, 로그인 페이지로 리다이렉션
                     window.location.href = 'index.html';
                 }
-            });
-
-            const deleteButton = document.getElementById('delete-collection-button');
-
-            // '컬렉션 삭제' 버튼 클릭 이벤트 (아이콘 클릭)
-            deleteButton.addEventListener('click', () => {
-                // 실제 삭제 로직을 여기에 구현해야 합니다. (예: fetch 요청)
-                alert(`컬렉션 (ID: ${collectionId || '없음'}) 삭제를 요청했습니다. 이 기능은 백엔드 구현이 필요합니다.`);
-                console.log(`컬렉션 (ID: ${collectionId}) 삭제 버튼 클릭됨`);
             });
         });
     </script>
