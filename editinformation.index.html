@@ -9,60 +9,105 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* 기본 레이아웃 스타일 유지 */
         html, body {
             height: 100%;
             margin: 0;
-            overflow: hidden;
+            overflow-x: hidden; 
         }
         body {
             font-family: 'Noto Sans KR', 'Inter', sans-serif;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
+        
+        /* 💡 모든 입력 필드(input, select, textarea)의 포커스 시 스타일 통일 */
+        .input-focus-custom:focus {
+            outline: none; /* 기본 outline 제거 */
+            --tw-ring-color: #FF7A5A !important; /* 링 색상 설정 */
+            border-color: #FF7A5A !important; /* 테두리 색상 설정 */
+            --tw-ring-opacity: 1 !important;
+            --tw-ring-width: 1px !important;
+            box-shadow: 0 0 0 1px #FF7A5A; /* 테두리 링 효과 대체 */
+        }
+        
+        /* 기존 커스텀 스타일 유지 */
+        .bg-custom-point { background-color: #FF7A5A !important; }
+        .hover-bg-custom-point:hover { background-color: #FF7A5A !important; color: white !important; }
+        .border-custom-point { border-color: #FF7A5A !important; }
         input[type="radio"]:checked {
             background-color: #FF7A5A;
             border-color: #FF7A5A;
         }
-        input[type="radio"]:checked:hover {
+        input[type="checkbox"]:checked {
             background-color: #FF7A5A;
             border-color: #FF7A5A;
         }
-        .bg-custom-point { background-color: #FF7A5A !important; }
-        .hover-bg-custom-point:hover { background-color: #FF7A5A !important; color: white !important; }
-        .border-custom-point { border-color: #FF7A5A !important; }
     </style>
 </head>
 <body class="bg-white">
 
     <div class="h-full flex flex-col">
         
-        <header class="grid grid-cols-3 items-center p-4 border-b border-gray-200 flex-shrink-0">
-            <div>
+        <header class="grid grid-cols-3 items-center px-2 py-4 border-b border-gray-200 flex-shrink-0">
+            <div class="flex-shrink-0 w-6 h-6">
                 <a href="mypage.index.html" class="text-gray-600 hover:text-gray-900">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg>
                 </a>
             </div>
-            <h1 class="text-xl font-bold text-center text-gray-800">회원정보 수정</h1>
-            <div class="justify-self-end"><div class="w-6 h-6"></div></div>
+            <h1 class="text-xl font-bold text-center text-gray-800 col-span-1 whitespace-nowrap">회원정보 수정</h1>
+            <div class="justify-self-end flex-shrink-0 w-6 h-6"></div>
         </header>
 
         
-        <main class="flex-1 overflow-y-auto bg-white p-6 flex flex-col">
-            <div class="space-y-6">
+        <main class="flex-1 overflow-y-auto bg-white p-6 pb-20 flex flex-col">
+            <form id="edit-form" class="space-y-6 flex-1 max-w-md w-full mx-auto flex flex-col">
+                
                 <div>
-                    <label for="email" class="block text-sm font-medium text-gray-500 mb-2">이메일</label>
-                    <input type="email" id="email" class="w-full p-3.5 text-base bg-gray-100 text-gray-500 border border-gray-300 rounded-lg" readonly>
+                    <label for="user-email" class="block text-sm font-medium text-gray-700 mb-2">이메일</label>
+                    <input type="email" id="user-email" class="w-full p-3.5 text-base bg-gray-50 text-gray-700 border border-gray-300 rounded-lg input-focus-custom" value="user@example.com" readonly>
                 </div>
-                <div>
-                    <label for="birthdate" class="block text-sm font-medium text-gray-500 mb-2">생년월일</label>
-                    <input type="date" id="birthdate" class="w-full p-3.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF7A5A]">
+                
+                <div class="mb-4">
+                    <label for="birthdate-input" class="block text-sm font-medium text-gray-700">생년월일</label>
+                    <div class="flex items-stretch mt-1 space-x-2 w-full">
+                        
+                        <div class="relative flex-shrink-0">
+                            <select id="birth_calendar" name="calendar_type" class="appearance-none w-24 sm:w-28 px-3 rounded-lg border border-gray-300 bg-gray-50 text-gray-700 input-focus-custom p-3.5">
+                                <option value="solar">양력</option>
+                                <option value="lunar">음력</option>
+                                <option value="lunar_leap">음력(윤달)</option>
+                            </select>
+                            <div class="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-700">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"></path>
+                                </svg>
+                            </div>
+                        </div>
+
+                        <input type="date" id="birthdate-input" name="birth_date" class="flex-1 min-w-0 px-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm input-focus-custom p-3.5">
+                    </div>
                 </div>
-                <div>
-                    <label for="birthtime" class="block text-sm font-medium text-gray-500 mb-2">태어난 시간</label>
-                    <input type="time" id="birthtime" class="w-full p-3.5 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FF7A5A]">
+                
+                <div class="mb-4">
+                    <label for="birth-hour" class="block text-sm font-medium text-gray-700">태어난 시간</label>
+                    <div class="flex items-center mt-1 space-x-4 w-full">
+                        
+                        <div id="birth-time-container" class="flex items-center justify-center w-24 border border-gray-300 rounded-lg bg-gray-50 p-3.5 text-gray-700">
+                            <input type="text" id="birth-hour" name="birth_hour" maxlength="2" placeholder="19" class="w-8 text-center bg-transparent focus:outline-none">
+                            <span class="text-gray-700 mx-0.5">:</span>
+                            <input type="text" id="birth-minute" name="birth_minute" maxlength="2" placeholder="00" class="w-8 text-center bg-transparent focus:outline-none">
+                        </div>
+
+                        <label class="flex items-center text-sm text-gray-600">
+                            <input type="checkbox" id="unknown-time" name="unknown_time" class="rounded border-gray-300 focus:ring-[#FF7A5A]">
+                            <span class="ml-1">시간 모름</span>
+                        </label>
+                    </div>
                 </div>
+                
                 <div>
-                    <label class="block text-sm font-medium text-gray-500 mb-3">성별</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-3">성별</label>
                     <div class="flex items-center space-x-6">
                         <label class="flex items-center">
                             <input type="radio" name="gender" value="male" class="w-5 h-5 mr-2 border-gray-300 text-[#FF7A5A] focus:ring-[#FF7A5A]">
@@ -74,149 +119,216 @@
                         </label>
                     </div>
                 </div>
-            </div>
-            
-            <button id="save-info-btn" class="w-full p-4 bg-[#FF7A5A] text-white text-base font-bold rounded-xl cursor-pointer mt-auto disabled:bg-gray-400 transition">저장</button>
+            </form>
         </main>
+
+        <footer class="flex-shrink-0 bg-white p-6 pt-0 border-t border-gray-100">
+            <div class="max-w-md mx-auto">
+                <button type="submit" form="edit-form" id="save-info-btn" class="w-full p-4 bg-custom-point text-white text-base font-bold rounded-xl cursor-pointer disabled:bg-gray-400 transition">저장</button>
+            </div>
+        </footer>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
+        import { firebaseConfig } from "./firebase-config.js"; 
 
-       
-        const firebaseConfig = {
-          apiKey: "AIzaSyAlmVXljDPwkmi4rik69GLhBIHLskw7P2o",
-          authDomain: "bapick-front.firebaseapp.com",
-          projectId: "bapick-front",
-          storageBucket: "bapick-front.firebasestorage.app",
-          messagingSenderId: "883956844611",
-          appId: "1:883956844611:web:ac74a589aae30be9d0ecf6",
-          measurementId: "G-Z1WEHMPL7F"
-        };
-        
-    
-        
+        // Firebase 앱 초기화
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getFirestore(app);
 
-        // --- UI 요소 ---
-        const phoneInput = document.getElementById('phone');
-        const emailInput = document.getElementById('email');
-        const birthdateInput = document.getElementById('birthdate');
-        const birthtimeInput = document.getElementById('birthtime');
-        const addFoodBtn = document.getElementById('add-food-btn');
-        const foodInput = document.getElementById('avoid-food-input');
-        const tagsContainer = document.getElementById('food-tags-container');
-        const saveInfoBtn = document.getElementById('save-info-btn');
+        // FastAPI 서버 URL
+        const FASTAPI_BASE_URL = 'http://127.0.0.1:8000'; // 로컬 테스트용
+        //const FASTAPI_BASE_URL = "https://bab-back.onrender.com"; 
 
+        let idToken = null;
         let currentUser = null;
 
-        // --- 로그인 상태 확인 ---
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUser = user;
-                loadUserInfo(user.uid);
-            } else {
-                window.location.href = 'index.html';
-            }
-        });
+        // 1. 사용자 정보 불러오기
+        async function loadUserInfo(token) {
+            try {
+                const response = await fetch(`${FASTAPI_BASE_URL}/users/me`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}` 
+                    }
+                });
 
-        // --- 사용자 정보 불러오기 ---
-        async function loadUserInfo(uid) {
-            const userDocRef = doc(db, "users", uid);
-            const docSnap = await getDoc(userDocRef);
+                if (!response.ok) {
+                    throw new Error(`데이터 로드 실패: ${response.statusText}`);
+                }
 
-            if (docSnap.exists()) {
-                const userData = docSnap.data();
-                phoneInput.value = userData.phoneNumber || '';
-                emailInput.value = userData.email || '';
-                birthdateInput.value = userData.dateOfBirth || '';
-                birthtimeInput.value = userData.timeOfBirth || '';
+                const data = await response.json();
                 
-                // 성별 라디오 버튼 설정
-                if (userData.gender === 'male') {
-                    document.querySelector('input[name="gender"][value="male"]').checked = true;
-                } else if (userData.gender === 'female') {
-                    document.querySelector('input[name="gender"][value="female"]').checked = true;
+                // 폼 필드 채우기
+                document.getElementById('user-email').value = data.email || '';
+                document.getElementById('birthdate-input').value = data.birthDate || '';
+                document.getElementById('birth_calendar').value = data.birthCalendar || 'solar';
+                
+                // 시간 필드 처리
+                const birthTime = data.birthTime; // 'HH:MM' 또는 null
+                if (birthTime) {
+                    const [h, m] = birthTime.split(':');
+                    document.getElementById('birth-hour').value = h;
+                    document.getElementById('birth-minute').value = m;
+                    document.getElementById('unknown-time').checked = false;
+                } else {
+                    document.getElementById('birth-hour').value = '';
+                    document.getElementById('birth-minute').value = '';
+                    document.getElementById('unknown-time').checked = true;
+                }
+                toggleTimeInputState(); // 시간 모름 상태에 따라 input 활성화/비활성화 처리
+                
+                // 성별 필드 처리
+                if (data.gender) {
+                    const genderRadio = document.querySelector(`input[name="gender"][value="${data.gender.toLowerCase()}"]`);
+                    if (genderRadio) {
+                        genderRadio.checked = true;
+                    }
                 }
 
-                // 먹지 않는 음식 태그 생성
-                tagsContainer.innerHTML = ''; // 기존 태그 초기화
-                if (userData.dislikedFoods && Array.isArray(userData.dislikedFoods)) {
-                    userData.dislikedFoods.forEach(food => createTag(food));
+            } catch (error) {
+                console.error("사용자 정보 로드 중 오류 발생:", error);
+                alert("사용자 정보를 불러오는 데 실패했습니다.");
+            }
+        }
+        
+        // 2. 폼 제출 핸들러 (정보 수정)
+        async function handleFormSubmit(event) {
+            event.preventDefault(); // 기본 폼 제출 방지
+
+            const idToken = await currentUser.getIdToken();
+            if (!idToken) {
+                alert("로그인이 필요합니다.");
+                return;
+            }
+
+            const saveBtn = document.getElementById('save-info-btn');
+            saveBtn.disabled = true;
+            saveBtn.textContent = '저장 중...';
+
+            // 폼 데이터 수집
+            const form = event.target;
+            const formData = new FormData();
+            
+            // 생년월일
+            const birthDate = document.getElementById('birthdate-input').value;
+            const birthCalendar = document.getElementById('birth_calendar').value;
+            if (birthDate) formData.append('birth_date', birthDate);
+            if (birthCalendar) formData.append('birth_calendar', birthCalendar);
+            
+            // 성별
+            const gender = form.querySelector('input[name="gender"]:checked');
+            if (gender) formData.append('gender', gender.value);
+
+            // 태어난 시간
+            const unknownTime = document.getElementById('unknown-time').checked;
+            formData.append('unknown_time', unknownTime ? 'true' : 'false');
+
+            if (!unknownTime) {
+                const hour = document.getElementById('birth-hour').value.padStart(2, '0');
+                const minute = document.getElementById('birth-minute').value.padStart(2, '0');
+                if (hour && minute) {
+                    formData.append('birth_time', `${hour}:${minute}`); 
                 }
+            }
+            
+
+            try {
+                const response = await fetch(`${FASTAPI_BASE_URL}/users/me`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Authorization': `Bearer ${idToken}`
+                    },
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.detail || "정보 수정에 실패했습니다. 서버 로그를 확인하세요.");
+                }
+
+                alert("회원 정보가 성공적으로 수정되었습니다.");
+                await loadUserInfo(idToken); 
+
+            } catch (error) {
+                console.error("정보 수정 중 오류 발생:", error);
+                alert(`정보 수정에 실패했습니다: ${error.message}`);
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.textContent = '저장';
+            }
+        }
+        
+
+        const unknownTimeCheckbox = document.getElementById('unknown-time');
+        const birthHourInput = document.getElementById('birth-hour');
+        const birthMinuteInput = document.getElementById('birth-minute');
+        const timeContainer = document.getElementById('birth-time-container');
+        const formElement = document.getElementById('edit-form');
+        
+        // 3. 시간 모름 토글 상태 관리
+        function toggleTimeInputState() {
+            const isDisabled = unknownTimeCheckbox.checked;
+            
+            birthHourInput.disabled = isDisabled;
+            birthMinuteInput.disabled = isDisabled;
+
+            if (isDisabled) {
+                birthHourInput.value = '';
+                birthMinuteInput.value = '';
+                timeContainer.classList.add('bg-gray-200', 'text-gray-500'); 
+                timeContainer.classList.remove('bg-gray-50', 'text-gray-700'); 
             } else {
-                console.log("사용자 데이터가 없습니다.");
-                emailInput.value = currentUser.email; // 이메일은 Auth에서 가져옴
+                timeContainer.classList.remove('bg-gray-200', 'text-gray-500');
+                timeContainer.classList.add('bg-gray-50', 'text-gray-700');
             }
         }
 
-        // --- '먹지 않는 음식' 태그 관련 함수 ---
-        const createTag = (foodName) => {
-            const tag = document.createElement('div');
-            tag.className = 'flex items-center bg-gray-200 text-gray-800 text-sm font-medium px-3 py-1 rounded-full';
-            tag.innerHTML = `<span>${foodName}</span><button class="ml-2 text-gray-500 hover:text-gray-800">&times;</button>`;
-            tag.querySelector('button').addEventListener('click', () => tag.remove());
-            tagsContainer.appendChild(tag);
-        };
-        addFoodBtn.addEventListener('click', () => {
-            const foodName = foodInput.value.trim();
-            if (foodName) {
-                createTag(foodName);
-                foodInput.value = '';
+        // 출생 시간 컨테이너 포커스/블러 로직
+        function handleTimeFocus(event) {
+            if (!unknownTimeCheckbox.checked) {
+                timeContainer.classList.remove('border-gray-300');
+                timeContainer.classList.add('border-[#FF7A5A]');
+                timeContainer.style.boxShadow = '0 0 0 1px #FF7A5A'; // 커스텀 링 효과
             }
-        });
-        foodInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                addFoodBtn.click();
-            }
-        });
+        }
 
-        // --- 저장 버튼 클릭 이벤트 ---
-        saveInfoBtn.addEventListener('click', async () => {
-            if (!currentUser) return;
+        function handleTimeBlur(event) {
+            timeContainer.classList.remove('border-[#FF7A5A]');
+            timeContainer.style.boxShadow = 'none';
+            timeContainer.classList.add('border-gray-300');
+        }
+        
+        // 이벤트 리스너 연결
+        document.addEventListener('DOMContentLoaded', function() {
+            // 폼 제출 이벤트 연결
+            formElement.addEventListener('submit', handleFormSubmit);
 
-            // 1. 화면에서 현재 값들 가져오기
-            const phoneNumber = phoneInput.value;
-            const dateOfBirth = birthdateInput.value;
-            const timeOfBirth = birthtimeInput.value;
-            const gender = document.querySelector('input[name="gender"]:checked')?.value;
-            const dislikedFoods = Array.from(tagsContainer.children).map(tag => tag.querySelector('span').textContent);
-
-            saveInfoBtn.disabled = true;
-            saveInfoBtn.textContent = '저장 중...';
-
-            try {
-                // 2. Firestore에 저장할 데이터 객체 만들기
-                const userDataToSave = {
-                    phoneNumber: phoneNumber,
-                    dateOfBirth: dateOfBirth,
-                    timeOfBirth: timeOfBirth,
-                    gender: gender,
-                    dislikedFoods: dislikedFoods,
-                    // 이메일은 보통 변경하지 않으므로 저장하지 않습니다.
-                };
-
-                // 3. Firestore에 데이터 업데이트 (merge: true로 다른 필드는 유지)
-                const userDocRef = doc(db, "users", currentUser.uid);
-                await setDoc(userDocRef, userDataToSave, { merge: true });
-
-                alert('정보가 성공적으로 저장되었습니다!');
-                window.location.href = 'mypage.index.html';
-
-            } catch (error) {
-                console.error("정보 저장 에러:", error);
-                alert('오류가 발생했습니다: ' + error.message);
-            } finally {
-                saveInfoBtn.disabled = false;
-                saveInfoBtn.textContent = '저장';
-            }
+            // 시간 모름 체크박스 이벤트 연결
+            unknownTimeCheckbox.addEventListener('change', toggleTimeInputState);
+            
+            // 시간 입력 포커스 이벤트 연결
+            birthHourInput.addEventListener('focus', handleTimeFocus);
+            birthMinuteInput.addEventListener('focus', handleTimeFocus);
+            birthHourInput.addEventListener('blur', handleTimeBlur);
+            birthMinuteInput.addEventListener('blur', handleTimeBlur);
         });
 
+        // 로그인 상태 확인 및 초기화
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                idToken = await user.getIdToken();
+                await loadUserInfo(idToken);
+            } else {
+                alert('로그인이 필요합니다.');
+                window.location.href = 'index.html'; // 로그인 페이지로 이동
+                return;
+            }
+        });
+        
     </script>
 </body>
 </html>
