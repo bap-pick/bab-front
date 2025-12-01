@@ -388,15 +388,15 @@
 }
 
     function openFortuneModal() {
-    if (fortuneCookieModal) {
-        fortuneCookieModal.classList.remove('hidden');
-        setTimeout(() => {
-            fortuneCookieModal.classList.add('opacity-100');
-            modalContent.classList.remove('scale-95', 'opacity-0');
-            modalContent.classList.add('scale-100', 'opacity-100');
-        }, 10);
+        if (fortuneCookieModal) {
+            fortuneCookieModal.classList.remove('hidden');
+            setTimeout(() => {
+                fortuneCookieModal.classList.add('opacity-100');
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
     }
-}
 
     function handleOpenCookie() {
     if (!openCookieBtnInModal || !fortuneMessage) return;
@@ -629,6 +629,10 @@
             msg.message_type  === 'restaurant_cards' ||
             (msg.role === 'assistant' && msg.content && msg.content.trim().startsWith('{"restaurants":'));
 
+        if (msg.message_type === "hidden_initial") {
+            return;
+        }
+                
         if (msg.message_type === 'location_select') {
             isExpectingAddress = true; 
 
@@ -783,6 +787,7 @@
 
             success = true;
             
+            return data;
         } catch (err) {
             handleApiError(err, loadingDiv, chatArea, "채팅방 생성 중 오류");
         } finally {
@@ -844,6 +849,7 @@
 
 
     // 로그인 상태 확인
+    /*
     onAuthStateChanged(auth, async (user) => {
         if (!user) {
             window.location.href = 'index.html';
@@ -875,7 +881,7 @@
         
 
     });
-    
+    */
     // 채팅방 입장 시 초기 추천 메시지 렌더링
     async function renderInitialMessage(roomId, container) {
         if (!idToken || !roomId) return;
@@ -1163,6 +1169,7 @@
     /* =========================================================
     * 로그인 상태 확인 및 초기화
     * ======================================================= */
+    
     onAuthStateChanged(auth, async (user) => {
         if (!user) {
             window.location.href = 'index.html';
