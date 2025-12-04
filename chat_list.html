@@ -642,10 +642,7 @@
             try {
                 const token = await currentUser.getIdToken();
 
-                const url = new URL(`/api/chat/list`);
-                url.searchParams.append('is_group', isGroup);
-
-                const response = await fetch(url.toString(), {
+                const response = await fetch(`/api/chat/list?is_group=${isGroup}`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
