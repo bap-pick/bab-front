@@ -11,7 +11,7 @@ export default async function handler(req, res) {
 
     try {
         const EC2_URL = process.env.EC2_API_URL;
-        
+        console.log(`[Proxy] Incoming Auth Header: ${req.headers.authorization}`);
         const { path } = req.query;
         const endpoint = Array.isArray(path) ? `/${path.join('/')}` : `/${path}`;
         
