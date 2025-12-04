@@ -14,13 +14,6 @@ export default async function handler(req, res) {
 
         const targetPath = req.url;
 
-        // POST/PUT/PATCH는 쿼리 스트링 제거
-        if (["POST", "PUT", "PATCH"].includes(req.method.toUpperCase()) && req.body && Object.keys(req.body).length) {
-            fetchOptions.body = JSON.stringify(req.body);
-        } else {
-            delete fetchOptions.headers['Content-Type'];
-        }
-
         const fullUrl = `${EC2_URL}${targetPath}`;
 
         // Authorization 헤더 전달
