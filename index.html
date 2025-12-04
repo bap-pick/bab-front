@@ -903,7 +903,10 @@
 
                     method: "POST",
 
-                    headers: { "Authorization": `Bearer ${idToken}` },
+                    headers: { 
+                        "Authorization": `Bearer ${idToken}`,
+                        "Content-Type": "application/json"
+                    },
 
                     credentials: "include" // 브라우저에 쿠키 자동 저장
 
