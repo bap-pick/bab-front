@@ -463,7 +463,7 @@
             const isUpdate = reservationId !== null;
             const url = isUpdate 
                 ? `/api/reservations/${reservationId}` 
-                : `/api/reservations`;
+                : `/api/reservations/create`;
             const method = isUpdate ? 'PUT' : 'POST';
             
             try {

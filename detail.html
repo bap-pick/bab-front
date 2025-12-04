@@ -665,7 +665,7 @@
                     const idToken = await currentUser.getIdToken(true);
                     const restaurantId = currentRestaurant.id;
 
-                    const response = await fetch(`/api/scraps/`, {
+                    const response = await fetch(`/api/scraps/create`, {
                         method: 'POST',
                         headers: {
                             'Authorization': `Bearer ${idToken}`,
