@@ -15,9 +15,9 @@ export default async function handler(req, res) {
         const { path } = req.query;
         const endpoint = Array.isArray(path) ? `/${path.join('/')}` : `/${path}`;
         
-        const fullEndpoint = `/api${endpoint}`;
+        console.log(`[Proxy] Final EC2 Endpoint: ${EC2_URL}${fullEndpoint}`);
         
-        const response = await fetch(`${EC2_URL}${fullEndpoint}`, {
+        const response = await fetch(`${EC2_URL}${endpoint}`, {
             method: req.method,
             headers: {
                 'Content-Type': 'application/json',
