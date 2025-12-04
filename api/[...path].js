@@ -2,7 +2,7 @@ export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');  // Authorization 추가!
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
     if (req.method === 'OPTIONS') {
         res.status(200).end();
@@ -14,17 +14,27 @@ export default async function handler(req, res) {
         const { path } = req.query;
         const endpoint = Array.isArray(path) ? `/${path.join('/')}` : `/${path}`;
         
-        // 요청 헤더 전달 (Authorization 포함)
+        // 쿼리 파라미터 추출 및 전달
+        const queryParams = new URLSearchParams();
+        for (const [key, value] of Object.entries(req.query)) {
+            if (key !== 'path') {  // 'path'는 제외
+                queryParams.append(key, value);
+            }
+        }
+        const queryString = queryParams.toString();
+        const fullUrl = queryString 
+            ? `${EC2_URL}${endpoint}?${queryString}`
+            : `${EC2_URL}${endpoint}`;
+        
+        // Authorization 헤더 설정
         const headers = {
             'Content-Type': 'application/json',
         };
-        
-        // Authorization 헤더가 있으면 전달
         if (req.headers.authorization) {
             headers['Authorization'] = req.headers.authorization;
         }
 
-        const response = await fetch(`${EC2_URL}${endpoint}`, {
+        const response = await fetch(fullUrl, {
             method: req.method,
             headers: headers,
             body: req.method !== 'GET' && req.body ? JSON.stringify(req.body) : undefined
