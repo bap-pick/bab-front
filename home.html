@@ -315,10 +315,6 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        //const FASTAPI_BASE_URL = "https://bab-back.onrender.com"; 
-        //const FASTAPI_BASE_URL = 'http://localhost:8000'; // 로컬 테스트용
-        const FASTAPI_BASE_URL = 'http://13.209.3.54'; // 로컬 테스트용
-
         const userNameEl = document.getElementById('user-nickname');
         const userbirthdateEl = document.getElementById('user-birthdate');
         const userProfileImageEl = document.getElementById('user-profile-image');
@@ -329,7 +325,7 @@
         
         const locationTextEl = document.getElementById('location-text');
 
-        // 2. 오행 통계 요소 맵
+        // 오행 통계 요소 맵
         const statElements = {
             wood: { bar: document.getElementById('stat-wood'), value: document.getElementById('stat-wood-value') },
             fire: { bar: document.getElementById('stat-fire'), value: document.getElementById('stat-fire-value') },
@@ -426,10 +422,9 @@
             }
         };
 
-
         // 오행 분석 및 추천 메시지 가져오는 함수
         async function fetchRecommendation(idToken) {
-            const res = await fetch(`${FASTAPI_BASE_URL}/saju/analyze`, {
+            const res = await fetch(`api/saju/analyze`, {
                 headers: { 'Authorization': `Bearer ${idToken}` }
             });
 
@@ -530,7 +525,7 @@
                     lon = pos.coords.longitude;
                 }
 
-                const response = await fetch(`${FASTAPI_BASE_URL}/restaurants/nearby?lat=${lat}&lon=${lon}&limit=5`, {
+                const response = await fetch(`api/restaurants/nearby?lat=${lat}&lon=${lon}&limit=5`, {
                     method: 'GET',
                     headers: { 'Authorization': `Bearer ${idToken}` },
                 });
@@ -586,7 +581,7 @@
             try {
                 const sajuFields = ['ohengWood', 'ohengFire', 'ohengEarth', 'ohengMetal', 'ohengWater'];
                 const fields = ['nickname', 'birthDate', 'profileImage', ...sajuFields];
-                const res = await fetch(`${FASTAPI_BASE_URL}/users/me?fields=${fields.join(',')}`, {
+                const res = await fetch(`api/users/me?fields=${fields.join(',')}`, {
                     headers: { 'Authorization': `Bearer ${idToken}` }
                 });
 
