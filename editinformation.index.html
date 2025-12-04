@@ -9,7 +9,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* 기본 레이아웃 스타일 유지 */
         html, body {
             height: 100%;
             margin: 0;
@@ -21,24 +20,34 @@
             -moz-osx-font-smoothing: grayscale;
         }
         
-        /* 💡 모든 입력 필드(input, select, textarea)의 포커스 시 스타일 통일 */
+        /* 모든 입력 필드(input, select, textarea)의 포커스 스타일 */
         .input-focus-custom:focus {
-            outline: none; /* 기본 outline 제거 */
-            --tw-ring-color: #FF7A5A !important; /* 링 색상 설정 */
-            border-color: #FF7A5A !important; /* 테두리 색상 설정 */
-            --tw-ring-opacity: 1 !important;
-            --tw-ring-width: 1px !important;
-            box-shadow: 0 0 0 1px #FF7A5A; /* 테두리 링 효과 대체 */
+            outline: none;
+            --tw-ring-color: #FF7A5A;
+            border-color: #FF7A5A;
+            --tw-ring-opacity: 1;
+            --tw-ring-width: 1px;
+            box-shadow: 0 0 0 1px #FF7A5A;
         }
         
-        /* 기존 커스텀 스타일 유지 */
-        .bg-custom-point { background-color: #FF7A5A !important; }
-        .hover-bg-custom-point:hover { background-color: #FF7A5A !important; color: white !important; }
-        .border-custom-point { border-color: #FF7A5A !important; }
+        .bg-custom-point { 
+            background-color: #FF7A5A; 
+        }
+
+        .hover-bg-custom-point:hover { 
+            background-color: #FF7A5A;
+            color: white;
+        }
+
+        .border-custom-point { 
+            border-color: #FF7A5A; 
+        }
+
         input[type="radio"]:checked {
             background-color: #FF7A5A;
             border-color: #FF7A5A;
         }
+        
         input[type="checkbox"]:checked {
             background-color: #FF7A5A;
             border-color: #FF7A5A;
@@ -138,17 +147,13 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // FastAPI 서버 URL
-        const FASTAPI_BASE_URL = 'http://127.0.0.1:8000'; // 로컬 테스트용
-        //const FASTAPI_BASE_URL = "https://bab-back.onrender.com"; 
-
         let idToken = null;
         let currentUser = null;
 
         // 1. 사용자 정보 불러오기
         async function loadUserInfo(token) {
             try {
-                const response = await fetch(`${FASTAPI_BASE_URL}/users/me`, {
+                const response = await fetch(`/api/users/me`, {
                     headers: {
                         'Authorization': `Bearer ${token}` 
                     }
@@ -235,7 +240,7 @@
             
 
             try {
-                const response = await fetch(`${FASTAPI_BASE_URL}/users/me`, {
+                const response = await fetch(`/api/users/me`, {
                     method: 'PATCH',
                     headers: {
                         'Authorization': `Bearer ${idToken}`

@@ -234,10 +234,6 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     
-    // FastAPI 서버 URL
-    const FASTAPI_BASE_URL = 'http://127.0.0.1:8000'; // 로컬 테스트용
-    //const FASTAPI_BASE_URL = "https://bab-back.onrender.com"; 
-    
     // JSON 응답 
     marked.setOptions({ breaks: true, gfm: true});
 
@@ -553,14 +549,23 @@
     /* =========================================================
     * WebSocket
     * ======================================================= */
+    let WS_URL = null;
+    
+    async function loadConfig() {
+        const response = await fetch('/api/ws-config');
+        const config = await response.json();
+        WS_URL = config.wsUrl;
+    }
+
     // WebSocket 연결 생성 및 이벤트 핸들러 등록
-    function connectWebSocket(roomId, token) {
+    async function connectWebSocket(roomId, token) {
+        if (!WS_URL) await loadConfig();
+        
         if (websocket) {
             websocket.close();
         }
 
-        const wsUrl = FASTAPI_BASE_URL.replace('http://', 'ws://').replace('https://', 'wss://');
-        websocket = new WebSocket(`${wsUrl}/chat/ws/${roomId}?token=${token}`);
+        websocket = new WebSocket(`${WS_URL}/chat/ws/${roomId}?token=${token}`);
 
         websocket.onopen = () => {
             console.log('WebSocket 연결됨');
@@ -643,7 +648,7 @@
         let success = false;
         
         try {
-            const res = await fetch(`${FASTAPI_BASE_URL}/chat/create`, {
+            const res = await fetch(`/api/chat/create`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -694,7 +699,7 @@
         messageInput.disabled = true;
 
         try {
-            const res = await fetch(`${FASTAPI_BASE_URL}/chat/messages/${roomId}`, {
+            const res = await fetch(`/api/chat/messages/${roomId}`, {
                 headers: { "Authorization": `Bearer ${idToken}` }
             });
 
@@ -734,7 +739,7 @@
         if (!idToken || !roomId) return;
         
         try {
-            const res = await fetch(`${FASTAPI_BASE_URL}/chat/messages/${roomId}`, {
+            const res = await fetch(`/api/chat/messages/${roomId}`, {
                 headers: { "Authorization": `Bearer ${idToken}` }
             });
 

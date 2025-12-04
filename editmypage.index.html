@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>프로필 편집</title>
+    <title>밥픽 - 프로필 편집</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -118,7 +118,7 @@
                 const idToken = await user.getIdToken();
 
                 const fields = ['nickname', 'profileImage'];
-                const res = await fetch(`${FASTAPI_BASE_URL}/users/me?fields=${fields.join(',')}`, {
+                const res = await fetch(`/api/users/me?fields=${fields.join(',')}`, {
                     headers: {
                         'Authorization': `Bearer ${idToken}`
                     }
@@ -172,7 +172,7 @@
                     });
 
                     // Pre-signed URL 요청
-                    const presignRes = await fetch(`${FASTAPI_BASE_URL}/users/generate-presigned-url`, {
+                    const presignRes = await fetch(`/api/users/generate-presigned-url`, {
                         method: 'POST',
                         headers: { 'Authorization': `Bearer ${idToken}` },
                         body: new URLSearchParams({
@@ -199,7 +199,7 @@
                 if (newNickname) patchData.append('nickname', newNickname);
                 if (profile_image_s3_key) patchData.append('profile_image_s3_key', profile_image_s3_key);
 
-                const patchRes = await fetch(`${FASTAPI_BASE_URL}/users/me`, {
+                const patchRes = await fetch(`/api/users/me`, {
                     method: 'PATCH',
                     headers: { 'Authorization': `Bearer ${idToken}` },
                     body: patchData

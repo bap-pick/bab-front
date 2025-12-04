@@ -81,9 +81,6 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-
-        //const FASTAPI_BASE_URL = "https://bab-back.onrender.com"; 
-        const FASTAPI_BASE_URL = 'http://127.0.0.1:8000'; // 로컬 테스트용
         
         let currentUser = null;
         const defaultImageUrl = 'Untitled.png'; 
@@ -94,7 +91,7 @@
             const deleteButton = document.getElementById('delete-collection-button');
 
             let collectionName = '모든 스크랩';
-            let apiEndpoint = `${FASTAPI_BASE_URL}/scraps/me`;
+            let apiEndpoint = `/api/scraps/me`;
 
             // 로딩 UI 표시
             headerTitle.textContent = collectionId ? '' : '모든 스크랩';
@@ -107,7 +104,7 @@
 
                 // 컬렉션 이름 불러오기
                 try {
-                    const collectionsRes = await fetch(`${FASTAPI_BASE_URL}/scraps/collections/me`, {
+                    const collectionsRes = await fetch(`/api/scraps/collections/me`, {
                         headers: { 'Authorization': `Bearer ${token}` }
                     });
                     if (collectionsRes.ok) {
@@ -225,7 +222,7 @@
                         }
 
                         try {
-                            const response = await fetch(`${FASTAPI_BASE_URL}/scraps/collections/${collectionId}`, {
+                            const response = await fetch(`/api/scraps/collections/${collectionId}`, {
                                 method: 'DELETE',
                                 headers: {
                                     'Authorization': `Bearer ${idToken}`,

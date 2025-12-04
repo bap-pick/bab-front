@@ -66,7 +66,7 @@
                         <li class="py-1"><a href="editinformation.index.html" class="flex justify-between items-center py-3.5 text-gray-700 hover:bg-gray-50 rounded-lg -mx-2 px-2"><span class="font-medium">회원정보 수정</span><svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></a></li>
                         <li class="py-1"><a href="permission.index.html" class="flex justify-between items-center py-3.5 text-gray-700 hover:bg-gray-50 rounded-lg -mx-2 px-2"><span class="font-medium">권한 설정</span><svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></a></li>
                         <li class="py-1"><a href="notification.index.html" class="flex justify-between items-center py-3.5 text-gray-700 hover:bg-gray-50 rounded-lg -mx-2 px-2"><span class="font-medium">알림 설정</span><svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></a></li>
-                        <li class="py-1"><a href="frined_list.html" class="flex justify-between items-center py-3.5 text-gray-700 hover:bg-gray-50 rounded-lg -mx-2 px-2"><span class="font-medium">친구 목록</span><svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></a></li>
+                        <li class="py-1"><a href="friend_list.html" class="flex justify-between items-center py-3.5 text-gray-700 hover:bg-gray-50 rounded-lg -mx-2 px-2"><span class="font-medium">친구 목록</span><svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></a></li>
                         <li class="py-1"><a href="announcement.index.html" class="flex justify-between items-center py-3.5 text-gray-700 hover:bg-gray-50 rounded-lg -mx-2 px-2"><span class="font-medium">공지사항</span><svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></a></li>
                         <li class="py-1"><a href="terms.index.html" class="flex justify-between items-center py-3.5 text-gray-700 hover:bg-gray-50 rounded-lg -mx-2 px-2"><span class="font-medium">이용약관</span><svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></a></li>
                         <li class="py-1">
@@ -181,15 +181,10 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // fastapi 서버 url
-        //const FASTAPI_BASE_URL = "https://bab-back.onrender.com"; 
-        const FASTAPI_BASE_URL = 'http://127.0.0.1:8000'; // 로컬 테스트용
-        
         const overlay = document.getElementById('overlay');
         const logoutBtn = document.getElementById('logout-btn');
         const logoutModal = document.getElementById('logout-modal');
         const cancelLogoutBtn = document.getElementById('cancel-logout-btn');
-        // ▼▼▼ [수정] 버튼을 ID로 선택하도록 변경합니다. ▼▼▼
         const confirmLogoutBtn = document.getElementById('confirm-logout-btn');
         const withdrawBtn = document.getElementById('withdraw-btn');
         const withdrawalModal = document.getElementById('withdrawal-modal');
@@ -217,7 +212,7 @@
                 const idToken = await user.getIdToken();
 
                 const fields = ['nickname', 'profileImage'];
-                const res = await fetch(`${FASTAPI_BASE_URL}/users/me?fields=${fields.join(',')}`, {
+                const res = await fetch(`/api/users/me?fields=${fields.join(',')}`, {
                     headers: {
                         'Authorization': `Bearer ${idToken}`
                     }
