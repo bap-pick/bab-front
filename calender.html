@@ -465,7 +465,7 @@
             const isUpdate = reservationId !== null;
             const url = isUpdate 
                 ? `${fastapiUrl}/api/reservations/${reservationId}` 
-                : `${fastabiUrl}/api/reservations/create`;
+                : `${fastapiUrl}/api/reservations/create`;
             const method = isUpdate ? 'PUT' : 'POST';
             
             try {
