@@ -567,7 +567,7 @@
             websocket.close();
         }
 
-        websocket = new WebSocket(`${WS_URL}/chat/ws/${roomId}?token=${token}`);
+        websocket = new WebSocket(`${WS_URL}/api/chat/ws/${roomId}?token=${token}`);
 
         websocket.onopen = () => {
             console.log('WebSocket 연결됨');
