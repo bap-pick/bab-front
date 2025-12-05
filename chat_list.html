@@ -250,6 +250,8 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
+        const fastapiUrl = "https://bapick.duckdns.org"
+
         // UI 요소
         const overlay = document.getElementById('overlay');
         const addChatBtn = document.getElementById('add-chat-btn');
@@ -364,7 +366,7 @@
             try {
                 const token = await currentUser.getIdToken();
 
-                const res = await fetch(`/api/friends/search?query=${encodeURIComponent(query)}`, {
+                const res = await fetch(`${fastapiUrl}/api/friends/search?query=${encodeURIComponent(query)}`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -408,7 +410,7 @@
                 const token = await currentUser.getIdToken();
 
                 // POST /friends/request (친구 요청 API) 호출
-                const res = await fetch(`/api/friends/request`, { 
+                const res = await fetch(`${fastapiUrl}/api/friends/request`, { 
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -478,7 +480,7 @@
 
             try {
                 const token = await currentUser.getIdToken();
-                const res = await fetch(`/api/friends/requests`, {
+                const res = await fetch(`${fastapiUrl}/api/friends/requests`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -517,7 +519,7 @@
             if (!currentUser) return;
             try {
                 const token = await currentUser.getIdToken();
-                const res = await fetch(`/api/friends/handle`, {
+                const res = await fetch(`${fastapiUrl}/api/friends/handle`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -642,7 +644,7 @@
             try {
                 const token = await currentUser.getIdToken();
 
-                const response = await fetch(`/api/chat/list?is_group=${isGroup}`, {
+                const response = await fetch(`${fastapiUrl}/api/chat/list?is_group=${isGroup}`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -858,7 +860,7 @@
             try {
                 const token = await currentUser.getIdToken();
 
-                const response = await fetch(`/api/chat/${roomId}`, {
+                const response = await fetch(`${fastapiUrl}/api/chat/${roomId}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${token}`,

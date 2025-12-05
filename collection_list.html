@@ -105,6 +105,8 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+
+        const fastapiUrl = "https://bapick.duckdns.org"
         
         let currentUser = null;
         const defaultImageUrl = 'Untitled.png'; 
@@ -115,7 +117,7 @@
             const deleteButton = document.getElementById('delete-collection-button');
 
             let collectionName = '모든 스크랩';
-            let apiEndpoint = `/api/scraps/me`;
+            let apiEndpoint = `${fastapiUrl}/api/scraps/me`;
 
             // 로딩 UI 표시
             headerTitle.textContent = collectionId ? '' : '모든 스크랩';
@@ -128,7 +130,7 @@
 
                 // 컬렉션 이름 불러오기
                 try {
-                    const collectionsRes = await fetch(`/api/scraps/collections/me`, {
+                    const collectionsRes = await fetch(`${fastapiUrl}/api/scraps/collections/me`, {
                         headers: { 'Authorization': `Bearer ${token}` }
                     });
                     if (collectionsRes.ok) {
@@ -246,7 +248,7 @@
                         }
 
                         try {
-                            const response = await fetch(`/api/scraps/collections/${collectionId}`, {
+                            const response = await fetch(`${fastapiUrl}/api/scraps/collections/${collectionId}`, {
                                 method: 'DELETE',
                                 headers: {
                                     'Authorization': `Bearer ${idToken}`,

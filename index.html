@@ -224,6 +224,8 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
+        const fastapiUrl = "https://bapick.duckdns.org"
+
         // ui 요소
         const loginForm = document.getElementById('login-form-container');
         const registerForm = document.getElementById('register-form-container');
@@ -307,7 +309,7 @@
                 };
 
                 // 3. 백엔드 API 호출 (/auth/guest-login)
-                const response = await fetch(`api/auth/guest-login`, {
+                const response = await fetch(`${fastapiUrl}/api/auth/guest-login`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -429,7 +431,7 @@
                 };
 
                 // 백엔드 register API: idToken 검증 -> DB에 회원 정보 저장
-                const response = await fetch(`api/auth/register`, {
+                const response = await fetch(`${fastapiUrl}/api/auth/register`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -477,7 +479,7 @@
                 const idToken = await user.getIdToken();
 
                 // 백엔드 login API: idToken 검증 -> 세션/쿠키 발급
-                const response = await fetch(`api/auth/login`, {
+                const response = await fetch(`${fastapiUrl}/api/auth/login`, {
                     method: "POST",
                     headers: { "Authorization": `Bearer ${idToken}` },
                     credentials: "include" // 브라우저에 쿠키 자동 저장

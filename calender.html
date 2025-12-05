@@ -324,6 +324,8 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
+        const fastapiUrl = "https://bapick.duckdns.org"
+
         let currentUser = null; 
         let searchTimer = null;
         let currentDate = new Date();
@@ -432,7 +434,7 @@
         const loadReservations = async (date) => {
             if (!date || !currentUser) return [];
             const dateString = formatDateToYYYYMMDD(date);
-            const url = `/api/reservations?target_date=${dateString}`;
+            const url = `${fastapiUrl}/api/reservations?target_date=${dateString}`;
 
             try {
                 const idToken = await currentUser.getIdToken();
@@ -462,8 +464,8 @@
         const createOrUpdateReservation = async (reservationData, reservationId = null) => {
             const isUpdate = reservationId !== null;
             const url = isUpdate 
-                ? `/api/reservations/${reservationId}` 
-                : `/api/reservations/create`;
+                ? `${fastapiUrl}/api/reservations/${reservationId}` 
+                : `${fastabiUrl}/api/reservations/create`;
             const method = isUpdate ? 'PUT' : 'POST';
             
             try {
@@ -494,7 +496,7 @@
         // 예약 삭제 API 호출
         const deleteReservationApi = async (reservationId) => {
             const token = await currentUser.getIdToken(); 
-            const url = `/api/reservations/${reservationId}`;
+            const url = `${fastapiUrl}/api/reservations/${reservationId}`;
             try {
                 const response = await fetch(url, {
                     method: 'DELETE',
@@ -532,7 +534,7 @@
 
             try {
                 const token = await currentUser.getIdToken(); 
-                const url = `/api/restaurants/search?keyword=${encodeURIComponent(keyword)}`;
+                const url = `${fastapiUrl}/api/restaurants/search?keyword=${encodeURIComponent(keyword)}`;
                 
                 const response = await fetch(url, {
                     method: 'GET',

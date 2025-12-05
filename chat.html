@@ -233,6 +233,8 @@
     // Firebase 앱 초기화
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+
+    const fastapiUrl = "https://bapick.duckdns.org"
     
     // JSON 응답 
     marked.setOptions({ breaks: true, gfm: true});
@@ -648,7 +650,7 @@
         let success = false;
         
         try {
-            const res = await fetch(`/api/chat/create`, {
+            const res = await fetch(`${fastapiUrl}/api/chat/create`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -699,7 +701,7 @@
         messageInput.disabled = true;
 
         try {
-            const res = await fetch(`/api/chat/messages/${roomId}`, {
+            const res = await fetch(`${fastapiUrl}/api/chat/messages/${roomId}`, {
                 headers: { "Authorization": `Bearer ${idToken}` }
             });
 
@@ -739,7 +741,7 @@
         if (!idToken || !roomId) return;
         
         try {
-            const res = await fetch(`/api/chat/messages/${roomId}`, {
+            const res = await fetch(`${fastapiUrl}/api/chat/messages/${roomId}`, {
                 headers: { "Authorization": `Bearer ${idToken}` }
             });
 

@@ -68,16 +68,9 @@
                         <li class="py-1"><a href="notification.index.html" class="flex justify-between items-center py-3.5 text-gray-700 hover:bg-gray-50 rounded-lg -mx-2 px-2"><span class="font-medium">알림 설정</span><svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></a></li>
                         <li class="py-1"><a href="friend_list.html" class="flex justify-between items-center py-3.5 text-gray-700 hover:bg-gray-50 rounded-lg -mx-2 px-2"><span class="font-medium">친구 목록</span><svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></a></li>
                         <li class="py-1"><a href="announcement.index.html" class="flex justify-between items-center py-3.5 text-gray-700 hover:bg-gray-50 rounded-lg -mx-2 px-2"><span class="font-medium">공지사항</span><svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></a></li>
-                        <li class="py-1"><a href="terms.index.html" class="flex justify-between items-center py-3.5 text-gray-700 hover:bg-gray-50 rounded-lg -mx-2 px-2"><span class="font-medium">이용약관</span><svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></a></li>
                         <li class="py-1">
-                            <a href="#" id="logout-btn" class="flex justify-between items-center py-3.5 text-gray-700 hover:bg-gray-50 rounded-lg -mx-2 px-2">
+                            <a href="#" id="logout-btn" class="flex justify-between items-center py-3.5 text-red-500 hover:bg-red-50 rounded-lg -mx-2 px-2">
                                 <span class="font-medium">로그아웃</span>
-                                <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-                            </a>
-                        </li>
-                        <li class="py-1">
-                            <a href="#" id="withdraw-btn" class="flex justify-between items-center py-3.5 text-red-500 hover:bg-red-50 rounded-lg -mx-2 px-2">
-                                <span class="font-medium">탈퇴하기</span>
                                 <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                             </a>
                         </li>
@@ -181,6 +174,8 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
+        const fastapiUrl = "https://bapick.duckdns.org"
+
         const overlay = document.getElementById('overlay');
         const logoutBtn = document.getElementById('logout-btn');
         const logoutModal = document.getElementById('logout-modal');
@@ -212,7 +207,7 @@
                 const idToken = await user.getIdToken();
 
                 const fields = ['nickname', 'profileImage'];
-                const res = await fetch(`/api/users/me?fields=${fields.join(',')}`, {
+                const res = await fetch(`${fastapiUrl}/api/users/me?fields=${fields.join(',')}`, {
                     headers: {
                         'Authorization': `Bearer ${idToken}`
                     }

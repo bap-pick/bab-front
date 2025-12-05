@@ -180,6 +180,8 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
+        const fastapiUrl = "https://bapick.duckdns.org"
+
         let currentUser = null;
         const NO_IMAGE_URL = 'Untitled.png'; // 스크랩된 식당은 있으나 식당 이미지가 없을 때
         const EMPTY_COLLECTION_IMAGE = 'no_scraps.png'; // 스크랩이 0개일 때 (컬렉션을 채워주세요)
@@ -228,7 +230,7 @@
         // 모든 스크랩 정보 조회
         async function fetchLatestScrapInfo(idToken) {
             try {
-                const response = await fetch(`/api/scraps/me`, {
+                const response = await fetch(`${fastapiUrl}/api/scraps/me`, {
                     method: 'GET',
                     headers: { 'Authorization': `Bearer ${idToken}` }
                 });
@@ -289,7 +291,7 @@
                 };
 
                 // 3. 일반 컬렉션 목록 API 호출
-                const collectionsResponse = await fetch(`/api/scraps/collections/me`, {
+                const collectionsResponse = await fetch(`${fastapiUrl}/api/scraps/collections/me`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${idToken}`,
@@ -406,7 +408,7 @@
 
             try {
                 const token = await currentUser.getIdToken();
-                const response = await fetch(`/api/scraps/collections`, {
+                const response = await fetch(`${fastapiUrl}/api/scraps/collections`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

@@ -76,6 +76,8 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
+        const fastapiUrl = "https://bapick.duckdns.org"
+
         // fastapi 서버 url
         //const FASTAPI_BASE_URL = "https://bab-back.onrender.com"; 
         const FASTAPI_BASE_URL = 'http://127.0.0.1:8000'; // 로컬 테스트용
@@ -118,7 +120,7 @@
                 const idToken = await user.getIdToken();
 
                 const fields = ['nickname', 'profileImage'];
-                const res = await fetch(`/api/users/me?fields=${fields.join(',')}`, {
+                const res = await fetch(`${fastapiUrl}/api/users/me?fields=${fields.join(',')}`, {
                     headers: {
                         'Authorization': `Bearer ${idToken}`
                     }
@@ -172,7 +174,7 @@
                     });
 
                     // Pre-signed URL 요청
-                    const presignRes = await fetch(`/api/users/generate-presigned-url`, {
+                    const presignRes = await fetch(`${fastapiUrl}/api/users/generate-presigned-url`, {
                         method: 'POST',
                         headers: { 'Authorization': `Bearer ${idToken}` },
                         body: new URLSearchParams({
@@ -199,7 +201,7 @@
                 if (newNickname) patchData.append('nickname', newNickname);
                 if (profile_image_s3_key) patchData.append('profile_image_s3_key', profile_image_s3_key);
 
-                const patchRes = await fetch(`/api/users/me`, {
+                const patchRes = await fetch(`${fastapiUrl}/api/users/me`, {
                     method: 'PATCH',
                     headers: { 'Authorization': `Bearer ${idToken}` },
                     body: patchData
