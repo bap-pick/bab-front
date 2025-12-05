@@ -426,7 +426,7 @@
 
         // 오행 분석 및 추천 메시지 가져오는 함수
         async function fetchRecommendation(idToken) {
-            const res = await fetch(`${fastapiUrl}api/saju/analyze`, {
+            const res = await fetch(`${fastapiUrl}/api/saju/analyze`, {
                 headers: { 'Authorization': `Bearer ${idToken}` }
             });
 
@@ -527,7 +527,7 @@
                     lon = pos.coords.longitude;
                 }
 
-                const response = await fetch(`${fastapiUrl}api/restaurants/nearby?lat=${lat}&lon=${lon}&limit=5`, {
+                const response = await fetch(`${fastapiUrl}/api/restaurants/nearby?lat=${lat}&lon=${lon}&limit=5`, {
                     method: 'GET',
                     headers: { 'Authorization': `Bearer ${idToken}` },
                 });
@@ -583,7 +583,7 @@
             try {
                 const sajuFields = ['ohengWood', 'ohengFire', 'ohengEarth', 'ohengMetal', 'ohengWater'];
                 const fields = ['nickname', 'birthDate', 'profileImage', ...sajuFields];
-                const res = await fetch(`${fastapiUrl}api/users/me?fields=${fields.join(',')}`, {
+                const res = await fetch(`${fastapiUrl}/api/users/me?fields=${fields.join(',')}`, {
                     headers: { 'Authorization': `Bearer ${idToken}` }
                 });
 
