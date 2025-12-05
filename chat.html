@@ -213,13 +213,7 @@
 
         <main class="chat-area"></main> 
 
-        <div class="input-area">
-            <button id="openFortuneBtn" class="icon-button">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                </svg>
-            </button>
-            
+        <div class="input-area">            
             <div class="input-container">
                 <input type="text" id="messageInput" placeholder="메시지를 입력하세요..." onclick="this.focus()">
                 <button id="sendButton" class="send-button">
@@ -228,33 +222,8 @@
                     </svg>
                 </button>
             </div>
-
-            <div id="fortuneCookieModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden transition-opacity duration-300">
-    <div id="fortuneModalContent" class="bg-white rounded-lg shadow-xl p-6 w-11/12 max-w-sm relative transform transition-all duration-300 scale-95 opacity-0">
-        
-        <button id="closeFortuneCookie" class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 text-2xl font-bold">
-            &times;
-        </button>
-
-        <h3 class="text-center text-xl font-bold mb-4 text-gray-800">운명의 포춘 쿠키</h3>
-
-        <div id="closedCookieSection" class="flex flex-col items-center">
-            <img src="close fortune cookie.png" alt="닫힌 포춘 쿠키" class="w-40 h-40 mb-6 animate-pulse">
-            <button id="openCookieBtn" class="bg-gradient-to-r from-orange-400 to-red-500 text-white font-semibold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-200">
-                열어보기
-            </button>
-        </div>
-
-        <div id="openedCookieSection" class="hidden flex flex-col items-center text-center">
-            <img src="open fortune cookie.png" alt="열린 포춘 쿠키" class="w-40 h-40 mb-4 animate-fadeIn">
-            <p id="fortuneMessage" class="text-lg font-semibold text-gray-700 mb-6 leading-relaxed"></p>
-            <button id="confirmCookieBtn" class="bg-gray-200 text-gray-800 font-semibold py-2 px-6 rounded-full hover:bg-gray-300 transition duration-200">
-                확인
-            </button>
         </div>
     </div>
-</div>
-        </div>
     <script type="module">
     // Firebase SDK import 
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
@@ -265,10 +234,6 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     
-    // FastAPI 서버 URL
-    const FASTAPI_BASE_URL = 'http://127.0.0.1:8000'; // 로컬 테스트용
-    //const FASTAPI_BASE_URL = "https://bab-back.onrender.com"; 
-    
     // JSON 응답 
     marked.setOptions({ breaks: true, gfm: true});
 
@@ -278,18 +243,9 @@
     let currentRoomId = null;
     let isCreatingRoom = false;
     let currentChatroomIsGroup = false;
-    const fortuneCookieModal = document.getElementById('fortuneCookieModal'); 
-    const openCookieBtnInModal = document.getElementById('openCookieBtn'); 
-    const closedCookieSection = document.getElementById('closedCookieSection');
-    const openedCookieSection = document.getElementById('openedCookieSection');
-    const fortuneMessage = document.getElementById('fortuneMessage');
-    const closeFortuneCookieBtn = document.getElementById('closeFortuneCookie');
-    const confirmCookieBtn = document.getElementById('confirmCookieBtn');
-    const modalContent = document.getElementById('fortuneModalContent');
     const defaultProfileImg = "https://bit.ly/3K2rlSh"; // 프로필 이미지를 설정하지 않은 경우
     let chatbotProfileImg = 'logo_bapick copy.png'; 
-    const greetingMessage = "안녕! 나는 오늘의 운세로 너에게 행운의 맛집을 골라주는 밥풀이야🍀 지금 너한테 딱 맞는 메뉴 추천해줄까?"; 
-
+    const greetingMessage = "안녕! 나는 오늘의 운세에 맞춰 행운의 맛집을 추천해주는 밥풀이야🍀 지금 너한테 딱 맞는 메뉴 추천해줄까?"; 
     let websocket = null;
     let isWebSocketConnected = false;
 
@@ -335,84 +291,6 @@
             }
         });
     }
-
-    /* =========================================================
- * 포춘 쿠키 (Fortune Cookie) 로직
- * ======================================================= */
-
-    const fortunes = [
-    "오늘은 매운 음식을 먹어야 운이 풀려요! 새로운 곳을 탐험하세요.",
-    "뜻밖의 행운이 찾아옵니다. 가장 친한 친구에게 연락해 보세요.",
-    "오랜만에 만나는 친구와 즐거운 식사를 하세요. 행운이 따를 거예요.",
-    "오늘은 달콤한 디저트가 행운을 가져다줍니다. 새로운 카페를 방문해 보세요.",
-    "새로운 도전을 두려워하지 마세요. 용기가 큰 보상으로 돌아올 거예요.",
-    "스트레스는 금물! 오늘은 편안한 식사를 하며 휴식을 취하세요.",
-    "오늘은 따뜻한 한 끼가 운을 부릅니다. 마음 가는 음식을 선택해 보세요.",
-    "가볍게 즐기는 식사가 오늘 하루를 부드럽게 풀어 줄 거예요.",
-    "배를 너무 빵빵하게 채우기보다, 기분 좋아질 만큼만 먹으면 행운이 따를 거예요.",
-    "느긋하게 천천히 씹어 먹으면 답답했던 마음이 조금씩 풀릴 거예요.",
-    "좋아하는 음식을 한 번쯤 허용해 주세요. 작은 행복이 큰 운을 부릅니다.",
-    "혼자 먹더라도 식탁을 예쁘게 차리면, 예상 못 한 좋은 소식이 찾아올 거예요.",
-    "오늘 첫 끼를 즐겁게 먹으면 남은 하루의 흐름도 밝아집니다.",
-    "배고픔을 오래 참지 말고 제때 챙겨 먹으면 생각지 못한 도움이 들어올 거예요.",
-    "간단한 간식 하나가 지친 마음을 다독여 줄 거예요. 스스로를 조금은 챙겨 주세요.",
-    "당이 살짝 떨어졌다면, 달콤한 한 입이 마음의 여유와 함께 행운도 데려올 거예요.",
-    "오늘은 식사 시간만큼은 휴식 시간으로 정해 보세요. 그 여유가 좋은 인연을 불러옵니다.",
-    "익숙한 맛의 식사가 불안한 마음을 안정시켜 줄 거예요. 편안한 메뉴를 골라 보세요.",
-    "식사할 때 휴대폰을 잠시 내려두면, 머릿속이 맑아지고 좋은 아이디어가 떠오를 거예요.",
-    "누군가와 음식을 나누어 먹으면, 그만큼 기쁨과 운도 나누어 돌아올 거예요.",
-    "오늘 한 끼는 스스로를 응원하는 식사로 준비해 보세요. 자신감이 행운을 끌어당깁니다.",
-    "물을 자주 마시며 식사 리듬을 맞추면 몸도 마음도 가벼워지고 일이 수월해질 거예요.",
-    "식사 전에 오늘 잘 되고 싶은 일을 한 번 떠올리면, 그 에너지가 음식과 함께 스며들 거예요.",
-    "배부름보다 ‘만족감’을 기준으로 식사를 마치면, 마음이 한결 단단해질 거예요.",
-    "조용한 곳에서 차분히 먹는 한 끼가 흐트러진 운을 정리해 줄 거예요.",
-    "오늘 마지막 한 입까지 감사한 마음으로 먹으면, 내일 맞이할 행운의 크기가 커집니다.",
-];
-
-    function closeFortuneModal() {
-    if (fortuneCookieModal) {
-        modalContent.classList.remove('scale-100', 'opacity-100');
-        modalContent.classList.add('scale-95', 'opacity-0');
-        fortuneCookieModal.classList.remove('opacity-100');
-        
-        setTimeout(() => {
-            fortuneCookieModal.classList.add('hidden');
-            if (closedCookieSection && openedCookieSection) {
-                closedCookieSection.classList.remove('hidden');
-                openedCookieSection.classList.add('hidden');
-                if (openCookieBtnInModal) openCookieBtnInModal.disabled = false; 
-            }
-            if (fortuneMessage) fortuneMessage.textContent = '';
-        }, 300); // 애니메이션 시간
-    }
-}
-
-    function openFortuneModal() {
-    if (fortuneCookieModal) {
-        fortuneCookieModal.classList.remove('hidden');
-        setTimeout(() => {
-            fortuneCookieModal.classList.add('opacity-100');
-            modalContent.classList.remove('scale-95', 'opacity-0');
-            modalContent.classList.add('scale-100', 'opacity-100');
-        }, 10);
-    }
-}
-
-    function handleOpenCookie() {
-    if (!openCookieBtnInModal || !fortuneMessage) return;
-
-    openCookieBtnInModal.disabled = true;
-    
-    // 랜덤으로 메시지 선택 및 렌더링
-    const randomIndex = Math.floor(Math.random() * fortunes.length);
-    let messageText = fortunes[randomIndex];
-    
-    // *친구닉네임* 부분을 강조
-    fortuneMessage.innerHTML = messageText.replace(/\*(.*?)\*/g, '<span class="text-blue-600 font-bold">@$1</span>'); 
-    
-    closedCookieSection.classList.add('hidden');
-    openedCookieSection.classList.remove('hidden');
-}
 
     /* =========================================================
     * DOM 생성 및 렌더링 함수
@@ -629,6 +507,10 @@
             msg.message_type  === 'restaurant_cards' ||
             (msg.role === 'assistant' && msg.content && msg.content.trim().startsWith('{"restaurants":'));
 
+        if (msg.message_type === "hidden_initial") {
+            return;
+        }
+                
         if (msg.message_type === 'location_select') {
             isExpectingAddress = true; 
 
@@ -667,14 +549,23 @@
     /* =========================================================
     * WebSocket
     * ======================================================= */
+    let WS_URL = null;
+    
+    async function loadConfig() {
+        const response = await fetch('/api/ws-config');
+        const config = await response.json();
+        WS_URL = config.wsUrl;
+    }
+
     // WebSocket 연결 생성 및 이벤트 핸들러 등록
-    function connectWebSocket(roomId, token) {
+    async function connectWebSocket(roomId, token) {
+        if (!WS_URL) await loadConfig();
+        
         if (websocket) {
             websocket.close();
         }
 
-        const wsUrl = FASTAPI_BASE_URL.replace('http://', 'ws://').replace('https://', 'wss://');
-        websocket = new WebSocket(`${wsUrl}/chat/ws/${roomId}?token=${token}`);
+        websocket = new WebSocket(`${WS_URL}/chat/ws/${roomId}?token=${token}`);
 
         websocket.onopen = () => {
             console.log('WebSocket 연결됨');
@@ -757,7 +648,7 @@
         let success = false;
         
         try {
-            const res = await fetch(`${FASTAPI_BASE_URL}/chat/create`, {
+            const res = await fetch(`/api/chat/create`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -783,6 +674,7 @@
 
             success = true;
             
+            return data;
         } catch (err) {
             handleApiError(err, loadingDiv, chatArea, "채팅방 생성 중 오류");
         } finally {
@@ -807,7 +699,7 @@
         messageInput.disabled = true;
 
         try {
-            const res = await fetch(`${FASTAPI_BASE_URL}/chat/messages/${roomId}`, {
+            const res = await fetch(`/api/chat/messages/${roomId}`, {
                 headers: { "Authorization": `Bearer ${idToken}` }
             });
 
@@ -842,46 +734,12 @@
         }
     }
 
-
-    // 로그인 상태 확인
-    onAuthStateChanged(auth, async (user) => {
-        if (!user) {
-            window.location.href = 'index.html';
-            return;
-        }
-        // 토큰 새로 갱신
-        idToken = await user.getIdToken(true);
-        currentUserUid = user.uid;
-        // 🔥 기존 roomId 사용 여부 확인
-        if (!currentRoomId) {
-            currentRoomId = localStorage.getItem("roomId");
-        }
-
-        if (!currentRoomId) {
-            // 새 방 만들기
-            const created = await createChatRoom();
-            currentRoomId = created.chatroom_id;
-
-            // 🔥 앞으로 새로고침해도 이 방 유지
-            localStorage.setItem("roomId", created.chatroom_id);
-
-        } else {
-            // 기존 방 로드
-            await loadMessages(currentRoomId, chatArea);
-        }
-
-        // 웹소켓 연결
-        connectWebSocket(currentRoomId, idToken);
-        
-
-    });
-    
-    // 채팅방 입장 시 초기 추천 메시지 렌더링
+    // 채팅방 입장 시 인사 메시지 렌더링
     async function renderInitialMessage(roomId, container) {
         if (!idToken || !roomId) return;
         
         try {
-            const res = await fetch(`${FASTAPI_BASE_URL}/chat/messages/${roomId}`, {
+            const res = await fetch(`/api/chat/messages/${roomId}`, {
                 headers: { "Authorization": `Bearer ${idToken}` }
             });
 
@@ -1083,30 +941,6 @@
         }
     });
 
-// [+] 버튼 (ID: openFortuneBtn) 클릭 시 모달 열기
-    const openFortuneBtn = document.getElementById('openFortuneBtn');
-    if (openFortuneBtn) {
-    openFortuneBtn.addEventListener('click', (event) => {
-        event.preventDefault(); 
-        openFortuneModal();
-    });
-}
-
-// 모달 내부 버튼 연결
-    if (openCookieBtnInModal) openCookieBtnInModal.addEventListener('click', handleOpenCookie);
-    if (closeFortuneCookieBtn) closeFortuneCookieBtn.addEventListener('click', closeFortuneModal);
-    if (confirmCookieBtn) confirmCookieBtn.addEventListener('click', closeFortuneModal);
-
-// 모달 외부 (배경) 클릭 시 닫기
-    if (fortuneCookieModal) {
-    fortuneCookieModal.addEventListener('click', (e) => {
-        if (e.target.id === 'fortuneCookieModal') {
-            closeFortuneModal();
-        }
-    });
-}
-
-
     window.addEventListener('beforeunload', () => {
         if (websocket) {
             websocket.close();
@@ -1116,8 +950,9 @@
     /* =========================================================
     * 위치 관련 유틸리티 및 상태
     * ======================================================= */
-    let isExpectingAddress = false; // 사용자의 다음 메시지가 주소인지 여부 (메뉴 선택 후 주소 입력을 기대하는 상태)
     let kakaoPlaces = null;
+    // 사용자의 다음 메시지가 주소인지 여부 (메뉴 선택 후 주소 입력을 기대하는 상태)
+    let isExpectingAddress = false; 
 
     // Kakao Places 초기화 함수
     function initializeKakaoPlaces() {
@@ -1163,6 +998,7 @@
     /* =========================================================
     * 로그인 상태 확인 및 초기화
     * ======================================================= */
+    
     onAuthStateChanged(auth, async (user) => {
         if (!user) {
             window.location.href = 'index.html';

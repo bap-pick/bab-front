@@ -324,8 +324,6 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        const FASTAPI_BASE_URL = 'http://127.0.0.1:8000'; // 로컬 테스트용
-
         let currentUser = null; 
         let searchTimer = null;
         let currentDate = new Date();
@@ -434,7 +432,7 @@
         const loadReservations = async (date) => {
             if (!date || !currentUser) return [];
             const dateString = formatDateToYYYYMMDD(date);
-            const url = `${FASTAPI_BASE_URL}/reservations?target_date=${dateString}`;
+            const url = `/api/reservations?target_date=${dateString}`;
 
             try {
                 const idToken = await currentUser.getIdToken();
@@ -464,8 +462,8 @@
         const createOrUpdateReservation = async (reservationData, reservationId = null) => {
             const isUpdate = reservationId !== null;
             const url = isUpdate 
-                ? `${FASTAPI_BASE_URL}/reservations/${reservationId}` 
-                : `${FASTAPI_BASE_URL}/reservations`;
+                ? `/api/reservations/${reservationId}` 
+                : `/api/reservations/create`;
             const method = isUpdate ? 'PUT' : 'POST';
             
             try {
@@ -496,7 +494,7 @@
         // 예약 삭제 API 호출
         const deleteReservationApi = async (reservationId) => {
             const token = await currentUser.getIdToken(); 
-            const url = `${FASTAPI_BASE_URL}/reservations/${reservationId}`;
+            const url = `/api/reservations/${reservationId}`;
             try {
                 const response = await fetch(url, {
                     method: 'DELETE',
@@ -534,7 +532,7 @@
 
             try {
                 const token = await currentUser.getIdToken(); 
-                const url = `${FASTAPI_BASE_URL}/restaurants/search?keyword=${encodeURIComponent(keyword)}`;
+                const url = `/api/restaurants/search?keyword=${encodeURIComponent(keyword)}`;
                 
                 const response = await fetch(url, {
                     method: 'GET',

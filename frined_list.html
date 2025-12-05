@@ -3,16 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>친구 검색 및 목록</title>
-    
-    <meta http-equiv="Content-Security-Policy" content="
-        default-src 'self' http://localhost:8000; 
-        script-src 'self' https://cdn.tailwindcss.com https://www.gstatic.com 'unsafe-inline' 'unsafe-eval'; 
-        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; 
-        font-src 'self' https://fonts.gstatic.com; 
-        connect-src 'self' http://localhost:8000;
-    ">
-    
+    <title>밥픽 - 친구 목록</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -26,7 +17,7 @@
             <a href="mypage.index.html" class="text-gray-600 hover:text-gray-900">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 19l-7-7 7-7"/></svg>
             </a>
-            <h1 class="text-xl font-bold ml-4 text-gray-800">친구 검색 및 목록</h1>
+            <h1 class="text-xl font-bold ml-4 text-gray-800">친구 목록</h1>
         </div>
     </header>
 
@@ -62,9 +53,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
     import { firebaseConfig } from "./firebase-config.js";
-
-    // 백엔드 API의 기본 URL을 설정하세요.
-    const BASE_URL = 'http://localhost:8000'; 
     
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -117,7 +105,7 @@
         friendListContainer.innerHTML = `<p class="text-center text-indigo-500 mt-10">친구 목록을 불러오는 중입니다...</p>`;
 
         try {
-            const response = await fetch(`${BASE_URL}/friends/list`, {
+            const response = await fetch(`/api/friends/list`, {
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${idToken}` },
             });
@@ -192,7 +180,7 @@
 
         try {
             const encodedQuery = encodeURIComponent(query.trim()); 
-            const response = await fetch(`${BASE_URL}/friends/search?query=${encodedQuery}`, {
+            const response = await fetch(`/api/friends/search?query=${encodedQuery}`, {
                 method: 'GET',
                 headers: { 'Authorization': `Bearer ${idToken}` },
             });
@@ -227,38 +215,36 @@
     }
     
     // =========================================================
-    // 4. API: 친구 요청 보내기 (POST /friends/request)
+    // 4. API: 친구 삭제 (DELETE /friends/{target_user_uid})
     // =========================================================
-    async function sendFriendRequest(targetUid) {
-        if (!idToken) {
-            alert("로그인 세션이 유효하지 않습니다.");
+    async function deleteFriend(targetUid) {
+        if (!idToken) return false;
+
+        if (!confirm('정말로 이 친구를 삭제하시겠습니까?')) {
             return false;
         }
 
         try {
-            const response = await fetch(`${BASE_URL}/friends/request`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${idToken}`,
-                },
-                body: JSON.stringify({ to_user: targetUid }),
+            const response = await fetch(`/api/friends/${targetUid}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${idToken}` },
             });
-
-            if (response.status === 200) {
-                alert('친구 요청을 보냈습니다.');
-                return true;
-            } else if (response.status === 409) {
-                 alert('이미 요청을 보냈거나 친구입니다.');
-                 return false;
-            } else {
-                const errorData = await response.json();
-                throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+            
+            if (response.status === 404) {
+                alert("친구 관계를 찾을 수 없습니다. (이미 삭제되었거나 잘못된 요청)");
+                return true; // 목록에서는 삭제되어야 하므로 성공으로 간주
+            }
+            
+            if (response.status !== 204) { // 204 No Content
+                throw new Error(`친구 삭제 실패: ${response.status}`);
             }
 
+            alert("친구가 삭제되었습니다.");
+            return true;
+
         } catch (error) {
-            console.error("친구 요청 중 오류 발생:", error);
-            alert(`친구 요청 실패: ${error.message}`);
+            console.error("친구 삭제 중 오류 발생:", error);
+            alert(`친구 삭제 실패: ${error.message}`);
             return false;
         }
     }
@@ -266,6 +252,7 @@
     // =========================================================
     // 5. 공통 UI 컴포넌트: 친구 카드 생성
     // =========================================================
+    const defaultProfileImg = "https://bit.ly/3K2rlSh";
 
     function createFriendCard(user, status) {
         const card = document.createElement('div');
@@ -273,35 +260,15 @@
         
         card.innerHTML = `
             <div class="flex items-center">
-                <img class="h-12 w-12 rounded-full object-cover" 
-                     src="${user.profile_image || 'https://via.placeholder.com/128'}" alt="Profile">
+                <img class="h-12 w-12 rounded-full object-cover" src="${user.profile_image || defaultProfileImg}" alt="Profile">
                 <span class="ml-4 font-semibold text-gray-800">${user.nickname || '이름 없음'}</span>
             </div>
-            ${getActionButtonHtml(user, status)}
+            <button data-target-uid="JbNBZckFroXbOpTsUWxIxBRMB2s1" class="delete-friend-btn px-3 py-1 text-sm text-red-600 border border-red-600 rounded-full hover:bg-red-50 transition duration-150">
+                친구 삭제
+            </button>
         `;
         return card;
     }
-
-    // 상태에 따른 버튼 HTML 생성
-    function getActionButtonHtml(user, status) {
-        switch (status) {
-            case 'friend':
-                return `<span class="text-sm font-medium text-green-600">친구</span>`;
-            case 'sent_request':
-                return `<span class="text-sm font-medium text-yellow-600">요청 보냄</span>`;
-            case 'received_request':
-                return `<span class="text-sm font-medium text-blue-600">요청 받음</span>`; 
-            case 'none':
-            default:
-                // 친구 요청 버튼
-                return `<button 
-                            data-target-uid="${user.firebase_uid}" 
-                            class="add-friend-btn px-3 py-1 text-sm text-white bg-indigo-500 rounded-full hover:bg-indigo-600 transition duration-150">
-                            친구 요청
-                        </button>`;
-        }
-    }
-
 
     // =========================================================
     // 6. 이벤트 리스너
@@ -328,16 +295,17 @@
         }
     });
 
-    // 친구 요청 버튼 클릭 이벤트 위임 (검색 결과 컨테이너에서 발생)
-    searchResultsContainer.addEventListener('click', async (e) => {
-        if (e.target.classList.contains('add-friend-btn')) {
+    // 친구 요청 버튼 클릭 이벤트 위임
+    friendListContainer.addEventListener('click', async (e) => {
+        if (e.target.classList.contains('delete-friend-btn')) {
             const targetUid = e.target.dataset.targetUid;
             
-            const success = await sendFriendRequest(targetUid);
+            const success = await deleteFriend(targetUid);
             
             if (success) {
-                // 요청 성공 시, 검색 결과를 새로고침하여 버튼 상태를 '요청 보냄'으로 변경
-                fetchSearchResults(searchInput.value); 
+                // 삭제 성공 시, 친구 목록을 새로고침하고 현재 필터링 상태 유지
+                await fetchFriendList(); 
+                // fetchFriendList 안에서 filterFriendList()를 호출하므로 별도로 호출할 필요 없음.
             }
         }
     });

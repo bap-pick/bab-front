@@ -250,9 +250,6 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // API URL 설정 (로컬 테스트용)
-        const FASTAPI_BASE_URL = 'http://127.0.0.1:8000';
-
         // UI 요소
         const overlay = document.getElementById('overlay');
         const addChatBtn = document.getElementById('add-chat-btn');
@@ -367,7 +364,7 @@
             try {
                 const token = await currentUser.getIdToken();
 
-                const res = await fetch(`${FASTAPI_BASE_URL}/friends/search?query=${encodeURIComponent(query)}`, {
+                const res = await fetch(`/api/friends/search?query=${encodeURIComponent(query)}`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -411,7 +408,7 @@
                 const token = await currentUser.getIdToken();
 
                 // POST /friends/request (친구 요청 API) 호출
-                const res = await fetch(`${FASTAPI_BASE_URL}/friends/request`, { 
+                const res = await fetch(`/api/friends/request`, { 
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -481,7 +478,7 @@
 
             try {
                 const token = await currentUser.getIdToken();
-                const res = await fetch(`${FASTAPI_BASE_URL}/friends/requests`, {
+                const res = await fetch(`/api/friends/requests`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -520,7 +517,7 @@
             if (!currentUser) return;
             try {
                 const token = await currentUser.getIdToken();
-                const res = await fetch(`${FASTAPI_BASE_URL}/friends/handle`, {
+                const res = await fetch(`/api/friends/handle`, {
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -645,10 +642,7 @@
             try {
                 const token = await currentUser.getIdToken();
 
-                const url = new URL(`${FASTAPI_BASE_URL}/chat/list`);
-                url.searchParams.append('is_group', isGroup);
-
-                const response = await fetch(url.toString(), {
+                const response = await fetch(`/api/chat/list?is_group=${isGroup}`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -864,7 +858,7 @@
             try {
                 const token = await currentUser.getIdToken();
 
-                const response = await fetch(`${FASTAPI_BASE_URL}/chat/${roomId}`, {
+                const response = await fetch(`/api/chat/${roomId}`, {
                     method: 'DELETE',
                     headers: {
                         'Authorization': `Bearer ${token}`,
