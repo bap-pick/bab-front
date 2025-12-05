@@ -434,7 +434,7 @@
         const loadReservations = async (date) => {
             if (!date || !currentUser) return [];
             const dateString = formatDateToYYYYMMDD(date);
-            const url = `${fastapiUrl}/api/reservations?target_date=${dateString}`;
+            const url = `${fastapiUrl}/api/reservations/?target_date=${dateString}`;
 
             try {
                 const idToken = await currentUser.getIdToken();
