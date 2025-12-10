@@ -104,8 +104,6 @@
     async function fetchFriendList() {
         if (!idToken) return;
 
-        friendListContainer.innerHTML = `<p class="text-center text-indigo-500 mt-10">친구 목록을 불러오는 중입니다...</p>`;
-
         try {
             const response = await fetch(`${fastapiUrl}/api/friends/list`, {
                 method: 'GET',
