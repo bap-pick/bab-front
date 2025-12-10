@@ -234,8 +234,9 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    const fastapiUrl = "https://bapick.duckdns.org"
-    
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const fastapiUrl = isLocal ? "http://127.0.0.1:8000" : "https://bapick.duckdns.org";
+
     // JSON 응답 
     marked.setOptions({ breaks: true, gfm: true});
 
@@ -554,9 +555,19 @@
     let WS_URL = null;
     
     async function loadConfig() {
-        const response = await fetch('/api/ws-config');
-        const config = await response.json();
-        WS_URL = config.wsUrl;
+        if (isLocal) {
+            WS_URL = 'ws://127.0.0.1:8000';
+            return;
+        }
+        
+        try {
+            const response = await fetch('/api/ws-config');
+            const config = await response.json();
+            WS_URL = config.wsUrl;
+        } catch (error) {
+            console.error('Failed to load WebSocket config, using fallback');
+            WS_URL = 'wss://bapick.duckdns.org';
+        }
     }
 
     // WebSocket 연결 생성 및 이벤트 핸들러 등록
@@ -678,7 +689,7 @@
             
             return data;
         } catch (err) {
-            handleApiError(err, loadingDiv, chatArea, "채팅방 생성 중 오류");
+            handleApiError(err, null, chatArea, "채팅방 생성 중 오류");
         } finally {
             isCreatingRoom = false;
             sendButton.disabled = false;
