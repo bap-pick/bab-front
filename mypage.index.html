@@ -50,10 +50,10 @@
             <div class="w-full">
                 <section class="bg-white flex items-center p-5 border-b-8 border-gray-100">
                     <div class="w-16 h-16 rounded-full mr-4 flex-shrink-0 overflow-hidden bg-gray-200">
-                        <img id="user-display-profile-image" class="w-full h-full object-cover" src="" alt="프로필 이미지">
+                        <img id="user-display-profile-image" class="w-full h-full object-cover" src="https://bapick-s3-bucket.s3.ap-northeast-2.amazonaws.com/default/default_profile.png" alt="프로필 사진">
                     </div>
                     <div class="flex-1">
-                        <a href="editmypage.index.html" class="text-lg font-bold text-gray-800 flex items-center">
+                        <a href="profile_edit.html" class="text-lg font-bold text-gray-800 flex items-center">
                             <span id="user-display-name"></span>
                             <svg class="w-5 h-5 ml-1 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                         </a>
@@ -148,7 +148,6 @@
     <script type="module">
         // Firebase SDK import 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-        // ▼▼▼ [수정] signOut 함수를 import 목록에 추가합니다. ▼▼▼
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
         import { firebaseConfig } from "./firebase-config.js";
         
@@ -200,7 +199,7 @@
 
                 // UI 업데이트
                 userDisplayName.textContent = `${data.nickname}님`;
-                userDisplayProfileImage.src = data.profileImage || 'https://bit.ly/3VZpUGD';
+                userDisplayProfileImage.src = data.profileImage;
 
             } catch (err) {
                 console.error('마이페이지 유저 정보 로드 실패:', err);
@@ -243,11 +242,6 @@
         // 로그아웃 버튼 클릭 시 모달 열기
         logoutBtn.addEventListener('click', (e) => { e.preventDefault(); logoutModal.classList.remove('hidden'); overlay.classList.remove('hidden'); });
         cancelLogoutBtn.addEventListener('click', () => { logoutModal.classList.add('hidden'); overlay.classList.add('hidden'); });
-        
-        // 탈퇴하기 버튼 클릭 시 모달 열기
-        withdrawBtn.addEventListener('click', (e) => { e.preventDefault(); withdrawalModal.classList.remove('hidden'); overlay.classList.remove('hidden'); });
-        cancelWithdrawBtn.addEventListener('click', () => { withdrawalModal.classList.add('hidden'); overlay.classList.add('hidden'); });
-
     </script>
 </body>
 </html>
