@@ -652,11 +652,15 @@
             try {
                 const analysisData = await fetchRecommendation(idToken);
 
-                const type = analysisData.user_type;
-                const headline = `"${analysisData.recommendation_headline}"`;
+                const headline = analysisData.recommendation_headline;
                 const advice = analysisData.recommendation_advice;
 
-                recommendationTypeEl.textContent = type;
+                const today = new Date();
+                const month = (today.getMonth() + 1).toString().padStart(2, '0');
+                const day = today.getDate().toString().padStart(2, '0');
+                const customTitle = `${month}/${day} 오늘의 운세`;
+
+                recommendationTypeEl.textContent = customTitle;
                 recommendationHeadlineEl.textContent = headline;
                 recommendationAdviceEl.textContent = advice;
 
