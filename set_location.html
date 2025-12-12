@@ -21,6 +21,11 @@
 </head>
 <body class="flex flex-col h-screen">
 
+    <div id="custom-toast"
+        class="fixed top-5 left-1/2 transform -translate-x-1/2 px-6 py-3 bg-gray-800 text-white text-sm font-medium rounded-lg shadow-lg z-50 transition-opacity duration-300 opacity-0 pointer-events-none">
+        알림 메시지
+    </div>
+    
     <header class="grid grid-cols-3 items-center bg-white p-4 shadow-md z-10">
         <div class="justify-self-start">
             <a href="javascript:history.back()" class="text-gray-600 hover:bg-gray-100 rounded-full">
@@ -28,7 +33,6 @@
             </a>
         </div>
         <div class="justify-self-center text-lg font-bold">위치 설정</div>
-        <!-- 현재 위치 불러오기 -->
         <div class="justify-self-end">
             <button id="gps-btn" class="p-2 text-orange-600 hover:bg-orange-50 rounded-full" title="현재 위치로 설정">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-crosshair"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg>
@@ -56,8 +60,26 @@
     </div>
 
     <script>
+        // ✅ [추가] 커스텀 토스트 함수 정의
+        const customToast = document.getElementById('custom-toast');
+        const toastDuration = 2500; 
+
+        function showCustomToast(message) {
+            if (!customToast) return;
+            customToast.textContent = message;
+            customToast.classList.remove('opacity-0', 'pointer-events-none');
+            customToast.classList.add('opacity-100');
+
+            setTimeout(() => {
+                customToast.classList.remove('opacity-100');
+                customToast.classList.add('opacity-0', 'pointer-events-none');
+            }, toastDuration);
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             const mapContainer = document.getElementById('map');
+            const saveButton = document.getElementById('save-location-btn'); // DOM 요소는 여기서 가져옵니다.
+            const gpsButton = document.getElementById('gps-btn');
             let map, marker;
             let currentLocationData = null; 
 
@@ -72,14 +94,15 @@
             }
 
             function onErrorGPS(error) {
-                alert("현재 위치를 가져올 수 없습니다. 기본 위치로 지도를 표시합니다.");
+                // alert("현재 위치를 가져올 수 없습니다. 기본 위치로 지도를 표시합니다."); // ❌ [삭제]
+                showCustomToast("현재 위치를 가져올 수 없습니다."); // ✅ [수정] 토스트로 변경
                 initializeMap(37.566826, 126.9786567);
             }
 
-            function initializeMap() {
+            function initializeMap(lat, lon) {
                 const savedLocationJson = localStorage.getItem('savedBapickLocation');
-                let initialLat = 37.566826; // 서울 시청
-                let initialLon = 126.978656;
+                let initialLat = lat || 37.566826; // 서울 시청
+                let initialLon = lon || 126.978656;
                 let initialZoom = 6; // 기본 줌 레벨
 
                 if (savedLocationJson) {
@@ -111,7 +134,8 @@
 
             // 현재 위치를 기준으로 설정하고, currentLocationData 업데이트
             async function setCurrentLocation() {
-                const saveButton = document.getElementById('save-location-btn');
+                saveButton.textContent = '위치 확인 중...'; // 버튼 텍스트 변경
+                saveButton.disabled = true;
 
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(
@@ -124,6 +148,9 @@
                             marker.setPosition(locPosition);
                             map.setLevel(3);
 
+                            let fullAddress = '주소 정보 없음';
+                            let locationName = '현재 위치';
+
                             // Reverse geocoding: 좌표와 가장 가까운 주소 반환(Nominatim API 사용)
                             try {
                                 const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=ko`);
@@ -133,34 +160,30 @@
                                 const data = await response.json();
                                 const address = data.address;
                             
-                                // 상세 주소
+                                // 주소 파싱 로직 (기존 로직 유지)
                                 const city = address.city || address.province || '';
-                                const city_district = address.city_district || address.county || ''; // 구/군
-                                const suburb = address.suburb || address.neighbourhood || address.village || ''; // 동/읍/면
-                                const road = address.road || ''; // 도로명
-                                const house_number = address.house_number || ''; // 건물 번호
+                                const city_district = address.city_district || address.county || '';
+                                const suburb = address.suburb || address.neighbourhood || address.village || '';
+                                const road = address.road || '';
+                                const house_number = address.house_number || '';
 
                                 let detailed_address_parts = [];
                                 
-                                // 시/구/동 (광역 단위)
                                 if (city) detailed_address_parts.push(city);
-                                if (city_district && city_district !== city) detailed_address_parts.push(city_district); // 구/군
-                                if (suburb && suburb !== city_district) detailed_address_parts.push(suburb); // 동/읍/면
+                                if (city_district && city_district !== city) detailed_address_parts.push(city_district);
+                                if (suburb && suburb !== city_district) detailed_address_parts.push(suburb);
 
-                                // 도로명 + 번지/건물번호
                                 let road_part = road;
                                 if (house_number) road_part += ` ${house_number}`;
                                 if (road_part) detailed_address_parts.push(road_part.trim());
 
-                                // 최종 주소와 이름 설정
                                 if (detailed_address_parts.length > 0) {
-                                    fullAddress = detailed_address_parts.join(' ');                                    
+                                    fullAddress = detailed_address_parts.join(' ');
                                     locationName = fullAddress; 
                                     
-                                    // gps 위치에 특정 건물/시설 이름이 있다면 사용
                                     const parts = data.display_name.split(', ');
                                     const primaryName = parts.length > 0 ? parts[0] : null; 
-                                    // primaryName가 주소(시/도, 도로명)와 중복되지 않은 경우에만 사용
+                                    
                                     if (primaryName && !primaryName.includes(city) && !primaryName.includes(road)) {
                                         locationName = primaryName;
                                     }
@@ -178,11 +201,15 @@
                                 lat: lat,
                                 lon: lon
                             };
+                            
+                            saveButton.textContent = '위치 저장';
+                            saveButton.disabled = false;
                         },
                         (error) => {
                             // GPS 실패 처리
                             console.error(`Geolocation error: ${error.code} - ${error.message}`);
-                            alert('GPS 현재 위치를 찾을 수 없습니다. (권한 거부 또는 오류)');
+                            // alert('GPS 현재 위치를 찾을 수 없습니다. (권한 거부 또는 오류)'); // ❌ [삭제]
+                            showCustomToast('GPS 현재 위치를 찾을 수 없습니다. (권한 거부 또는 오류)'); // ✅ [수정] 토스트로 변경
                             saveButton.textContent = '위치 저장';
                             saveButton.disabled = false;
                         },
@@ -193,7 +220,8 @@
                         }
                     );
                 } else {
-                    alert('이 브라우저는 GPS Geolocation 기능을 지원하지 않습니다.');
+                    // alert('이 브라우저는 GPS Geolocation 기능을 지원하지 않습니다.'); // ❌ [삭제]
+                    showCustomToast('이 브라우저는 GPS Geolocation 기능을 지원하지 않습니다.'); // ✅ [수정] 토스트로 변경
                     saveButton.textContent = '위치 저장';
                     saveButton.disabled = false;
                 }
@@ -202,7 +230,8 @@
             function searchPlaces() {
                 const keyword = document.getElementById('address-input').value;
                 if (!keyword.trim()) {
-                    alert('키워드를 입력해주세요.');
+                    // alert('키워드를 입력해주세요.'); // ❌ [삭제]
+                    showCustomToast('키워드를 입력해주세요.'); // ✅ [수정] 토스트로 변경
                     return;
                 }
 
@@ -223,10 +252,12 @@
                         };
                         
                     } else if (status === kakao.maps.services.Status.ZERO_RESULT) {
-                        alert('검색 결과가 존재하지 않습니다.');
+                        // alert('검색 결과가 존재하지 않습니다.'); // ❌ [삭제]
+                        showCustomToast('검색 결과가 존재하지 않습니다.'); // ✅ [수정] 토스트로 변경
                         currentLocationData = null;
                     } else {
-                        alert('검색 중 오류가 발생했습니다.');
+                        // alert('검색 중 오류가 발생했습니다.'); // ❌ [삭제]
+                        showCustomToast('검색 중 오류가 발생했습니다.'); // ✅ [수정] 토스트로 변경
                         currentLocationData = null;
                     }
                 });
@@ -235,7 +266,8 @@
             document.getElementById('save-location-btn').addEventListener('click', () => {
                 if (currentLocationData) {
                     localStorage.setItem('savedBapickLocation', JSON.stringify(currentLocationData));
-                    alert(`'${currentLocationData.name}' 위치가 저장되었습니다!`);
+                    // alert(`'${currentLocationData.name}' 위치가 저장되었습니다!`); // ❌ [삭제]
+                    showCustomToast(`'${currentLocationData.name}' 위치가 저장되었습니다!`); // ✅ [수정] 토스트로 변경
                     
                     // returnTo 쿼리 파라미터 확인 후 이동 경로 설정
                     const urlParams = new URLSearchParams(window.location.search);
@@ -250,7 +282,8 @@
                         window.location.href = 'home.html';
                     }
                 } else {
-                    alert('위치를 검색하거나, 우측 상단 GPS 버튼을 눌러 현재 위치를 설정해주세요.');
+                    // alert('위치를 검색하거나, 우측 상단 GPS 버튼을 눌러 현재 위치를 설정해주세요.'); // ❌ [삭제]
+                    showCustomToast('위치를 검색하거나, GPS 버튼을 눌러 위치를 설정해주세요.'); // ✅ [수정] 토스트로 변경
                 }
             });
 

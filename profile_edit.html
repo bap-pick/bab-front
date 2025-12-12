@@ -21,6 +21,11 @@
 </head>
 <body class="bg-white">
     
+    <div id="custom-toast"
+        class="fixed top-20 left-1/2 transform -translate-x-1/2 px-6 py-3 bg-gray-800 text-white text-sm font-medium rounded-lg shadow-lg z-50 transition-opacity duration-300 opacity-0 pointer-events-none">
+        알림 메시지
+    </div>
+    
     <div class="h-full flex flex-col">
         
         <header class="grid grid-cols-3 items-center p-4 border-b border-gray-200 flex-shrink-0">
@@ -56,15 +61,7 @@
             </div>
         </main>
         
-        <div id="message-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden">
-            <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm mx-auto">
-                <p id="message-text" class="text-center text-lg font-semibold text-gray-800"></p>
-                <div class="mt-4 flex justify-center">
-                    <button id="modal-btn" class="py-2 px-4 rounded-lg bg-[#FF7242] text-white hover:bg-[#E0653B]">확인</button>
-                </div>
-            </div>
         </div>
-    </div>
     
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
@@ -81,12 +78,26 @@
         const profileImagePreview = document.getElementById('profile-image-preview');
         const nicknameInput = document.getElementById('nickname');
         const saveProfileBtn = document.getElementById('save-profile-btn');
-        const messageModal = document.getElementById('message-modal');
-        const messageText = document.getElementById('message-text');
-        const closeBtn = document.getElementById('modal-btn');
+        // ❌ messageModal, messageText, closeBtn 변수는 삭제되었습니다.
 
+        // ✅ [추가] 토스트 관련 변수 정의
+        const customToast = document.getElementById('custom-toast');
+        const toastDuration = 2500; 
+        
         let currentUser = null;
         let selectedFile = null;
+        
+        // ✅ [추가] 커스텀 토스트 함수 정의 (기존 showMessage, closeModal 대체)
+        function showCustomToast(message) {
+            customToast.textContent = message;
+            customToast.classList.remove('opacity-0', 'pointer-events-none');
+            customToast.classList.add('opacity-100');
+
+            setTimeout(() => {
+                customToast.classList.remove('opacity-100');
+                customToast.classList.add('opacity-0', 'pointer-events-none');
+            }, toastDuration);
+        }
 
         // 로그인 확인
         onAuthStateChanged(auth, (user) => {
@@ -98,16 +109,8 @@
             }
         });
 
-        function showMessage(message) {
-            messageText.textContent = message;
-            messageModal.classList.remove('hidden');
-        }
-
-        function closeModal() {
-            messageModal.classList.add('hidden');
-        }
-
-        closeBtn.addEventListener('click', closeModal);
+        // ❌ 기존 showMessage, closeModal 함수는 삭제되었습니다.
+        // ❌ closeBtn.addEventListener('click', closeModal); 이벤트 리스너는 삭제되었습니다.
 
         // 유저 정보 로드
         async function loadUserProfile(user) {
@@ -129,6 +132,7 @@
                 profileImagePreview.src = data.profileImage;
             } catch (err) {
                 console.error('유저 정보 로드 실패:', err);
+                // loadUserProfile 실패는 치명적이므로, 필요시 토스트로 알림 가능
             }
         }
 
@@ -208,16 +212,18 @@
                 if (patchResult.profile_image) profileImagePreview.src = patchResult.profile_image;
                 if (patchResult.nickname) nicknameInput.value = patchResult.nickname;
 
-                showMessage('프로필 편집이 완료됐습니다.');
+                // ✅ [수정] 성공 알림: showMessage 대신 토스트 사용
+                showCustomToast('프로필 편집이 완료됐습니다.'); 
                 selectedFile = null; // 완료 후 초기화
             } catch (err) {
                 console.error(err);
-                alert(err.message);
+                // ✅ [수정] 실패 알림: alert() 대신 토스트 사용
+                showCustomToast(`프로필 편집 실패: ${err.message}`);
             } finally {
                 saveProfileBtn.disabled = false;
                 saveProfileBtn.textContent = '저장';
             }
-});
+        });
     </script>
 </body>
 </html>

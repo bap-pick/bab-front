@@ -56,6 +56,11 @@
 </head>
 <body class="bg-white">
 
+    <div id="custom-toast"
+        class="fixed top-5 left-1/2 transform -translate-x-1/2 px-6 py-3 bg-gray-800 text-white text-sm font-medium rounded-lg shadow-lg z-50 transition-opacity duration-300 opacity-0 pointer-events-none">
+        알림 메시지
+    </div>
+    
     <div class="h-full flex flex-col">
         
         <header class="grid grid-cols-3 items-center px-2 py-4 border-b border-gray-200 flex-shrink-0">
@@ -72,10 +77,7 @@
         <main class="flex-1 overflow-y-auto bg-white p-6 pb-20 flex flex-col">
             <form id="edit-form" class="space-y-6 flex-1 max-w-md w-full mx-auto flex flex-col">
                 
-                <div>
-                    <label for="user-email" class="block text-sm font-medium text-gray-700 mb-2">이메일</label>
-                    <input type="email" id="user-email" class="w-full p-3.5 text-base bg-gray-50 text-gray-700 border border-gray-300 rounded-lg input-focus-custom" value="user@example.com" readonly>
-                </div>
+                
                 
                 <div class="mb-4">
                     <label for="birthdate-input" class="block text-sm font-medium text-gray-700">생년월일</label>
@@ -152,6 +154,24 @@
         let idToken = null;
         let currentUser = null;
 
+        // ✅ [사용] 이미 HTML에 정의된 토스트 요소를 가져옵니다.
+        const customToast = document.getElementById('custom-toast'); 
+        const toastDuration = 2500; 
+
+        function showCustomToast(message) {
+            const toastElement = document.getElementById('custom-toast');
+            if (!toastElement) return;
+            
+            toastElement.textContent = message;
+            toastElement.classList.remove('opacity-0', 'pointer-events-none');
+            toastElement.classList.add('opacity-100');
+
+            setTimeout(() => {
+                toastElement.classList.remove('opacity-100');
+                toastElement.classList.add('opacity-0', 'pointer-events-none');
+            }, toastDuration);
+        }
+
         // 1. 사용자 정보 불러오기
         async function loadUserInfo(token) {
             try {
@@ -168,7 +188,7 @@
                 const data = await response.json();
                 
                 // 폼 필드 채우기
-                document.getElementById('user-email').value = data.email || '';
+                // document.getElementById('user-email').value = data.email || ''; // HTML에 해당 ID가 없으므로 주석 처리
                 document.getElementById('birthdate-input').value = data.birthDate || '';
                 document.getElementById('birth_calendar').value = data.birthCalendar || 'solar';
                 
@@ -196,7 +216,7 @@
 
             } catch (error) {
                 console.error("사용자 정보 로드 중 오류 발생:", error);
-                alert("사용자 정보를 불러오는 데 실패했습니다.");
+                showCustomToast("사용자 정보를 불러오는 데 실패했습니다."); // ✅ [수정] alert -> 토스트
             }
         }
         
@@ -206,7 +226,7 @@
 
             const idToken = await currentUser.getIdToken();
             if (!idToken) {
-                alert("로그인이 필요합니다.");
+                showCustomToast("로그인이 필요합니다."); // ✅ [수정] alert -> 토스트
                 return;
             }
 
@@ -256,12 +276,12 @@
                     throw new Error(result.detail || "정보 수정에 실패했습니다. 서버 로그를 확인하세요.");
                 }
 
-                alert("회원 정보가 성공적으로 수정되었습니다.");
+                showCustomToast("회원 정보가 성공적으로 수정되었습니다."); // ✅ [수정] alert -> 토스트
                 await loadUserInfo(idToken); 
 
             } catch (error) {
                 console.error("정보 수정 중 오류 발생:", error);
-                alert(`정보 수정에 실패했습니다: ${error.message}`);
+                showCustomToast(`정보 수정에 실패했습니다: ${error.message}`); // ✅ [수정] alert -> 토스트
             } finally {
                 saveBtn.disabled = false;
                 saveBtn.textContent = '저장';
@@ -330,7 +350,7 @@
                 idToken = await user.getIdToken();
                 await loadUserInfo(idToken);
             } else {
-                alert('로그인이 필요합니다.');
+                showCustomToast('로그인이 필요합니다.'); // ✅ [수정] alert -> 토스트
                 window.location.href = 'index.html'; // 로그인 페이지로 이동
                 return;
             }

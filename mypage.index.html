@@ -36,6 +36,11 @@
 </head>
 <body class="bg-white">
     
+    <div id="custom-toast"
+        class="fixed top-5 left-1/2 transform -translate-x-1/2 px-6 py-3 bg-gray-800 text-white text-sm font-medium rounded-lg shadow-lg z-50 transition-opacity duration-300 opacity-0 pointer-events-none">
+        알림 메시지
+    </div>
+
     <div id="overlay" class="fixed inset-0 bg-black bg-opacity-20 z-40 hidden transition-opacity duration-300"></div>
 
     <div class="h-full flex flex-col">
@@ -156,28 +161,44 @@
         const auth = getAuth(app);
 
         const fastapiUrl = "https://bapick.duckdns.org"
-
+        
+        // DOM 요소 로드
         const overlay = document.getElementById('overlay');
         const logoutBtn = document.getElementById('logout-btn');
         const logoutModal = document.getElementById('logout-modal');
         const cancelLogoutBtn = document.getElementById('cancel-logout-btn');
         const confirmLogoutBtn = document.getElementById('confirm-logout-btn');
-        const withdrawBtn = document.getElementById('withdraw-btn');
-        const withdrawalModal = document.getElementById('withdrawal-modal');
-        const cancelWithdrawBtn = document.getElementById('cancel-withdraw-btn');
         const addChatBtn = document.getElementById('add-chat-btn');
         const addChatPopup = document.getElementById('add-chat-popup');
         const userDisplayName = document.getElementById('user-display-name');
         const userDisplayProfileImage = document.getElementById('user-display-profile-image');
 
-        onAuthStateChanged(auth, async (user) => {
-            if (!user) {
-                userDisplayName.textContent = "로그인이 필요합니다";
-            }
-            loadUserProfile(user); 
-        })
+        // ✅ [추가] 커스텀 토스트 관련 변수 및 함수 정의
+        const customToast = document.getElementById('custom-toast');
+        const toastDuration = 2500; 
 
-        // (1) 유저 정보를 로드하는 비동기 함수를 별도로 정의
+        function showCustomToast(message) {
+            if (!customToast) return;
+            customToast.textContent = message;
+            customToast.classList.remove('opacity-0', 'pointer-events-none');
+            customToast.classList.add('opacity-100');
+
+            setTimeout(() => {
+                customToast.classList.remove('opacity-100');
+                customToast.classList.add('opacity-0', 'pointer-events-none');
+            }, toastDuration);
+        }
+        
+        // 팝업/모달 관리 함수
+        function closeAllPopups() {
+            overlay.classList.add('hidden');
+            addChatPopup.classList.remove('popup-visible');
+            addChatPopup.classList.add('popup-hidden');
+            logoutModal.classList.add('hidden');
+            // withdrawalModal.classList.add('hidden'); // 존재하지 않는 변수 제거
+        }
+
+        // (1) 유저 정보를 로드하는 비동기 함수
         async function loadUserProfile(user) {
             if (!user) {
                 userDisplayName.textContent = "로그인이 필요합니다";
@@ -207,14 +228,11 @@
             }
         }
 
-        function closeAllPopups() {
-            overlay.classList.add('hidden');
-            addChatPopup.classList.remove('popup-visible');
-            addChatPopup.classList.add('popup-hidden');
-            logoutModal.classList.add('hidden');
-            withdrawalModal.classList.add('hidden');
-        }
-
+        // =======================================================
+        // 이벤트 리스너
+        // =======================================================
+        
+        // ✅ [수정] 채팅 추가 버튼 클릭 시 (팝업 토글)
         addChatBtn.addEventListener('click', (event) => {
             event.stopPropagation();
             const isAddChatOpen = addChatPopup.classList.contains('popup-visible');
@@ -228,20 +246,39 @@
         
         overlay.addEventListener('click', closeAllPopups);
         
-        // 로그아웃 확인 버튼 클릭 시
+        // ✅ [수정] 로그아웃 확인 버튼 클릭 시 (alert -> 토스트)
         confirmLogoutBtn.addEventListener('click', () => {
             signOut(auth).then(() => {
                 // 로그아웃 성공 후 로그인 페이지로 이동
                 window.location.href = 'index.html';
             }).catch((error) => {
                 console.error('로그아웃 에러:', error);
-                alert('로그아웃에 실패했습니다.');
+                showCustomToast('로그아웃에 실패했습니다.'); // ✅ [수정] alert -> 토스트
             });
         });
         
         // 로그아웃 버튼 클릭 시 모달 열기
-        logoutBtn.addEventListener('click', (e) => { e.preventDefault(); logoutModal.classList.remove('hidden'); overlay.classList.remove('hidden'); });
-        cancelLogoutBtn.addEventListener('click', () => { logoutModal.classList.add('hidden'); overlay.classList.add('hidden'); });
+        logoutBtn.addEventListener('click', (e) => { 
+            e.preventDefault(); 
+            closeAllPopups(); // 다른 팝업 닫고
+            logoutModal.classList.remove('hidden'); 
+            overlay.classList.remove('hidden'); 
+        });
+        
+        // 로그아웃 모달 취소 버튼
+        cancelLogoutBtn.addEventListener('click', () => { 
+            logoutModal.classList.add('hidden'); 
+            overlay.classList.add('hidden'); 
+        });
+
+        // Firebase 인증 상태 확인
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                // 로그인되지 않은 경우, 바로 loadUserProfile(user)를 호출하여 "로그인이 필요합니다"를 표시
+                // 리다이렉션은 수동으로 하지 않습니다.
+            }
+            loadUserProfile(user); 
+        });
     </script>
 </body>
 </html>
