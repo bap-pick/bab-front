@@ -79,8 +79,10 @@
 
     <div class="mt-16 relative flex items-center w-full bg-[#FF7242] px-4 py-4">
         <div class="max-w-screen-xl mx-auto w-full relative">
-            <input type="text" id="location-text" class="w-full pl-5 pr-16 py-3 bg-white/80 backdrop-blur-sm border-none rounded-full shadow-lg focus:ring-2 focus:ring-[#FF7242] focus:outline-none text-gray-800 placeholder-gray-400">
-            <a href="set_location.html" class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#FF7242] hover:bg-orange-600 text-white rounded-full flex items-center justify-center shadow-md transition-transform transform hover:scale-110">
+            <input type="text" id="location-text"
+                class="w-full pl-5 pr-16 py-3 bg-white/80 backdrop-blur-sm border-none rounded-full shadow-lg focus:ring-2 focus:ring-[#FF7242] focus:outline-none text-gray-800 placeholder-gray-400">
+            <a href="set_location.html"
+                class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#FF7242] hover:bg-orange-600 text-white rounded-full flex items-center justify-center shadow-md transition-transform transform hover:scale-110">
                 <span class="material-symbols-outlined">location_on</span>
             </a>
         </div>
@@ -104,7 +106,8 @@
                             <div class="profile-image-container flex-shrink-0 w-auto max-w-[122px]">
                                 <img id="user-profile-image"
                                     class="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-white"
-                                    src="https://bapick-s3-bucket.s3.ap-northeast-2.amazonaws.com/default/default_profile.png" alt="프로필 사진">
+                                    src="https://bapick-s3-bucket.s3.ap-northeast-2.amazonaws.com/default/default_profile.png"
+                                    alt="프로필 사진">
                             </div>
 
                             <div id="stats-container" class="flex flex-col space-y-3 w-full">
@@ -112,7 +115,8 @@
                                     <div class="w-6 h-6 flex items-center justify-center" title="목 (Wood)"><span
                                             class="material-symbols-outlined text-[#4CAF50]">nature</span></div>
                                     <div class="w-full bg-gray-200 rounded-full h-4">
-                                        <div id="stat-wood" class="h-full rounded-full progress-bar-wood" style="width: 0%;">
+                                        <div id="stat-wood" class="h-full rounded-full progress-bar-wood"
+                                            style="width: 0%;">
                                         </div>
                                     </div>
                                     <span id="stat-wood-value" class="font-bold text-gray-700 w-8 text-left"></span>
@@ -122,7 +126,8 @@
                                             class="material-symbols-outlined text-[#EF5350]">local_fire_department</span>
                                     </div>
                                     <div class="w-full bg-gray-200 rounded-full h-4">
-                                        <div id="stat-fire" class="h-full rounded-full progress-bar-fire" style="width: 0%;">
+                                        <div id="stat-fire" class="h-full rounded-full progress-bar-fire"
+                                            style="width: 0%;">
                                         </div>
                                     </div>
                                     <span id="stat-fire-value" class="font-bold text-gray-700 w-8 text-left"></span>
@@ -131,7 +136,8 @@
                                     <div class="w-6 h-6 flex items-center justify-center" title="토 (Earth)"><span
                                             class="material-symbols-outlined text-[#8D6E63]">landscape</span></div>
                                     <div class="w-full bg-gray-200 rounded-full h-4">
-                                        <div id="stat-earth" class="h-full rounded-full progress-bar-earth" style="width: 0%;">
+                                        <div id="stat-earth" class="h-full rounded-full progress-bar-earth"
+                                            style="width: 0%;">
                                         </div>
                                     </div>
                                     <span id="stat-earth-value" class="font-bold text-gray-700 w-8 text-left"></span>
@@ -140,7 +146,8 @@
                                     <div class="w-6 h-6 flex items-center justify-center" title="금 (Metal)"><span
                                             class="material-symbols-outlined text-[#FFB300]">paid</span></div>
                                     <div class="w-full bg-gray-200 rounded-full h-4">
-                                        <div id="stat-metal" class="h-full rounded-full progress-bar-metal" style="width: 0%;">
+                                        <div id="stat-metal" class="h-full rounded-full progress-bar-metal"
+                                            style="width: 0%;">
                                         </div>
                                     </div>
                                     <span id="stat-metal-value" class="font-bold text-gray-700 w-8 text-left"></span>
@@ -149,7 +156,8 @@
                                     <div class="w-6 h-6 flex items-center justify-center" title="수 (Water)"><span
                                             class="material-symbols-outlined text-[#42A5F5]">water_drop</span></div>
                                     <div class="w-full bg-gray-200 rounded-full h-4">
-                                        <div id="stat-water" class="h-full rounded-full progress-bar-water" style="width: 0%;">
+                                        <div id="stat-water" class="h-full rounded-full progress-bar-water"
+                                            style="width: 0%;">
                                         </div>
                                     </div>
                                     <span id="stat-water-value" class="font-bold text-gray-700 w-8 text-left"></span>
@@ -172,44 +180,47 @@
 
 
                 <!-- 포춘쿠키 섹션  -->
-                <div class="fortune-cookie-widget bg-white backdrop-blur-sm rounded-2xl shadow-lg p-6 flex flex-col">
-                        <h3 class="text-xl font-bold text-gray-800">오늘의 포춘쿠키</h3>
+                <div
+                    class="fortune-cookie-widget bg-white backdrop-blur-sm rounded-2xl shadow-lg p-8 flex flex-col gap-8">
 
-                        <div id="closedCookieSection" class="flex flex-col items-center">
-                            <img src="close fortune cookie.png" alt="닫힌 포춘 쿠키" class="w-40 mx-auto animate-pulse">
-                            </div>
+                    <h3 class="text-xl font-bold text-gray-800 text-left">오늘의 포춘쿠키</h3>
 
-                        <div id="openedCookieSection" class="hidden flex flex-col items-center text-center">
-                            <img src="open fortune cookie.png" alt="열린 포춘 쿠키" class="w-60 mx-auto animate-fadeIn">
-                            <p id="fortuneMessage" class="text-sm font-semibold text-gray-700 leading-relaxed mt-4"></p>
-                        </div>
-                        
-                        <button id="cookieActionButton" class="w-full bg-gradient-to-r from-orange-400 to-red-500 text-white font-semibold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-200">
-                            열어보기
-                        </button>
-
+                    <div id="closedCookieSection" class="flex flex-col items-center">
+                        <img src="close fortune cookie.png" alt="닫힌 포춘 쿠키" class="w-40 mx-auto animate-pulse">
                     </div>
+
+                    <div id="openedCookieSection" class="hidden flex flex-col items-center text-center">
+                        <img src="open fortune cookie.png" alt="열린 포춘 쿠키" class="w-60 mx-auto animate-fadeIn">
+                        <p id="fortuneMessage" class="text-sm font-semibold text-gray-700 leading-relaxed mt-6"></p>
+                    </div>
+
+                    <button id="cookieActionButton"
+                        class="w-full bg-gradient-to-r from-orange-400 to-red-500 text-white font-semibold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-200">
+                        열어보기
+                    </button>
+
                 </div>
             </div>
+        </div>
 
-            <!-- 식당 추천 -->
-            <div class="mt-6 p-6 max-w-md lg:max-w-screen-xl w-full mx-auto bg-white backdrop-blur-sm rounded-2xl shadow-lg overflow-hidden">
-                <div class="pt-2 flex justify-between items-center">
-                    <h3 id="nearby-restaurants-heading" class="text-xl lg:text-2xl font-bold text-gray-800">
-                        나의 근처 맛집
-                    </h3>
-                    <a href="restaurant_list.html"
-                        class="text-base font-semibold text-gray-500 hover:text-[#FF7242]">
-                        전체보기 &gt;
-                    </a>
-                </div>
-                <div class="relative mt-4 lg:mt-6">
-                    <div id="restaurant-carousel"
-                        class="flex overflow-x-auto scroll-smooth scrollbar-hide space-x-4 py-2 flex-nowrap">
-                        <p id="nearby-restaurants-loading" class="text-gray-500">주변 맛집 정보를 불러오는 중...</p>
-                    </div>
+        <!-- 식당 추천 -->
+        <div
+            class="mt-6 p-6 max-w-md lg:max-w-screen-xl w-full mx-auto bg-white backdrop-blur-sm rounded-2xl shadow-lg overflow-hidden">
+            <div class="pt-2 flex justify-between items-center">
+                <h3 id="nearby-restaurants-heading" class="text-xl lg:text-2xl font-bold text-gray-800">
+                    나의 근처 맛집
+                </h3>
+                <a href="restaurant_list.html" class="text-base font-semibold text-gray-500 hover:text-[#FF7242]">
+                    전체보기 &gt;
+                </a>
+            </div>
+            <div class="relative mt-4 lg:mt-6">
+                <div id="restaurant-carousel"
+                    class="flex overflow-x-auto scroll-smooth scrollbar-hide space-x-4 py-2 flex-nowrap">
+                    <p id="nearby-restaurants-loading" class="text-gray-500">주변 맛집 정보를 불러오는 중...</p>
                 </div>
             </div>
+        </div>
 
         </div>
     </main>
@@ -256,13 +267,14 @@
     </footer>
 
     <!-- + 버튼 -->
-    <button id="add-chat-btn" class="fixed bottom-6 left-1/2 -translate-x-1/2 w-16 h-16 bg-[#FF7242] hover:bg-orange-600 text-white rounded-full flex items-center justify-center shadow-lg transition-transform transform hover:scale-110 z-40">
+    <button id="add-chat-btn"
+        class="fixed bottom-6 left-1/2 -translate-x-1/2 w-16 h-16 bg-[#FF7242] hover:bg-orange-600 text-white rounded-full flex items-center justify-center shadow-lg transition-transform transform hover:scale-110 z-40">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
         </svg>
     </button>
-    
+
     <!-- + 버튼 팝업-->
     <div id="add-chat-popup"
         class="absolute bottom-24 left-1/2 -translate-x-1/2 w-48 bg-white rounded-md shadow-xl z-50 popup-hidden">
@@ -324,7 +336,7 @@
         const recommendationTypeEl = document.getElementById('recommendation-type');
         const recommendationHeadlineEl = document.getElementById('recommendation-headline');
         const recommendationAdviceEl = document.getElementById('recommendation-advice');
-        
+
         const locationTextEl = document.getElementById('location-text');
 
         // 오행 통계 요소 맵
@@ -348,7 +360,7 @@
                 updateLocation();
             }
         }
-        
+
         // GPS 기반 현재 위치를 가져와 주소로 변환하는 함수
         async function updateLocation() {
             if (navigator.geolocation) {
@@ -441,7 +453,7 @@
 
         // 근처 식당 정보 렌더링
         const renderRestaurantCard = (restaurant) => {
-            const defaultImageUrl = 'Untitled.png'; 
+            const defaultImageUrl = 'Untitled.png';
             let imageUrl = defaultImageUrl;
 
             // 이미지 렌더링: image가 문자열인 동시에 비어있지 않은 경우 첫 번째 이미지 렌더링
@@ -464,7 +476,7 @@
             }
 
             // 조건부 렌더링 (평점/리뷰)
-            const ratingValue = restaurant.rating || 0; 
+            const ratingValue = restaurant.rating || 0;
             const reviewCount = restaurant.review_count || 0;
             let statsHtml = '';
 
@@ -514,8 +526,8 @@
                 const savedLocation = localStorage.getItem('savedBapickLocation');
                 if (savedLocation) {
                     const locationData = JSON.parse(savedLocation);
-                    lat = parseFloat(locationData.lat); 
-                    lon = parseFloat(locationData.lon || locationData.lng); 
+                    lat = parseFloat(locationData.lat);
+                    lon = parseFloat(locationData.lon || locationData.lng);
                 }
 
                 // 2. 저장된 위치가 없거나 유효하지 않으면 GPS 획득 시도
@@ -559,7 +571,7 @@
                 restaurants.forEach(rest => {
                     carouselEl.insertAdjacentHTML('beforeend', renderRestaurantCard(rest));
                 });
-                
+
             } catch (err) {
                 console.error("Restaurant fetch failed:", err);
                 carouselEl.innerHTML = `<p class="text-gray-500 p-3">${err.message || '식당 정보를 불러오는 중 오류가 발생했습니다.'}</p>`;
@@ -668,7 +680,7 @@
         const openedCookieSection = document.getElementById('openedCookieSection');
         const fortuneMessage = document.getElementById('fortuneMessage');
         const cookieActionButton = document.getElementById('cookieActionButton');
-        
+
         // 상태 변수
         let isCookieOpened = false;
 
@@ -712,7 +724,7 @@
 
             if (closedCookieSection) closedCookieSection.classList.add('hidden');
             if (openedCookieSection) openedCookieSection.classList.remove('hidden');
-            
+
             cookieActionButton.textContent = '닫기';
             cookieActionButton.classList.remove('from-orange-400', 'to-red-500', 'text-white');
             cookieActionButton.classList.add('bg-gray-200', 'text-gray-800', 'bg-gradient-to-r');
@@ -735,7 +747,7 @@
         // 액션 버튼 클릭 시 상태에 따라 함수 실행
         if (cookieActionButton) {
             cookieActionButton.addEventListener('click', (e) => {
-                e.preventDefault(); 
+                e.preventDefault();
                 if (isCookieOpened) {
                     closeCookie();
                 } else {
