@@ -753,52 +753,94 @@
         // 모달 UI 조작 및 이벤트 처리 함수
         // -----------------------------------------------------------
         // 스와이프 동작 리스너를 예약 카드에 추가
+        // -----------------------------------------------------------
+        // [수정됨] 스와이프 동작 리스너 (터치 + 마우스 지원)
+        // -----------------------------------------------------------
         function addSwipeListeners(element) {
             let startX, currentX = 0, initialTransform = 0;
             const swipeThreshold = 50;
-            
-            const container = element.parentElement; // swipe-container
+            let isMouseDown = false; // 마우스 클릭 상태 확인용
 
-            element.addEventListener('touchstart', (e) => {
-                startX = e.touches[0].clientX;
-                initialTransform = parseFloat(element.style.transform.replace('translateX(', '').replace('px)', '') || 0);
-                element.style.transition = 'none';
+            // 공통 로직: 드래그 시작
+            const handleStart = (clientX) => {
+                startX = clientX;
+                // 현재 transform 값 파싱 (없으면 0)
+                const transformMatch = element.style.transform.match(/translateX\(([-\d.]+)px\)/);
+                initialTransform = transformMatch ? parseFloat(transformMatch[1]) : 0;
+                
+                element.style.transition = 'none'; // 드래그 중엔 애니메이션 끄기
                 swipeState.isDragging = true;
                 swipeState.swipedElement = element;
-                // 다른 스와이프 요소 초기화
+
+                // 다른 열려있는 카드들 닫기
                 document.querySelectorAll('.swipe-content').forEach(other => {
-                    if (other !== element) { 
-                        other.style.transform = 'translateX(0px)'; 
-                        other.style.transition = 'transform 0.3s ease'; 
+                    if (other !== element) {
+                        other.style.transform = 'translateX(0px)';
+                        other.style.transition = 'transform 0.3s ease';
                     }
                 });
-            });
+            };
 
-            element.addEventListener('touchmove', (e) => {
+            // 공통 로직: 드래그 중
+            const handleMove = (clientX) => {
                 if (!swipeState.isDragging || swipeState.swipedElement !== element) return;
-                currentX = e.touches[0].clientX;
+                
+                currentX = clientX;
                 const diff = currentX - startX;
-                // -160px (액션 버튼 너비)와 0px 사이로 제한
+                // -160px (버튼 영역) ~ 0px 사이로 제한
+                // 마우스로 오른쪽으로 끄는 건 막음 (Math.min(0, ...))
                 const newTransform = Math.max(-160, Math.min(0, diff + initialTransform));
                 element.style.transform = `translateX(${newTransform}px)`;
-            });
+            };
 
-            element.addEventListener('touchend', () => {
+            // 공통 로직: 드래그 종료
+            const handleEnd = () => {
                 if (!swipeState.isDragging || swipeState.swipedElement !== element) return;
+                
                 swipeState.isDragging = false;
                 swipeState.swipedElement = null;
-                element.style.transition = 'transform 0.3s ease';
-                
-                const currentTransform = parseFloat(element.style.transform.replace('translateX(', '').replace('px)', '') || 0);
-                
+                element.style.transition = 'transform 0.3s ease'; // 애니메이션 다시 켜기
+
+                // 현재 위치 확인
+                const transformMatch = element.style.transform.match(/translateX\(([-\d.]+)px\)/);
+                const currentTransform = transformMatch ? parseFloat(transformMatch[1]) : 0;
+
+                // 임계값(-50px)보다 더 왼쪽으로 갔으면 버튼 열기(-160px), 아니면 닫기(0px)
                 if (currentTransform < -swipeThreshold) {
-                    // 임계값보다 많이 스와이프 시 액션 버튼 노출
                     element.style.transform = 'translateX(-160px)';
                 } else {
-                    // 원위치
                     element.style.transform = 'translateX(0px)';
                 }
+            };
+
+            // --- 터치 이벤트 리스너 ---
+            element.addEventListener('touchstart', (e) => handleStart(e.touches[0].clientX));
+            element.addEventListener('touchmove', (e) => handleMove(e.touches[0].clientX));
+            element.addEventListener('touchend', handleEnd);
+
+            // --- [추가됨] 마우스 이벤트 리스너 ---
+            element.addEventListener('mousedown', (e) => {
+                isMouseDown = true;
+                handleStart(e.clientX);
             });
+
+            // 마우스는 element 밖으로 나가도 드래그가 끊기면 안 되므로 window에 붙임
+            window.addEventListener('mousemove', (e) => {
+                if (isMouseDown) {
+                    e.preventDefault(); // 텍스트 선택 방지
+                    handleMove(e.clientX);
+                }
+            });
+
+            window.addEventListener('mouseup', () => {
+                if (isMouseDown) {
+                    isMouseDown = false;
+                    handleEnd();
+                }
+            });
+            
+            // 이미지/텍스트 드래그 방지 (PC에서 필수)
+            element.ondragstart = () => false;
         }
 
         // 시간 선택 UI
