@@ -50,10 +50,10 @@
             <div class="w-full">
                 <section class="bg-white flex items-center p-5 border-b-8 border-gray-100">
                     <div class="w-16 h-16 rounded-full mr-4 flex-shrink-0 overflow-hidden bg-gray-200">
-                        <img id="user-display-profile-image" class="w-full h-full object-cover" src="" alt="프로필 이미지">
+                        <img id="user-display-profile-image" class="w-full h-full object-cover" src="https://bapick-s3-bucket.s3.ap-northeast-2.amazonaws.com/default/default_profile.png" alt="프로필 사진">
                     </div>
                     <div class="flex-1">
-                        <a href="editmypage.index.html" class="text-lg font-bold text-gray-800 flex items-center">
+                        <a href="profile_edit.html" class="text-lg font-bold text-gray-800 flex items-center">
                             <span id="user-display-name"></span>
                             <svg class="w-5 h-5 ml-1 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                         </a>
@@ -66,18 +66,11 @@
                         <li class="py-1"><a href="editinformation.index.html" class="flex justify-between items-center py-3.5 text-gray-700 hover:bg-gray-50 rounded-lg -mx-2 px-2"><span class="font-medium">회원정보 수정</span><svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></a></li>
                         <li class="py-1"><a href="permission.index.html" class="flex justify-between items-center py-3.5 text-gray-700 hover:bg-gray-50 rounded-lg -mx-2 px-2"><span class="font-medium">권한 설정</span><svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></a></li>
                         <li class="py-1"><a href="notification.index.html" class="flex justify-between items-center py-3.5 text-gray-700 hover:bg-gray-50 rounded-lg -mx-2 px-2"><span class="font-medium">알림 설정</span><svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></a></li>
-                        <li class="py-1"><a href="addfriend.index.html" class="flex justify-between items-center py-3.5 text-gray-700 hover:bg-gray-50 rounded-lg -mx-2 px-2"><span class="font-medium">친구 추가</span><svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></a></li>
+                        <li class="py-1"><a href="friend_list.html" class="flex justify-between items-center py-3.5 text-gray-700 hover:bg-gray-50 rounded-lg -mx-2 px-2"><span class="font-medium">친구 목록</span><svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></a></li>
                         <li class="py-1"><a href="announcement.index.html" class="flex justify-between items-center py-3.5 text-gray-700 hover:bg-gray-50 rounded-lg -mx-2 px-2"><span class="font-medium">공지사항</span><svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></a></li>
-                        <li class="py-1"><a href="terms.index.html" class="flex justify-between items-center py-3.5 text-gray-700 hover:bg-gray-50 rounded-lg -mx-2 px-2"><span class="font-medium">이용약관</span><svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg></a></li>
                         <li class="py-1">
-                            <a href="#" id="logout-btn" class="flex justify-between items-center py-3.5 text-gray-700 hover:bg-gray-50 rounded-lg -mx-2 px-2">
+                            <a href="#" id="logout-btn" class="flex justify-between items-center py-3.5 text-red-500 hover:bg-red-50 rounded-lg -mx-2 px-2">
                                 <span class="font-medium">로그아웃</span>
-                                <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-                            </a>
-                        </li>
-                        <li class="py-1">
-                            <a href="#" id="withdraw-btn" class="flex justify-between items-center py-3.5 text-red-500 hover:bg-red-50 rounded-lg -mx-2 px-2">
-                                <span class="font-medium">탈퇴하기</span>
                                 <svg class="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                             </a>
                         </li>
@@ -102,25 +95,7 @@
         </div>
     </div>
 
-    <div id="withdrawal-modal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4 hidden">
-        <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-8 text-center flex flex-col items-center">
-            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-5">
-                <svg class="w-8 h-8 text-red-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.134-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.067-2.09 1.02-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-                </svg>
-            </div>
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">정말 탈퇴하시겠어요?</h2>
-            <p class="text-gray-500 mb-8 leading-relaxed">
-                탈퇴 버튼 선택 시, 계정은<br>삭제되며 복구되지 않습니다.
-            </p>
-            <div class="w-full flex flex-col space-y-3">
-                <button class="w-full py-3 bg-red-500 text-white font-bold rounded-lg hover:bg-red-600 transition-colors">탈퇴</button>
-                <button id="cancel-withdraw-btn" class="w-full py-3 text-gray-600 font-medium rounded-lg hover:bg-gray-100 transition-colors">취소</button>
-            </div>
-        </div>
-    </div>
-    
-     <div id="add-chat-popup" class="absolute bottom-24 left-1/2 -translate-x-1/2 w-48 bg-white rounded-md shadow-xl z-50 popup-hidden">
+    <div id="add-chat-popup" class="absolute bottom-24 left-1/2 -translate-x-1/2 w-48 bg-white rounded-md shadow-xl z-50 popup-hidden">
         <div class="py-2">
             <a href="chat_list.html" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -145,7 +120,7 @@
     </div>
     
     <footer class="fixed bottom-0 left-0 right-0 z-30">
-        <nav class="flex justify-around items-center h-16 bg-white rounded-t-2xl shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+        <nav class="flex justify-around items-center h-16 bg-white rounded-t-2xl shadow-[0_-2px_10px_rgba(0,0,0,0.05)] max-w-screen-xl mx-auto">
             <a href="home.html" class="flex flex-col items-center justify-center w-1/5 h-full text-gray-500 hover:text-[#FF7242] text-xs">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                 <span class="mt-1">홈</span>
@@ -173,7 +148,6 @@
     <script type="module">
         // Firebase SDK import 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-        // ▼▼▼ [수정] signOut 함수를 import 목록에 추가합니다. ▼▼▼
         import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
         import { firebaseConfig } from "./firebase-config.js";
         
@@ -181,14 +155,12 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // fastapi 서버 url
-        const FASTAPI_BASE_URL = "https://bab-back.onrender.com"; 
-        
+        const fastapiUrl = "https://bapick.duckdns.org"
+
         const overlay = document.getElementById('overlay');
         const logoutBtn = document.getElementById('logout-btn');
         const logoutModal = document.getElementById('logout-modal');
         const cancelLogoutBtn = document.getElementById('cancel-logout-btn');
-        // ▼▼▼ [수정] 버튼을 ID로 선택하도록 변경합니다. ▼▼▼
         const confirmLogoutBtn = document.getElementById('confirm-logout-btn');
         const withdrawBtn = document.getElementById('withdraw-btn');
         const withdrawalModal = document.getElementById('withdrawal-modal');
@@ -216,7 +188,7 @@
                 const idToken = await user.getIdToken();
 
                 const fields = ['nickname', 'profileImage'];
-                const res = await fetch(`${FASTAPI_BASE_URL}/users/me?fields=${fields.join(',')}`, {
+                const res = await fetch(`${fastapiUrl}/api/users/me?fields=${fields.join(',')}`, {
                     headers: {
                         'Authorization': `Bearer ${idToken}`
                     }
@@ -227,7 +199,7 @@
 
                 // UI 업데이트
                 userDisplayName.textContent = `${data.nickname}님`;
-                userDisplayProfileImage.src = data.profileImage || 'https://bit.ly/3VZpUGD';
+                userDisplayProfileImage.src = data.profileImage;
 
             } catch (err) {
                 console.error('마이페이지 유저 정보 로드 실패:', err);
@@ -270,11 +242,6 @@
         // 로그아웃 버튼 클릭 시 모달 열기
         logoutBtn.addEventListener('click', (e) => { e.preventDefault(); logoutModal.classList.remove('hidden'); overlay.classList.remove('hidden'); });
         cancelLogoutBtn.addEventListener('click', () => { logoutModal.classList.add('hidden'); overlay.classList.add('hidden'); });
-        
-        // 탈퇴하기 버튼 클릭 시 모달 열기
-        withdrawBtn.addEventListener('click', (e) => { e.preventDefault(); withdrawalModal.classList.remove('hidden'); overlay.classList.remove('hidden'); });
-        cancelWithdrawBtn.addEventListener('click', () => { withdrawalModal.classList.add('hidden'); overlay.classList.add('hidden'); });
-
     </script>
 </body>
 </html>

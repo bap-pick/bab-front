@@ -25,7 +25,6 @@
             -moz-osx-font-smoothing: grayscale;
             background-color: #ffffff;
             padding-bottom: 80px;
-            /* 하단 바와 버튼 공간 확보 */
         }
 
         .bg-custom-point {
@@ -110,81 +109,87 @@
     </style>
 </head>
 
-<body class="bg-white">
+<body>
     <div id="overlay" class="fixed inset-0 bg-black bg-opacity-20 z-40 hidden transition-opacity duration-300"></div>
 
-    <div id="toast"
-        class="fixed top-20 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg opacity-0 transition-opacity duration-300 z-[70] pointer-events-none">
+    <div id="toast" class="fixed top-20 left-1/2 -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg opacity-0 transition-opacity duration-300 z-[70] pointer-events-none">
         <p id="toast-message"></p>
     </div>
 
     <div class="h-full flex flex-col">
-        <header class="grid grid-cols-3 items-center p-4 border-b border-gray-200">
-            <div></div>
+        <header class="text-center p-4 border-b border-gray-200">
             <h1 class="text-xl font-bold text-center">캘린더</h1>
-            <div class="justify-self-end"></div>
         </header>
 
         <main class="flex-1 overflow-y-auto">
-            <div class="max-w-md lg:max-w-screen-xl w-full mx-auto p-4">
-                <div class="flex flex-col items-center">
-                    <div class="flex items-center justify-between w-full mb-4">
-                        <button id="monthYearBtn"
-                            class="text-lg font-semibold cursor-pointer p-2 rounded-md hover:bg-gray-100"></button>
-                        <div class="flex space-x-2">
-                            <button id="prevMonth" class="text-gray-500 p-2 rounded-full hover:bg-gray-200"><svg
-                                    class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                                    stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                                </svg></button>
-                            <button id="nextMonth" class="text-gray-500 p-2 rounded-full hover:bg-gray-200"><svg
-                                    class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                                    stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                                </svg></button>
+            <div class="max-w-lg mx-auto p-4 lg:max-w-screen-xl lg:pt-4">
+                <div class="lg:grid lg:grid-cols-5 lg:gap-8">
+                    <div class="lg:col-span-2">
+                        <div class="flex flex-col items-center">
+                            <div class="flex items-center justify-between w-full mb-4 lg:mb-4">
+                                <button id="monthYearBtn"class="text-lg font-semibold cursor-pointer p-2 rounded-md hover:bg-gray-100"></button>
+                                <div class="flex space-x-2">
+                                    <button id="prevMonth" class="text-gray-500 p-2 rounded-full hover:bg-gray-200">
+                                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                                        </svg>
+                                    </button>
+                                    <button id="nextMonth" class="text-gray-500 p-2 rounded-full hover:bg-gray-200">
+                                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-7 text-center text-sm font-medium text-gray-400 w-full lg:mb-2">
+                                <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
+                            </div>
+                            <div id="calendarGrid" class="grid grid-cols-7 justify-items-center w-full mt-2 gap-y-2">
+                            </div>
                         </div>
                     </div>
-                    <div class="grid grid-cols-7 text-center text-sm font-medium text-gray-400 w-full">
-                        <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
+
+                    <hr class="w-full mt-6 mb-4 border-gray-300 lg:hidden">
+
+                    <div class="lg:col-span-3">
+                        <div class="space-y-4">
+                            <h2 class="py-2 lg:mb-4 text-lg font-bold">예약 현황</h2>
+                            <div id="reservationsContainer" class="space-y-4"></div>
+                            <button id="add-reservation-btn"
+                                class="w-full flex items-center justify-center p-3 mt-4 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors">
+                                <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                </svg>
+                                <span>새 예약 추가</span>
+                            </button>
+                        </div>
                     </div>
-                    <div id="calendarGrid" class="grid grid-cols-7 justify-items-center w-full mt-2 gap-y-2"></div>
-                </div>
-                <hr class="w-full my-6 border-gray-300">
-                <div class="space-y-4">
-                    <h2 class="text-lg font-bold">예약 현황</h2>
-                    <div id="reservationsContainer" class="space-y-4"></div>
-                    <button id="add-reservation-btn"
-                        class="w-full flex items-center justify-center p-3 mt-4 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors">
-                        <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                            stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                        </svg>
-                        <span>새 예약 추가</span>
-                    </button>
                 </div>
             </div>
         </main>
     </div>
 
-    <div id="monthYearModal"
-        class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div id="monthYearModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
         <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-xs">
             <h3 class="text-lg font-bold mb-4 text-center">년도 및 월 선택</h3>
             <div class="flex justify-between items-center">
-                <button id="prevYear" class="text-gray-500 hover:bg-gray-200 p-2 rounded-full"><svg class="h-5 w-5"
-                        fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <button id="prevYear" class="text-gray-500 hover:bg-gray-200 p-2 rounded-full">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                    </svg></button>
+                    </svg>
+                </button>
                 <span id="modalYear" class="font-bold"></span>
-                <button id="nextYear" class="text-gray-500 hover:bg-gray-200 p-2 rounded-full"><svg class="h-5 w-5"
-                        fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <button id="nextYear" class="text-gray-500 hover:bg-gray-200 p-2 rounded-full">
+                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                    </svg></button>
+                    </svg>
+                </button>
             </div>
             <div id="monthSelector" class="grid grid-cols-3 gap-2 mt-4"></div>
         </div>
     </div>
 
+    <!-- 예약 바텀시트 -->
     <div id="reservation-modal" class="fixed inset-0 z-50 hidden flex justify-center items-end pointer-events-none">
         <div id="bottom-sheet"
             class="bg-white w-full max-w-lg rounded-t-2xl p-4 transition-transform duration-300 ease-in-out transform translate-y-full pointer-events-auto">
@@ -192,11 +197,12 @@
                 <div class="w-10 h-1 bg-gray-300 rounded-full"></div>
             </div>
             <h3 id="reservation-date-title" class="text-xl font-bold text-center mb-6"></h3>
+            
             <div class="mb-6">
-                <label class="font-semibold mb-3 text-gray-700 block">식당 이름</label>
-                <button id="open-search-modal-btn"
-                    class="w-full p-3 border border-gray-300 rounded-lg text-left text-gray-500 hover:bg-gray-50 transition">식당을
-                    검색해주세요</button>
+                <label for="restaurant-search-input" class="font-semibold mb-3 text-gray-700 block">식당 이름</label>
+                <input type="search" id="restaurant-search-input" placeholder="식당 이름으로 검색" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400">
+                <div id="search-results-container" class="max-h-48 overflow-y-auto border border-gray-200 rounded-lg mt-2 hidden">
+                </div>
             </div>
             <div class="mb-6">
                 <p class="font-semibold mb-3 text-gray-700">시간</p>
@@ -220,62 +226,9 @@
         </div>
     </div>
 
-    <div id="restaurant-search-modal"
-        class="fixed inset-0 bg-white z-[60] transform translate-y-full transition-transform duration-300 ease-in-out">
-        <div class="flex flex-col h-full">
-            <header class="flex items-center p-4 border-b border-gray-200">
-                <button id="close-search-modal-btn"><svg class="h-6 w-6 text-gray-600" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                    </svg></button>
-                <h2 class="text-lg font-bold text-center flex-1">식당 검색</h2>
-                <div class="w-6"></div>
-            </header>
-            <div class="p-4 border-b border-gray-200">
-                <input type="search" id="restaurant-search-input" placeholder="식당 이름으로 검색"
-                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-400">
-            </div>
-            <main id="search-results-container" class="flex-1 overflow-y-auto p-4"></main>
-        </div>
-    </div>
-
-    <div id="add-chat-popup"
-        class="absolute bottom-24 left-1/2 -translate-x-1/2 w-48 bg-white rounded-md shadow-xl z-50 popup-hidden">
-        <div class="py-2">
-            <a href="chat_list.html" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="8" y1="6" x2="21" y2="6"></line>
-                    <line x1="8" y1="12" x2="21" y2="12"></line>
-                    <line x1="8" y1="18" x2="21" y2="18"></line>
-                    <line x1="3" y1="6" x2="3.01" y2="6"></line>
-                    <line x1="3" y1="12" x2="3.01" y2="12"></line>
-                    <line x1="3" y1="18" x2="3.01" y2="18"></line>
-                </svg>
-                채팅 목록
-            </a>
-            <a href="chat.html" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                    <circle cx="9" cy="7" r="4" />
-                </svg>
-                1:1 채팅방
-            </a>
-            <a href="chat_group.html" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                    <path d="M18 21v-2a4 4 0 0 0-4-4h-1" />
-                    <circle cx="9" cy="7" r="4" />
-                    <path d="M18 7h3a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-3" />
-                    <path d="m15.5 13.5-3-3 3-3" />
-                </svg>
-                단체 채팅방
-            </a>
-        </div>
-    </div>
-
     <footer class="fixed bottom-0 left-0 right-0 z-30">
-        <nav class="flex justify-around items-center h-16 bg-white rounded-t-2xl shadow-[0_-2px_10px_rgba(0,0,0,0.05)] max-w-screen-xl mx-auto">
+        <nav
+            class="flex justify-around items-center h-16 bg-white rounded-t-2xl shadow-[0_-2px_10px_rgba(0,0,0,0.05)] max-w-screen-xl mx-auto">
             <a href="home.html"
                 class="flex flex-col items-center justify-center w-1/5 h-full text-gray-500 hover:text-[#FF7242] text-xs">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -320,345 +273,697 @@
             <line x1="5" y1="12" x2="19" y2="12"></line>
         </svg>
     </button>
+
+    <div id="add-chat-popup" class="absolute bottom-24 left-1/2 -translate-x-1/2 w-48 bg-white rounded-md shadow-xl z-50 popup-hidden">
+        <div class="py-2">
+            <a href="chat_list.html" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="8" y1="6" x2="21" y2="6"></line>
+                    <line x1="8" y1="12" x2="21" y2="12"></line>
+                    <line x1="8" y1="18" x2="21" y2="18"></line>
+                    <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                    <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                    <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                </svg>
+                채팅 목록
+            </a>
+            <a href="chat.html" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                </svg>
+                1:1 채팅방
+            </a>
+            <a href="chat_group.html" class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <path d="M18 21v-2a4 4 0 0 0-4-4h-1" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M18 7h3a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-3" />
+                    <path d="m15.5 13.5-3-3 3-3" />
+                </svg>
+                단체 채팅방
+            </a>
+        </div>
+    </div>
+
     <a href="chat.html" id="secondary-action-btn"
         class="fixed bottom-20 right-6 w-16 h-16 bg-[#FFF6E2] hover:bg-orange-600 text-white rounded-full flex items-center justify-center shadow-lg transition-transform transform hover:scale-110 z-40"
         style="background-image: url('logo_bapick.png'); background-size: 132%; background-repeat: no-repeat; background-position: center 0.5%;">
     </a>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- 상수 선언 ---
-            const overlay = document.getElementById('overlay');
-            const addChatBtn = document.getElementById('add-chat-btn');
-            const addChatPopup = document.getElementById('add-chat-popup');
-            const addReservationBtn = document.getElementById('add-reservation-btn');
-            const currentMonthYearEl = document.getElementById('monthYearBtn');
-            const calendarGridEl = document.getElementById('calendarGrid');
-            const prevMonthBtn = document.getElementById('prevMonth');
-            const nextMonthBtn = document.getElementById('nextMonth');
-            const reservationsContainer = document.getElementById('reservationsContainer');
-            const monthYearModal = document.getElementById('monthYearModal');
-            const monthSelector = document.getElementById('monthSelector');
-            const prevYearBtn = document.getElementById('prevYear');
-            const nextYearBtn = document.getElementById('nextYear');
-            const modalYearEl = document.getElementById('modalYear');
-            const toast = document.getElementById('toast');
-            const toastMessage = document.getElementById('toast-message');
-            const reservationModal = document.getElementById('reservation-modal');
-            const bottomSheet = document.getElementById('bottom-sheet');
-            const reservationDateTitle = document.getElementById('reservation-date-title');
-            const openSearchModalBtn = document.getElementById('open-search-modal-btn');
-            const peopleSelector = document.getElementById('people-selector');
-            const confirmReservationBtn = document.getElementById('confirm-reservation-btn');
-            const restaurantSearchModal = document.getElementById('restaurant-search-modal');
-            const closeSearchModalBtn = document.getElementById('close-search-modal-btn');
-            const restaurantSearchInput = document.getElementById('restaurant-search-input');
-            const searchResultsContainer = document.getElementById('search-results-container');
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+        import { firebaseConfig } from "./firebase-config.js";
 
-            let currentDate = new Date();
-            let selectedDate = null;
-            let selectedRestaurant = null;
-            let toastTimeout;
-            let editingReservationIndex = null;
-            const mockReservations = [];
-            const mockRestaurants = [
-                { name: '가나다 식당', address: '서울 강남구' },
-                { name: '강남 불백', address: '서울 강남구' },
-                { name: '브루클린 더 버거 조인트', address: '서울 서초구' }
-            ];
+        // -----------------------------------------------------------
+        // 초기 설정 및 전역 변수
+        // -----------------------------------------------------------
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
 
-            const closeAllPopups = () => {
-                overlay.classList.add('hidden');
-                addChatPopup.classList.remove('popup-visible');
-                addChatPopup.classList.add('popup-hidden');
-                monthYearModal.classList.add('hidden');
-                closeReservationModal();
-            };
+        const fastapiUrl = "https://bapick.duckdns.org"
 
-            const renderCalendar = () => {
-                const year = currentDate.getFullYear();
-                const month = currentDate.getMonth();
-                currentMonthYearEl.textContent = `${year}년 ${month + 1}월`;
-                calendarGridEl.innerHTML = '';
-                const firstDay = new Date(year, month, 1).getDay();
-                const lastDate = new Date(year, month + 1, 0).getDate();
-                const today = new Date();
-                for (let i = 0; i < firstDay; i++) { calendarGridEl.appendChild(document.createElement('div')); }
-                for (let date = 1; date <= lastDate; date++) {
-                    const dayCell = document.createElement('button');
-                    dayCell.textContent = date;
-                    // ✅ 수정: 'relative' 클래스 추가 (점 위치 조정을 위해)
-                    dayCell.className = 'w-10 h-10 flex items-center justify-center rounded-full transition-colors text-gray-800 relative';
+        let currentUser = null; 
+        let searchTimer = null;
+        let currentDate = new Date();
+        let selectedDate = new Date(); // 선택 날짜를 오늘로 설정
+        let selectedRestaurantId = null;
+        let toastTimeout;
+        let editingReservationId = null; 
+        let currentDayReservations = []; 
+        let swipeState = { startX: 0, currentX: 0, isDragging: false, swipedElement: null };
 
-                    // --- 🔽 [추가된 로직] ---
-                    const cellDate = new Date(year, month, date);
-                    // 해당 날짜에 예약이 있는지 확인
-                    const hasReservation = mockReservations.some(r =>
-                        new Date(r.date).toDateString() === cellDate.toDateString()
-                    );
+        // DOM 요소
+        const overlay = document.getElementById('overlay');
+        const addChatBtn = document.getElementById('add-chat-btn');
+        const addChatPopup = document.getElementById('add-chat-popup');
+        const addReservationBtn = document.getElementById('add-reservation-btn');
+        const currentMonthYearEl = document.getElementById('monthYearBtn');
+        const calendarGridEl = document.getElementById('calendarGrid');
+        const prevMonthBtn = document.getElementById('prevMonth');
+        const nextMonthBtn = document.getElementById('nextMonth');
+        const reservationsContainer = document.getElementById('reservationsContainer');
+        const monthYearModal = document.getElementById('monthYearModal');
+        const monthSelector = document.getElementById('monthSelector');
+        const prevYearBtn = document.getElementById('prevYear');
+        const nextYearBtn = document.getElementById('nextYear');
+        const modalYearEl = document.getElementById('modalYear');
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toast-message');
+        const reservationModal = document.getElementById('reservation-modal');
+        const bottomSheet = document.getElementById('bottom-sheet');
+        const reservationDateTitle = document.getElementById('reservation-date-title');
+        const peopleSelector = document.getElementById('people-selector');
+        const confirmReservationBtn = document.getElementById('confirm-reservation-btn');
+        const restaurantSearchInput = document.getElementById('restaurant-search-input');
+        const searchResultsContainer = document.getElementById('search-results-container');
 
-                    let dot; // 점(dot) 엘리먼트를 저장할 변수
-                    if (hasReservation) {
-                        dot = document.createElement('div');
-                        // 점 스타일 (Tailwind CSS)
-                        dot.className = 'absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-custom-point rounded-full';
-                        dayCell.appendChild(dot);
-                    }
-                    // --- 🔼 [추가된 로직] ---
 
-                    if (selectedDate && date === selectedDate.getDate() && month === selectedDate.getMonth() && year === selectedDate.getFullYear()) {
-                        dayCell.classList.add('bg-custom-point', 'text-white');
+        // -----------------------------------------------------------
+        // 유틸리티 함수
+        // -----------------------------------------------------------
+        // Date 객체를 'YYYY-MM-DD' 형식의 문자열로 변환
+        function formatDateToYYYYMMDD(dateObject) {
+            if (!(dateObject instanceof Date) || isNaN(dateObject)) {
+                return null;
+            }
+            const year = dateObject.getFullYear();
+            const month = String(dateObject.getMonth() + 1).padStart(2, '0');
+            const day = String(dateObject.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
 
-                        // --- 🔽 [추가된 로직] ---
-                        // 날짜가 선택되면 점을 흰색으로 바꿔서 보이게 함
-                        if (dot) {
-                            dot.classList.remove('bg-custom-point');
-                            dot.classList.add('bg-white');
-                        }
-                        // --- 🔼 [추가된 로직] ---
-                    }
-                    if (date === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
-                        dayCell.classList.add('border', 'border-custom-today');
-                    }
-                    if (!dayCell.classList.contains('bg-custom-point')) {
-                        dayCell.classList.add('hover:bg-gray-100');
-                    }
-                    dayCell.addEventListener('click', () => {
-                        selectedDate = new Date(year, month, date);
-                        renderCalendar(); // 캘린더를 다시 그려서 선택된 날짜 UI 업데이트
-                        renderReservations(selectedDate); // 예약 목록 업데이트
-                    });
-                    calendarGridEl.appendChild(dayCell);
+        const showToast = (message) => {
+            clearTimeout(toastTimeout);
+            toastMessage.textContent = message;
+            toast.classList.remove('opacity-0');
+            toastTimeout = setTimeout(() => { toast.classList.add('opacity-0'); }, 2000);
+        }
+
+        const closeAllPopups = () => {
+            overlay.classList.add('hidden');
+            addChatPopup.classList.remove('popup-visible');
+            addChatPopup.classList.add('popup-hidden');
+            monthYearModal.classList.add('hidden');
+            closeReservationModal();
+        };
+
+        const closeReservationModal = () => {
+            bottomSheet.classList.add('translate-y-full');
+            setTimeout(() => {
+                reservationModal.classList.add('hidden');
+                if (!addChatPopup.classList.contains('popup-visible')) {
+                    overlay.classList.add('hidden');
                 }
-            };
+            }, 300);
+        };
 
-            const renderReservations = (date) => {
-                reservationsContainer.innerHTML = '';
-                if (!date) {
-                    reservationsContainer.className = 'flex items-center justify-center min-h-[100px]';
-                    reservationsContainer.innerHTML = `<p class="text-center text-gray-500">날짜를 선택하여 예약 현황을 확인하세요.</p>`;
+        // 선택된 시:분을 문자열로 가져옴 
+        const getSelectedTime = () => {
+            const itemHeight = 40;
+            const hoursSelector = document.getElementById('hours-selector');
+            const minutesSelector = document.getElementById('minutes-selector');
+
+            const hourIndex = Math.round(hoursSelector.scrollTop / itemHeight);
+            const minuteIndex = Math.round(minutesSelector.scrollTop / itemHeight);
+            
+            const selectedHour = (hourIndex <= 0 ? 0 : hourIndex - 1).toString().padStart(2, '0');
+            const selectedMinute = ((minuteIndex <= 0 ? 0 : minuteIndex - 1) * 5).toString().padStart(2, '0');
+            
+            return `${selectedHour}:${selectedMinute}`;
+        };
+
+        // 인원/월 등 버튼 클릭 시 상태 업데이트
+        const handleSelection = (container, clickedButton) => {
+            container.querySelectorAll('button').forEach(btn => {
+                btn.classList.remove('bg-custom-point', 'text-white');
+                btn.classList.add('bg-gray-100');
+            });
+            clickedButton.classList.add('bg-custom-point', 'text-white');
+            clickedButton.classList.remove('bg-gray-100');
+        };
+
+
+        // -----------------------------------------------------------
+        // API 통신
+        // -----------------------------------------------------------
+        // 특정 날짜의 예약 목록 조회
+        const loadReservations = async (date) => {
+            if (!date || !currentUser) return [];
+            const dateString = formatDateToYYYYMMDD(date);
+            const url = `${fastapiUrl}/api/reservations/?target_date=${dateString}`;
+
+            try {
+                const idToken = await currentUser.getIdToken();
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: { 
+                        'Authorization': `Bearer ${idToken}`, 
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    const errorBody = await response.json().catch(() => ({ detail: `HTTP error! status: ${response.status}` }));
+                    throw new Error(errorBody.detail || `예약 목록 로드 실패 (Status: ${response.status})`);
+                }
+                
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error("Error fetching reservations:", error);
+                showToast(`예약 목록 로드 실패: ${error.message}`);
+                return [];
+            }
+        };
+
+        // 예약 생성 또는 수정 API 호출
+        const createOrUpdateReservation = async (reservationData, reservationId = null) => {
+            const isUpdate = reservationId !== null;
+            const url = isUpdate 
+                ? `${fastapiUrl}/api/reservations/${reservationId}` 
+                : `${fastapiUrl}/api/reservations/create`;
+            const method = isUpdate ? 'PUT' : 'POST';
+            
+            try {
+                const token = await currentUser.getIdToken(); 
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Authorization': `Bearer ${token}`, 
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(reservationData)
+                });
+
+                if (!response.ok) {
+                    const errorBody = await response.json().catch(() => ({ detail: `API 호출 실패 (Status: ${response.status})` }));
+                    throw new Error(errorBody.detail || `API 호출 실패 (Status: ${response.status})`);
+                }
+                
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error(`Error ${isUpdate ? 'updating' : 'creating'} reservation:`, error);
+                showToast(`${isUpdate ? '예약 수정' : '예약 생성'} 실패: ${error.message}`);
+                return null;
+            }
+        };
+
+        // 예약 삭제 API 호출
+        const deleteReservationApi = async (reservationId) => {
+            const token = await currentUser.getIdToken(); 
+            const url = `${fastapiUrl}/api/reservations/${reservationId}`;
+            try {
+                const response = await fetch(url, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`, 
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.status === 204) {
+                    showToast('예약 삭제 완료.');
+                    return true;
+                } else {
+                    const errorBody = await response.json().catch(() => ({ detail: `API 호출 실패 (Status: ${response.status})` }));
+                    throw new Error(errorBody.detail || `예약 삭제 실패 (Status: ${response.status})`);
+                }
+            } catch (error) {
+                console.error("Error deleting reservation:", error);
+                showToast(`예약 삭제 실패: ${error.message}`);
+                return false;
+            }
+        }
+
+        // 식당 검색 API 호출
+        async function searchRestaurants(keyword) {
+            searchResultsContainer.innerHTML = '';
+            
+            if (!keyword.trim()) {
+                searchResultsContainer.classList.add('hidden');
+                selectedRestaurantId = null;
+                return;
+            }
+            
+            searchResultsContainer.classList.remove('hidden');
+
+            try {
+                const token = await currentUser.getIdToken(); 
+                const url = `${fastapiUrl}/api/restaurants/search?keyword=${encodeURIComponent(keyword)}`;
+                
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`, 
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error(`식당 검색 API 오류 ${response.status}:`, errorText);
+                    searchResultsContainer.innerHTML = `<p class="p-2 text-red-500">검색 서버 오류 (${response.status})가 발생했습니다.</p>`;
                     return;
                 }
-                const reservations = mockReservations.filter(r => new Date(r.date).toDateString() === date.toDateString());
-                if (reservations.length > 0) {
-                    reservationsContainer.className = 'space-y-4';
-                    reservations.forEach((reservation, index) => {
-                        const swipeContainer = document.createElement('div');
-                        swipeContainer.className = 'swipe-container';
-                        const swipeActions = document.createElement('div');
-                        swipeActions.className = 'swipe-actions';
-                        const editButton = document.createElement('button');
-                        editButton.className = 'action-button';
-                        editButton.style.backgroundColor = '#6b7280';
-                        editButton.innerHTML = `<svg class="h-5 w-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg><span>수정</span>`;
-                        editButton.onclick = () => openReservationModalForEdit(index);
-                        const deleteButton = document.createElement('button');
-                        deleteButton.className = 'action-button';
-                        deleteButton.style.backgroundColor = '#ef4444';
-                        deleteButton.innerHTML = `<svg class="h-5 w-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg><span>삭제</span>`;
-                        deleteButton.onclick = () => {
-                            mockReservations.splice(index, 1);
+
+                const data = await response.json();
+
+                if (data && Array.isArray(data.restaurants)) {
+                    renderSearchResults(data.restaurants); 
+                } else {
+                    console.error("API 응답 구조 오류: 예상된 'restaurants' 배열이 없습니다.", data);
+                    searchResultsContainer.innerHTML = `<p class="p-2 text-red-500">검색 결과를 가져오는 데 실패했습니다.</p>`;
+                }
+            } catch (error) {
+                console.error("식당 검색 중 오류 발생:", error);
+                searchResultsContainer.innerHTML = `<p class="p-2 text-red-500">검색 결과를 가져오는 데 실패했습니다.</p>`;
+            }
+        }
+
+
+        // -----------------------------------------------------------
+        // 캘린더, 예약 목록 렌더링
+        // -----------------------------------------------------------
+        // 캘린더 렌더링 및 선택한 날짜 표시
+        const renderCalendar = () => {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            currentMonthYearEl.textContent = `${year}년 ${month + 1}월`;
+            calendarGridEl.innerHTML = '';
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const lastDate = new Date(year, month + 1, 0).getDate();
+            const today = new Date();
+
+            for (let i = 0; i < firstDay; i++) { calendarGridEl.appendChild(document.createElement('div')); }
+
+            for (let date = 1; date <= lastDate; date++) {
+                const dayCell = document.createElement('button');
+                dayCell.textContent = date;
+                dayCell.className = 'w-10 h-10 flex items-center justify-center rounded-full transition-colors text-gray-800 relative';
+
+                const isSelected = selectedDate && date === selectedDate.getDate() && month === selectedDate.getMonth() && year === selectedDate.getFullYear();
+                const isToday = date === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+                
+                if (isSelected) {
+                    dayCell.classList.add('bg-custom-point', 'text-white');
+                }
+                if (isToday) {
+                    dayCell.classList.add('border', 'border-custom-today');
+                }
+                if (!dayCell.classList.contains('bg-custom-point')) {
+                    dayCell.classList.add('hover:bg-gray-100');
+                }
+
+                dayCell.addEventListener('click', () => {
+                    selectedDate = new Date(year, month, date);
+                    renderCalendar();
+                    renderReservations(selectedDate); 
+                });
+                calendarGridEl.appendChild(dayCell);
+            }
+        };
+
+        // 월/년 선택 모달 렌더링
+        const renderMonthModal = () => {
+            const year = currentDate.getFullYear();
+            modalYearEl.textContent = year;
+            monthSelector.innerHTML = '';
+            const monthNames = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"];
+            monthNames.forEach((name, index) => {
+                const monthButton = document.createElement('button');
+                monthButton.textContent = name;
+                monthButton.className = 'p-2 rounded-lg transition-colors hover:bg-custom-point hover:text-white font-medium';
+                if (currentDate.getMonth() === index) { 
+                    monthButton.classList.add('bg-custom-point', 'text-white'); 
+                    monthButton.classList.remove('hover:bg-custom-point', 'hover:text-white');
+                }
+                monthButton.addEventListener('click', () => {
+                    currentDate.setMonth(index);
+                    monthYearModal.classList.add('hidden');
+                    renderCalendar();
+                    // 월 변경 시 예약 목록은 오늘 날짜로 로드하지 않음
+                });
+                monthSelector.appendChild(monthButton);
+            });
+        };
+
+        // 식당 검색 결과 렌더링 및 클릭 이벤트 연결 (식당 클릭 시 해당 식당 저장)
+        function renderSearchResults(restaurants) {
+            
+            if (restaurants.length === 0) {
+                searchResultsContainer.innerHTML = `<p class="p-2 text-gray-500 text-sm">일치하는 식당이 없습니다.</p>`;
+                searchResultsContainer.classList.remove('hidden');
+                return;
+            }
+
+            let results = '';
+            restaurants.forEach(restaurant => {
+                results += `
+                    <div class="restaurant-search-item p-2 hover:bg-gray-100 cursor-pointer border-b border-gray-100" 
+                        data-id="${restaurant.id}"
+                        data-name="${restaurant.name.replace(/"/g, '&quot;')}"
+                        data-category="${restaurant.category}">
+                        <p class="font-medium">${restaurant.name} <span class="text-xs text-gray-500">(${restaurant.category})</span></p>
+                        <p class="text-xs text-gray-600">${restaurant.address || '주소 정보 없음'}</p>
+                        <p class="text-xs text-yellow-500">평점: ${restaurant.rating ? restaurant.rating.toFixed(1) : '평점 없음'}</p>
+                    </div>
+                `;
+            });
+
+            searchResultsContainer.innerHTML = results;
+            
+            document.querySelectorAll('.restaurant-search-item').forEach(item => {
+                item.addEventListener('click', handleRestaurantSelection);
+            });
+            
+            searchResultsContainer.classList.remove('hidden');
+        }
+
+        // 선택된 날짜의 예약 목록 조회 및 렌더링
+        const renderReservations = async (date) => {
+            reservationsContainer.innerHTML = '';
+
+            if (!date || !currentUser) {
+                reservationsContainer.className = 'flex items-center justify-center min-h-[100px]';
+                reservationsContainer.innerHTML = `<p class="text-center text-gray-500">날짜를 선택하여 예약 현황을 확인하세요.</p>`;
+                currentDayReservations = []; 
+                return;
+            }
+            
+            const fetchedReservations = await loadReservations(date);
+            currentDayReservations = fetchedReservations; 
+
+            if (currentDayReservations.length > 0) {
+                reservationsContainer.className = 'space-y-4';
+                currentDayReservations.forEach((reservation) => {
+                    
+                    const resDate = new Date(reservation.reservation_date);
+                    const resTime = reservation.reservation_time.substring(0, 5); 
+                    const resPeople = `${reservation.people_count}명`;
+                    const restaurantName = reservation.restaurant_name;
+                    const resId = reservation.id;
+
+                    const swipeContainer = document.createElement('div');
+                    swipeContainer.className = 'swipe-container';
+                    
+                    // --- 스와이프 액션 버튼 생성 ---
+                    const swipeActions = document.createElement('div');
+                    swipeActions.className = 'swipe-actions';
+
+                    const editButton = document.createElement('button');
+                    editButton.className = 'action-button';
+                    editButton.style.backgroundColor = '#6b7280';
+                    editButton.innerHTML = `<svg class="h-5 w-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg><span>수정</span>`;
+                    editButton.onclick = () => openReservationModalForEdit(resId);
+
+                    const deleteButton = document.createElement('button');
+                    deleteButton.className = 'action-button';
+                    deleteButton.style.backgroundColor = '#ef4444';
+                    deleteButton.innerHTML = `<svg class="h-5 w-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg><span>삭제</span>`;
+                    deleteButton.onclick = async () => {
+                        const success = await deleteReservationApi(resId);
+                        if (success) {
+                            // 삭제 성공 시 카드 애니메이션
                             swipeContainer.style.transition = 'all 0.3s ease';
                             swipeContainer.style.height = '0px';
                             swipeContainer.style.opacity = '0';
                             swipeContainer.style.padding = '0';
                             swipeContainer.style.margin = '0';
                             setTimeout(() => {
-                                renderReservations(selectedDate);
-                                // --- 🔽 [추가된 라인] ---
-                                renderCalendar(); // ✅ 캘린더를 새로고침하여 점을 제거합니다.
-                                // --- 🔼 [추가된 라인] ---
+                                renderReservations(selectedDate); 
+                                renderCalendar(); 
                             }, 300);
-                        };
-                        swipeActions.appendChild(editButton);
-                        swipeActions.appendChild(deleteButton);
-                        const reservationCard = document.createElement('div');
-                        reservationCard.className = 'swipe-content p-4 shadow-md flex items-center space-x-4';
-                        reservationCard.innerHTML = `
-                        <div class="rounded-lg w-12 h-12 flex items-center justify-center text-white font-bold text-xl" style="background-color: #FDBF50;">${new Date(reservation.date).getDate()}</div>
-                        <div class="flex-1 text-gray-800">
-                            <p class="text-lg font-semibold">${reservation.restaurant}</p>
-                            <p class="text-sm font-medium mt-1">${reservation.time} / ${reservation.people}</p>
-                        </div>`;
-                        swipeContainer.appendChild(swipeActions);
-                        swipeContainer.appendChild(reservationCard);
-                        reservationsContainer.appendChild(swipeContainer);
-                        addSwipeListeners(reservationCard);
-                    });
+                        }
+                    };
+                    
+                    swipeActions.appendChild(editButton);
+                    swipeActions.appendChild(deleteButton);
+
+                    // --- 예약 카드 콘텐츠 생성 ---
+                    const reservationCard = document.createElement('div');
+                    reservationCard.className = 'swipe-content p-4 shadow-md flex items-center space-x-4';
+                    reservationCard.innerHTML = `
+                    <div class="rounded-lg w-12 h-12 flex items-center justify-center text-white font-bold text-xl" style="background-color: #FDBF50;">${resDate.getDate()}</div>
+                    <div class="flex-1 text-gray-800">
+                        <p class="text-lg font-semibold">${restaurantName}</p>
+                        <p class="text-sm font-medium mt-1">${resTime} / ${resPeople}</p>
+                    </div>`;
+                    
+                    swipeContainer.appendChild(swipeActions);
+                    swipeContainer.appendChild(reservationCard);
+                    reservationsContainer.appendChild(swipeContainer);
+                    
+                    // 스와이프 리스너 추가
+                    addSwipeListeners(reservationCard);
+                });
+            } else {
+                reservationsContainer.className = 'flex items-center justify-center min-h-[100px]';
+                reservationsContainer.innerHTML = `<p class="text-center text-gray-500">선택한 날짜에 예약이 없습니다.</p>`;
+            }
+        };
+
+
+        // -----------------------------------------------------------
+        // 모달 UI 조작 및 이벤트 처리 함수
+        // -----------------------------------------------------------
+        // 스와이프 동작 리스너를 예약 카드에 추가
+        function addSwipeListeners(element) {
+            let startX, currentX = 0, initialTransform = 0;
+            const swipeThreshold = 50;
+            
+            const container = element.parentElement; // swipe-container
+
+            element.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+                initialTransform = parseFloat(element.style.transform.replace('translateX(', '').replace('px)', '') || 0);
+                element.style.transition = 'none';
+                swipeState.isDragging = true;
+                swipeState.swipedElement = element;
+                // 다른 스와이프 요소 초기화
+                document.querySelectorAll('.swipe-content').forEach(other => {
+                    if (other !== element) { 
+                        other.style.transform = 'translateX(0px)'; 
+                        other.style.transition = 'transform 0.3s ease'; 
+                    }
+                });
+            });
+
+            element.addEventListener('touchmove', (e) => {
+                if (!swipeState.isDragging || swipeState.swipedElement !== element) return;
+                currentX = e.touches[0].clientX;
+                const diff = currentX - startX;
+                // -160px (액션 버튼 너비)와 0px 사이로 제한
+                const newTransform = Math.max(-160, Math.min(0, diff + initialTransform));
+                element.style.transform = `translateX(${newTransform}px)`;
+            });
+
+            element.addEventListener('touchend', () => {
+                if (!swipeState.isDragging || swipeState.swipedElement !== element) return;
+                swipeState.isDragging = false;
+                swipeState.swipedElement = null;
+                element.style.transition = 'transform 0.3s ease';
+                
+                const currentTransform = parseFloat(element.style.transform.replace('translateX(', '').replace('px)', '') || 0);
+                
+                if (currentTransform < -swipeThreshold) {
+                    // 임계값보다 많이 스와이프 시 액션 버튼 노출
+                    element.style.transform = 'translateX(-160px)';
                 } else {
-                    reservationsContainer.className = 'flex items-center justify-center min-h-[100px]';
-                    reservationsContainer.innerHTML = `<p class="text-center text-gray-500">선택한 날짜에 예약이 없습니다.</p>`;
+                    // 원위치
+                    element.style.transform = 'translateX(0px)';
                 }
+            });
+        }
+
+        // 시간 선택 UI
+        const populateTimePicker = () => {
+            const hoursSelector = document.getElementById('hours-selector');
+            const minutesSelector = document.getElementById('minutes-selector');
+            hoursSelector.innerHTML = ''; minutesSelector.innerHTML = '';
+            const itemHeight = 40;
+            const paddingElHeight = `calc(50% - ${itemHeight / 2}px)`;
+
+            const createPadding = () => {
+                const padding = document.createElement('div');
+                padding.style.height = paddingElHeight;
+                return padding;
             };
 
-            const renderMonthModal = () => {
-                const year = currentDate.getFullYear();
-                modalYearEl.textContent = year;
-                monthSelector.innerHTML = '';
-                const monthNames = ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"];
-                monthNames.forEach((name, index) => {
-                    const monthButton = document.createElement('button');
-                    monthButton.textContent = name;
-                    monthButton.className = 'p-2 rounded-lg transition-colors hover-bg-custom-point hover:text-white font-medium';
-                    if (currentDate.getMonth() === index) { monthButton.classList.add('bg-custom-point', 'text-white'); }
-                    monthButton.addEventListener('click', () => {
-                        currentDate.setMonth(index);
-                        monthYearModal.classList.add('hidden');
-                        renderCalendar();
-                    });
-                    monthSelector.appendChild(monthButton);
-                });
-            };
-
-            const showToast = (message) => {
-                clearTimeout(toastTimeout);
-                toastMessage.textContent = message;
-                toast.classList.remove('opacity-0');
-                toastTimeout = setTimeout(() => { toast.classList.add('opacity-0'); }, 2000);
+            // 시간 (00시 ~ 23시)
+            hoursSelector.appendChild(createPadding());
+            for (let i = 0; i <= 23; i++) {
+                const hour = document.createElement('div');
+                hour.textContent = i.toString().padStart(2, '0');
+                hour.className = 'h-10 flex items-center justify-center scroll-snap-align-center opacity-50 transition-all duration-150';
+                hoursSelector.appendChild(hour);
             }
+            hoursSelector.appendChild(createPadding());
 
-            const closeReservationModal = () => {
-                bottomSheet.classList.add('translate-y-full');
-                setTimeout(() => {
-                    reservationModal.classList.add('hidden');
-                    if (!addChatPopup.classList.contains('popup-visible')) {
-                        overlay.classList.add('hidden');
-                    }
-                }, 300);
-            };
+            // 분 (00분 ~ 55분, 5분 단위)
+            minutesSelector.appendChild(createPadding());
+            for (let i = 0; i < 60; i += 5) {
+                const minute = document.createElement('div');
+                minute.textContent = i.toString().padStart(2, '0');
+                minute.className = 'h-10 flex items-center justify-center scroll-snap-align-center opacity-50 transition-all duration-150';
+                minutesSelector.appendChild(minute);
+            }
+            minutesSelector.appendChild(createPadding());
 
-            const _openBottomSheetUI = () => {
-                const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
-                reservationDateTitle.textContent = selectedDate.toLocaleString('ko-KR', options);
-                overlay.classList.remove('hidden');
-                reservationModal.classList.remove('hidden');
-                setTimeout(() => { bottomSheet.classList.remove('translate-y-full'); }, 10);
-            };
-            const openReservationModalForCreate = () => {
-                if (!selectedDate) {
-                    showToast('날짜를 먼저 선택해주세요.');
-                    return;
-                }
-                editingReservationIndex = null;
-                confirmReservationBtn.textContent = '저장';
-                selectedRestaurant = null;
-                openSearchModalBtn.textContent = '식당을 검색해주세요';
-                openSearchModalBtn.classList.add('text-gray-500');
-                openSearchModalBtn.classList.remove('text-gray-800', 'font-semibold');
-                populateTimePicker();
-                populatePeopleCount();
-                _openBottomSheetUI();
-            };
-            const openReservationModalForEdit = (index) => {
-                const reservation = mockReservations[index];
-                if (!reservation) return;
-                editingReservationIndex = index;
-                confirmReservationBtn.textContent = '저장';
-                selectedDate = new Date(reservation.date);
-                selectedRestaurant = { name: reservation.restaurant, address: '' };
-                openSearchModalBtn.textContent = reservation.restaurant;
-                openSearchModalBtn.classList.remove('text-gray-500');
-                openSearchModalBtn.classList.add('text-gray-800', 'font-semibold');
-                populateTimePicker();
-                populatePeopleCount();
-                peopleSelector.querySelectorAll('button').forEach(btn => {
-                    if (btn.textContent === reservation.people) { handleSelection(peopleSelector, btn); }
-                });
-                _openBottomSheetUI();
-                setTimeout(() => {
-                    const [hour, minute] = reservation.time.split(':');
-                    const itemHeight = 40;
-                    document.getElementById('hours-selector').scrollTop = parseInt(hour, 10) * itemHeight;
-                    document.getElementById('minutes-selector').scrollTop = (parseInt(minute, 10) / 5) * itemHeight;
-                }, 100);
-            };
+            // 스크롤 위치에 따라 중앙 항목 활성화
+            const updateActive = (container) => {
+                const centerScroll = container.scrollTop + container.clientHeight / 2;
+                const centerIndex = Math.round(container.scrollTop / itemHeight);
+                
+                Array.from(container.children).forEach((child, index) => {
+                    const itemIndex = index - 1; // 패딩 고려
 
-            const openSearchModal = () => restaurantSearchModal.classList.remove('translate-y-full');
-            const closeSearchModal = () => restaurantSearchModal.classList.add('translate-y-full');
-            const renderSearchResults = (query = '') => {
-                searchResultsContainer.innerHTML = '';
-                const filtered = mockRestaurants.filter(r => r.name.toLowerCase().includes(query.toLowerCase()));
-                if (filtered.length === 0) {
-                    searchResultsContainer.innerHTML = `<p class="text-center text-gray-500">검색 결과가 없습니다.</p>`;
-                    return;
-                }
-                filtered.forEach(restaurant => {
-                    const resultItem = document.createElement('button');
-                    resultItem.className = 'w-full text-left p-4 hover:bg-gray-100 rounded-lg';
-                    resultItem.innerHTML = `<p class="font-semibold text-gray-800">${restaurant.name}</p><p class="text-sm text-gray-500">${restaurant.address}</p>`;
-                    resultItem.addEventListener('click', () => {
-                        selectedRestaurant = restaurant;
-                        openSearchModalBtn.textContent = restaurant.name;
-                        openSearchModalBtn.classList.remove('text-gray-500');
-                        openSearchModalBtn.classList.add('text-gray-800', 'font-semibold');
-                        closeSearchModal();
-                    });
-                    searchResultsContainer.appendChild(resultItem);
-                });
-            };
-
-            let swipeState = { startX: 0, currentX: 0, isDragging: false, swipedElement: null };
-            function addSwipeListeners(element) {
-                let startX, currentX = 0, initialTransform = 0;
-                const swipeThreshold = 50;
-                element.addEventListener('touchstart', (e) => {
-                    startX = e.touches[0].clientX;
-                    initialTransform = parseFloat(element.style.transform.replace('translateX(', '').replace('px)', '') || 0);
-                    element.style.transition = 'none';
-                    swipeState.isDragging = true;
-                    swipeState.swipedElement = element;
-                    document.querySelectorAll('.swipe-content').forEach(other => {
-                        if (other !== element) { other.style.transform = 'translateX(0px)'; other.style.transition = 'transform 0.3s ease'; }
-                    });
-                });
-                element.addEventListener('touchmove', (e) => {
-                    if (!swipeState.isDragging || swipeState.swipedElement !== element) return;
-                    currentX = e.touches[0].clientX;
-                    const diff = currentX - startX;
-                    const newTransform = Math.max(-160, Math.min(0, diff + initialTransform));
-                    element.style.transform = `translateX(${newTransform}px)`;
-                });
-                element.addEventListener('touchend', () => {
-                    if (!swipeState.isDragging || swipeState.swipedElement !== element) return;
-                    swipeState.isDragging = false;
-                    swipeState.swipedElement = null;
-                    element.style.transition = 'transform 0.3s ease';
-                    const currentTransform = parseFloat(element.style.transform.replace('translateX(', '').replace('px)', '') || 0);
-                    if (currentTransform < -swipeThreshold) {
-                        element.style.transform = 'translateX(-160px)';
+                    if (itemIndex === centerIndex) {
+                        child.classList.remove('opacity-50', 'scale-90');
+                        child.classList.add('opacity-100', 'scale-100', 'font-bold');
                     } else {
-                        element.style.transform = 'translateX(0px)';
+                        child.classList.add('opacity-50', 'scale-90');
+                        child.classList.remove('opacity-100', 'scale-100', 'font-bold');
                     }
                 });
-            }
+            };
+            
+            // 스크롤 이벤트 리스너 (디바운싱 적용)
+            let scrollTimeout;
+            const handleScroll = (container) => { 
+                clearTimeout(scrollTimeout); 
+                scrollTimeout = setTimeout(() => updateActive(container), 150); 
+            };
 
-            const populateTimePicker = () => {
-                const hoursSelector = document.getElementById('hours-selector');
-                const minutesSelector = document.getElementById('minutes-selector');
-                hoursSelector.innerHTML = ''; minutesSelector.innerHTML = '';
+            hoursSelector.addEventListener('scroll', () => handleScroll(hoursSelector));
+            minutesSelector.addEventListener('scroll', () => handleScroll(minutesSelector));
+            
+            // 초기 활성화 상태 설정
+            setTimeout(() => { updateActive(hoursSelector); updateActive(minutesSelector); }, 50);
+        };
+
+        // 인원 선택 버튼 UI
+        const populatePeopleCount = () => {
+            peopleSelector.innerHTML = '';
+            for (let i = 1; i <= 6; i++) {
+                const button = document.createElement('button');
+                button.textContent = `${i}명`;
+                button.className = 'p-3 rounded-lg font-medium bg-gray-100 hover:bg-gray-200 transition-colors';
+                button.addEventListener('click', () => handleSelection(peopleSelector, button));
+                peopleSelector.appendChild(button);
+            }
+            // 기본값 2명 선택
+            handleSelection(peopleSelector, peopleSelector.children[1]); 
+        };
+
+        // 검색 결과에서 식당 선택 시 해당 식당 저장
+        function handleRestaurantSelection(event) {
+            const item = event.currentTarget;
+            
+            const restaurantId = parseInt(item.dataset.id, 10); 
+            const restaurantName = item.dataset.name;
+            
+            selectedRestaurantId = restaurantId;
+            
+            restaurantSearchInput.value = restaurantName;
+            
+            searchResultsContainer.classList.add('hidden');
+            searchResultsContainer.innerHTML = '';
+        }
+
+        // 팝업 시트
+        const _openReservationModalUI = () => {
+            const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+            reservationDateTitle.textContent = selectedDate.toLocaleString('ko-KR', options);
+            overlay.classList.remove('hidden');
+            reservationModal.classList.remove('hidden');
+            setTimeout(() => { bottomSheet.classList.remove('translate-y-full'); }, 10);
+        };
+
+        // 새 예약을 위한 예약 모델 
+        const openReservationModalForCreate = () => {
+            if (!selectedDate) {
+                showToast('날짜를 먼저 선택해주세요.');
+                return;
+            }
+            editingReservationId = null;
+            confirmReservationBtn.textContent = '저장';
+            selectedRestaurantId = null;
+            
+            restaurantSearchInput.value = '';
+            searchResultsContainer.innerHTML = '';
+            searchResultsContainer.classList.add('hidden');
+
+            populateTimePicker();
+            populatePeopleCount();
+            _openReservationModalUI();
+        };
+
+        // 기존 예약을 수정하기 위한 예약 모달
+        const openReservationModalForEdit = (reservationId) => {
+            const reservation = currentDayReservations.find(r => r.id === reservationId);
+
+            if (!reservation) {
+                showToast('수정할 예약을 찾을 수 없습니다.');
+                return;
+            }
+            
+            editingReservationId = reservationId;
+            confirmReservationBtn.textContent = '수정 저장';
+            selectedDate = new Date(reservation.reservation_date);
+            selectedRestaurantId = reservation.restaurant_id;
+            
+            restaurantSearchInput.value = reservation.restaurant_name;
+            searchResultsContainer.innerHTML = '';
+            searchResultsContainer.classList.add('hidden');
+
+            populateTimePicker();
+            populatePeopleCount();
+            
+            // 인원 버튼 선택 상태 업데이트
+            peopleSelector.querySelectorAll('button').forEach(btn => {
+                if (btn.textContent === `${reservation.people_count}명`) { 
+                    handleSelection(peopleSelector, btn); 
+                }
+            });
+
+            _openReservationModalUI();
+            
+            // 시간 선택기 스크롤 위치 조정
+            setTimeout(() => {
+                const [hour, minute] = reservation.reservation_time.substring(0, 5).split(':').map(Number);
                 const itemHeight = 40;
-                const paddingElHeight = `calc(50% - ${itemHeight / 2}px)`;
-                const createPadding = () => {
-                    const padding = document.createElement('div');
-                    padding.style.height = paddingElHeight;
-                    return padding;
-                };
-                hoursSelector.appendChild(createPadding());
-                for (let i = 0; i <= 23; i++) {
-                    const hour = document.createElement('div');
-                    hour.textContent = i.toString().padStart(2, '0');
-                    hour.className = 'h-10 flex items-center justify-center scroll-snap-align-center opacity-50';
-                    hoursSelector.appendChild(hour);
-                }
-                hoursSelector.appendChild(createPadding());
-                minutesSelector.appendChild(createPadding());
-                for (let i = 0; i < 60; i += 5) {
-                    const minute = document.createElement('div');
-                    minute.textContent = i.toString().padStart(2, '0');
-                    minute.className = 'h-10 flex items-center justify-center scroll-snap-align-center opacity-50';
-                    minutesSelector.appendChild(minute);
-                }
-                minutesSelector.appendChild(createPadding());
+                
+                // 패딩 고려하여 스크롤 위치 조정
+                document.getElementById('hours-selector').scrollTop = (hour + 1) * itemHeight;
+                document.getElementById('minutes-selector').scrollTop = (minute / 5 + 1) * itemHeight;
+                
+                // 활성화 상태 강제 업데이트
                 const updateActive = (container) => {
                     const centerIndex = Math.round(container.scrollTop / itemHeight);
                     Array.from(container.children).forEach((child, index) => {
@@ -672,98 +977,111 @@
                         }
                     });
                 };
-                let scrollTimeout;
-                hoursSelector.addEventListener('scroll', () => { clearTimeout(scrollTimeout); scrollTimeout = setTimeout(() => updateActive(hoursSelector), 150); });
-                minutesSelector.addEventListener('scroll', () => { clearTimeout(scrollTimeout); scrollTimeout = setTimeout(() => updateActive(minutesSelector), 150); });
-                setTimeout(() => { updateActive(hoursSelector); updateActive(minutesSelector); }, 50);
-            };
+                updateActive(document.getElementById('hours-selector'));
+                updateActive(document.getElementById('minutes-selector'));
+                
+            }, 350); // 모달 애니메이션 완료 후 실행
+        };
 
-            const populatePeopleCount = () => {
-                peopleSelector.innerHTML = '';
-                for (let i = 1; i <= 6; i++) {
-                    const button = document.createElement('button');
-                    button.textContent = `${i}명`;
-                    button.className = 'p-3 rounded-lg font-medium bg-gray-100 hover:bg-gray-200';
-                    button.addEventListener('click', () => handleSelection(peopleSelector, button));
-                    peopleSelector.appendChild(button);
-                }
-            };
 
-            const handleSelection = (container, clickedButton) => {
-                container.querySelectorAll('button').forEach(btn => {
-                    btn.classList.remove('bg-custom-point', 'text-white');
-                    btn.classList.add('bg-gray-100');
-                });
-                clickedButton.classList.add('bg-custom-point', 'text-white');
-                clickedButton.classList.remove('bg-gray-100');
-            };
-
-            const getSelectedTime = () => {
-                const hourIndex = Math.round(document.getElementById('hours-selector').scrollTop / 40);
-                const minuteIndex = Math.round(document.getElementById('minutes-selector').scrollTop / 40);
-                const selectedHour = hourIndex.toString().padStart(2, '0');
-                const selectedMinute = (minuteIndex * 5).toString().padStart(2, '0');
-                return `${selectedHour}:${selectedMinute}`;
-            };
-
-            // --- 이벤트 리스너 ---
-            addChatBtn.addEventListener('click', (event) => {
-                event.stopPropagation();
-                const isAddChatOpen = addChatPopup.classList.contains('popup-visible');
-                closeAllPopups();
-                if (!isAddChatOpen) {
-                    overlay.classList.remove('hidden');
-                    addChatPopup.classList.remove('popup-hidden');
-                    addChatPopup.classList.add('popup-visible');
-                }
-            });
-
-            addReservationBtn.addEventListener('click', openReservationModalForCreate);
-            overlay.addEventListener('click', closeAllPopups);
-            currentMonthYearEl.addEventListener('click', () => { renderMonthModal(); monthYearModal.classList.remove('hidden'); });
-            monthYearModal.addEventListener('click', (e) => { if (e.target === monthYearModal) monthYearModal.classList.add('hidden'); });
-            prevYearBtn.addEventListener('click', () => { currentDate.setFullYear(currentDate.getFullYear() - 1); renderMonthModal(); });
-            nextYearBtn.addEventListener('click', () => { currentDate.setFullYear(currentDate.getFullYear() + 1); renderMonthModal(); });
-            prevMonthBtn.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); });
-            nextMonthBtn.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); });
-
-            reservationModal.addEventListener('click', (e) => { if (e.target === reservationModal) closeReservationModal(); });
-            openSearchModalBtn.addEventListener('click', () => { renderSearchResults(); openSearchModal(); });
-            closeSearchModalBtn.addEventListener('click', closeSearchModal);
-            restaurantSearchInput.addEventListener('input', (e) => renderSearchResults(e.target.value));
-
-            confirmReservationBtn.addEventListener('click', () => {
-                if (!selectedRestaurant) { showToast('식당을 선택해주세요.'); return; }
-                const selectedTime = getSelectedTime();
-                const selectedPeopleEl = peopleSelector.querySelector('.bg-custom-point');
-                if (!selectedPeopleEl) { showToast('인원을 선택해주세요.'); return; }
-                const selectedPeople = selectedPeopleEl.textContent;
-                const reservationData = {
-                    date: selectedDate.toISOString(),
-                    time: selectedTime,
-                    people: selectedPeople,
-                    restaurant: selectedRestaurant.name
-                };
-                if (editingReservationIndex !== null) {
-                    mockReservations[editingReservationIndex] = reservationData;
-                    showToast(`'${selectedRestaurant.name}' 예약 수정 완료!`);
-                } else {
-                    mockReservations.push(reservationData);
-                    showToast(`'${selectedRestaurant.name}' 예약 완료!`);
-                }
-                editingReservationIndex = null;
+        // -----------------------------------------------------------
+        // 이벤트 리스너 등록 및 초기 실행
+        // -----------------------------------------------------------
+        // Firebase 인증 상태
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user
+            if (user) {
                 renderReservations(selectedDate);
-                closeReservationModal();
-
-                // --- 🔽 [추가된 라인] ---
-                renderCalendar(); // ✅ 캘린더를 새로고침하여 점을 표시합니다.
-                // --- 🔼 [추가된 라인] ---
-            });
-
-            // --- 초기 실행 ---
-            renderCalendar();
-            renderReservations(null);
+            } else {
+                renderReservations(null);
+                showToast('로그인을 하지 않았습니다.');
+                window.location.href = 'index.html';
+            }
         });
+
+        // 채팅 팝업 토글
+        addChatBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            const isAddChatOpen = addChatPopup.classList.contains('popup-visible');
+            closeAllPopups();
+            if (!isAddChatOpen) {
+                overlay.classList.remove('hidden');
+                addChatPopup.classList.remove('popup-hidden');
+                addChatPopup.classList.add('popup-visible');
+            }
+        });
+
+        // 오버레이 클릭 시 팝업 닫기
+        overlay.addEventListener('click', closeAllPopups);
+        reservationModal.addEventListener('click', (e) => { if (e.target === reservationModal) closeReservationModal(); });
+
+        // 예약 추가 버튼
+        addReservationBtn.addEventListener('click', openReservationModalForCreate);
+
+        // 캘린더 이동 및 모달
+        currentMonthYearEl.addEventListener('click', () => { renderMonthModal(); monthYearModal.classList.remove('hidden'); });
+        monthYearModal.addEventListener('click', (e) => { if (e.target === monthYearModal) monthYearModal.classList.add('hidden'); });
+        prevYearBtn.addEventListener('click', () => { currentDate.setFullYear(currentDate.getFullYear() - 1); renderMonthModal(); });
+        nextYearBtn.addEventListener('click', () => { currentDate.setFullYear(currentDate.getFullYear() + 1); renderMonthModal(); });
+        prevMonthBtn.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); renderReservations(selectedDate); });
+        nextMonthBtn.addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); renderReservations(selectedDate); });
+
+        // 식당 검색 입력 처리 (디바운싱)
+        restaurantSearchInput.addEventListener('input', function() {
+            clearTimeout(searchTimer);
+            const keyword = this.value;
+
+            if (keyword.length > 0) {
+                searchTimer = setTimeout(() => {
+                    searchRestaurants(keyword);
+                }, 300);
+            } else {
+                searchResultsContainer.innerHTML = '';
+                searchResultsContainer.classList.add('hidden');
+                selectedRestaurantId = null;
+            }
+        });
+
+        // 예약 생성/수정 확정 버튼
+        confirmReservationBtn.addEventListener('click', async () => {
+            const restaurantName = restaurantSearchInput.value;
+            const restaurantId = selectedRestaurantId;
+
+            if (!restaurantId || typeof restaurantId !== 'number' || restaurantId <= 0) {
+                console.error("유효한 식당 ID가 선택되지 않았습니다.");
+                showToast(`${restaurantName}' 맛집을 검색 결과 목록에서 클릭해주세요.`); 
+                return;
+            }
+
+            const selectedTime = getSelectedTime();
+            const selectedPeopleEl = peopleSelector.querySelector('.bg-custom-point');
+            if (!selectedPeopleEl) { showToast('인원을 선택해주세요.'); return; }
+
+            const peopleCount = parseInt(selectedPeopleEl.textContent.replace('명', ''), 10);
+
+            const reservationData = {
+                restaurant_id: restaurantId,
+                reservation_date: formatDateToYYYYMMDD(selectedDate),
+                reservation_time: `${selectedTime}:00`, 
+                people_count: peopleCount
+            };
+
+            let result;
+            if (editingReservationId !== null) {
+                result = await createOrUpdateReservation(reservationData, editingReservationId);
+            } else {
+                result = await createOrUpdateReservation(reservationData);
+            }
+            
+            if (result) {
+                editingReservationId = null;
+                await renderReservations(selectedDate); 
+                closeReservationModal();
+                renderCalendar();
+            }
+        });
+
+        renderCalendar();
     </script>
 </body>
 

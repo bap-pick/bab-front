@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>채팅 목록</title>
+    <title>밥픽 - 채팅 목록</title>
     <script src="https://cdn.tailwindcss.com"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
@@ -75,69 +75,7 @@
 
 <body>
 
-    <div class="w-full h-full bg-white max-w-2xl mx-auto flex flex-col">
-        <div id="overlay" class="fixed inset-0 bg-black bg-opacity-20 z-40 hidden transition-opacity"></div>
-
-        <div id="add-friend-modal"
-            class="fixed inset-0 bg-black bg-opacity-40 z-50 hidden items-center justify-center p-4">
-            <div class="bg-white rounded-lg shadow-xl w-full max-w-sm">
-
-                <div class="p-6">
-                    <h3 class="text-xl font-semibold text-gray-800 mb-2">친구 추가</h3>
-                    <p class="text-gray-500 mb-4">추가할 친구의 이메일을 검색하세요.</p>
-                    <div class="relative">
-                        <input id="friend-email-input" type="email" placeholder="친구 이메일"
-                            class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400">
-                    </div>
-                    <div id="profile-list-container" class="mt-4 hidden space-y-2 max-h-48 overflow-y-auto">
-                    </div>
-                </div>
-
-                <hr class="border-gray-200">
-                <div class="p-6">
-                    <h4 class="text-lg font-semibold text-gray-800 mb-3">받은 친구 요청</h4>
-
-                    <div id="friend-request-list" class="space-y-3 max-h-48 overflow-y-auto">
-
-                        <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50">
-                            <div class="flex items-center space-x-3">
-                                <img class="h-10 w-10 rounded-full object-cover"
-                                    src="https://picsum.photos/100?random=2" alt="Profile">
-                                <span class="font-medium text-gray-700">밥푸리</span>
-                            </div>
-                            <div class="space-x-2 flex-shrink-0">
-                                <button
-                                    class="text-sm text-white bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded-md">수락</button>
-                                <button
-                                    class="text-sm text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded-md">거절</button>
-                            </div>
-                        </div>
-                        <div class="flex items-center justify-between p-2 rounded-lg bg-gray-50">
-                            <div class="flex items-center space-x-3">
-                                <img class="h-10 w-10 rounded-full object-cover"
-                                    src="https://picsum.photos/100?random=3" alt="Profile">
-                                <span class="font-medium text-gray-700">냠냠</span>
-                            </div>
-                            <div class="space-x-2 flex-shrink-0">
-                                <button
-                                    class="text-sm text-white bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded-md">수락</button>
-                                <button
-                                    class="text-sm text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded-md">거절</button>
-                            </div>
-                        </div>
-                        <p id="no-requests-text" class="text-sm text-gray-500 hidden">
-                            받은 친구 요청이 없습니다.
-                        </p>
-                    </div>
-                </div>
-
-                <div class="bg-gray-50 px-6 py-3 flex justify-end rounded-b-lg">
-                    <button id="cancel-add-friend-btn"
-                        class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 font-medium">닫기</button>
-                </div>
-            </div>
-        </div>
-
+    <div class="w-full h-full bg-white flex flex-col">
         <div id="chat-list-screen" class="h-full flex flex-col relative">
 
             <header class="h-16 bg-white border-b border-gray-200 flex-shrink-0">
@@ -145,13 +83,6 @@
                     <div></div>
                     <h1 class="text-xl font-bold text-gray-800 text-center">채팅</h1>
                     <div class="flex items-center space-x-3 justify-self-end">
-                        <button id="search-btn" class="text-gray-500 hover:text-gray-800">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <circle cx="11" cy="11" r="8"></circle>
-                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                            </svg>
-                        </button>
                         <button id="add-friend-btn" class="text-gray-500 hover:text-gray-800">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-width="2">
@@ -162,12 +93,6 @@
                             </svg>
                         </button>
                     </div>
-                </div>
-                <div id="header-search" class="hidden flex items-center gap-2 h-full px-4">
-                    <input type="text" id="chat-search-input" placeholder="채팅방 검색"
-                        class="w-full px-3 py-1.5 border-gray-200 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400">
-                    <button id="cancel-search-btn"
-                        class="text-gray-600 hover:text-gray-900 text-sm font-medium flex-shrink-0">취소</button>
                 </div>
             </header>
 
@@ -181,61 +106,18 @@
             </div>
 
             <main id="main-content" class="flex-1 overflow-y-auto bg-gray-50">
-
                 <div id="chat-list-private">
                     <ul class="space-y-3 p-4 bg-white">
                     </ul>
                 </div>
-
                 <div id="chat-list-group" class="hidden">
                     <ul class="space-y-3 p-4 bg-white">
                     </ul>
                 </div>
             </main>
-
-            <div id="add-chat-popup"
-                class="absolute bottom-24 left-1/2 -translate-x-1/2 w-48 bg-white rounded-md shadow-xl z-50 popup-hidden">
-                <div class="py-2">
-                    <a href="chat_list.html"
-                        class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="8" y1="6" x2="21" y2="6"></line>
-                            <line x1="8" y1="12" x2="21" y2="12"></line>
-                            <line x1="8" y1="18" x2="21" y2="18"></line>
-                            <line x1="3" y1="6" x2="3.01" y2="6"></line>
-                            <line x1="3" y1="12" x2="3.01" y2="12"></line>
-                            <line x1="3" y1="18" x2="3.01" y2="18"></line>
-                        </svg>
-                        채팅 목록
-                    </a>
-                    <a href="chat.html" id="start-private-chat-btn"
-                        class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                            <circle cx="9" cy="7" r="4" />
-                        </svg>
-                        1:1 채팅방
-                    </a>
-                    <a href="chat_group.html"
-                        class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <path d="M12 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                            <path d="M18 21v-2a4 4 0 0 0-4-4h-1" />
-                            <circle cx="9" cy="7" r="4" />
-                            <path d="M18 7h3a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-3" />
-                            <path d="m15.5 13.5-3-3 3-3" />
-                        </svg>
-                        단체 채팅방
-                    </a>
-                </div>
-            </div>
-
-            <footer class="fixed bottom-0 left-0 right-0 z-30 max-w-2xl mx-auto">
-                <nav
-                    class="flex justify-around items-center h-16 bg-white rounded-t-2xl shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+    </div>
+                <footer class="fixed bottom-0 left-0 right-0 z-30">
+                <nav class="flex justify-around items-center h-16 bg-white rounded-t-2xl shadow-[0_-2px_10px_rgba(0,0,0,0.05)] max-w-screen-xl mx-auto">
                     <a href="home.html"
                         class="flex flex-col items-center justify-center w-1/5 h-full text-gray-500 hover:text-[#FF7242] text-xs">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -283,8 +165,81 @@
                     <line x1="5" y1="12" x2="19" y2="12"></line>
                 </svg>
             </button>
+
+            <div id="add-chat-popup"
+                class="absolute bottom-24 left-1/2 -translate-x-1/2 w-48 bg-white rounded-md shadow-xl z-50 popup-hidden">
+                <div class="py-2">
+                    <a href="chat_list.html"
+                        class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="8" y1="6" x2="21" y2="6"></line>
+                            <line x1="8" y1="12" x2="21" y2="12"></line>
+                            <line x1="8" y1="18" x2="21" y2="18"></line>
+                            <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                            <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                            <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                        </svg>
+                        채팅 목록
+                    </a>
+                    <a href="chat.html" id="start-private-chat-btn"
+                        class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                        </svg>
+                        1:1 채팅방
+                    </a>
+                    <a href="chat_group.html"
+                        class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M12 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                            <path d="M18 21v-2a4 4 0 0 0-4-4h-1" />
+                            <circle cx="9" cy="7" r="4" />
+                            <path d="M18 7h3a1 1 0 0 1 1 1v7a1 1 0 0 1-1 1h-3" />
+                            <path d="m15.5 13.5-3-3 3-3" />
+                        </svg>
+                        단체 채팅방
+                    </a>
+                </div>
+            </div>
         </div>
-    </div>
+
+        <div id="overlay" class="fixed inset-0 bg-black bg-opacity-20 z-40 hidden transition-opacity"></div>
+
+        <div id="add-friend-modal" class="fixed inset-0 bg-black bg-opacity-40 z-50 hidden items-center justify-center p-4">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-sm">
+
+                <div class="p-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">친구 추가</h3>
+                    <p class="text-gray-500 mb-4">추가할 친구의 닉네임을 검색하세요.</p>
+                    <div class="relative">
+                        <input id="friend-nickname-input" type="text" placeholder="친구 닉네임" class="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400">
+                    </div>
+                    <div id="profile-list-container" class="mt-4 hidden space-y-2 max-h-48 overflow-y-auto">
+                    </div>
+                </div>
+
+                <hr class="border-gray-200">
+                <div class="p-6">
+                    <h4 class="text-lg font-semibold text-gray-800 mb-3">받은 친구 요청</h4>
+                    <div id="friend-request-list" class="space-y-3 max-h-48 overflow-y-auto">
+                        <p id="no-requests-text" class="text-sm text-gray-500 hidden py-2">
+                            받은 친구 요청이 없습니다.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-gray-50 px-6 py-3 flex justify-end rounded-b-lg">
+                    <button id="cancel-add-friend-btn" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 font-medium">
+                        닫기
+                    </button>
+                </div>
+            </div>
+        </div>
+
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
@@ -295,9 +250,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // api url
-        const FASTAPI_BASE_URL = "https://bab-back.onrender.com";
-        //const FASTAPI_BASE_URL = 'http://127.0.0.1:8000'; // 로컬 테스트용
+        const fastapiUrl = "https://bapick.duckdns.org"
 
         // UI 요소
         const overlay = document.getElementById('overlay');
@@ -306,52 +259,381 @@
         const addFriendBtn = document.getElementById('add-friend-btn');
         const addFriendModal = document.getElementById('add-friend-modal');
         const cancelAddFriendBtn = document.getElementById('cancel-add-friend-btn');
-        const friendEmailInput = document.getElementById('friend-email-input');
         const profileListContainer = document.getElementById('profile-list-container');
-
         const tabPrivate = document.getElementById('tab-private');
         const tabGroup = document.getElementById('tab-group');
         const chatListPrivate = document.getElementById('chat-list-private');
         const chatListGroup = document.getElementById('chat-list-group');
-
-        const searchBtn = document.getElementById('search-btn');
-        const cancelSearchBtn = document.getElementById('cancel-search-btn');
         const headerMain = document.getElementById('header-main');
-        const headerSearch = document.getElementById('header-search');
-        const chatSearchInput = document.getElementById('chat-search-input');
+        const userSearchInput = document.getElementById('friend-nickname-input');
+        const friendRequestList = document.getElementById('friend-request-list');
+        const noRequestsText = document.getElementById('no-requests-text');
 
-        const startPrivateChatBtn = document.getElementById('start-private-chat-btn');
+        let currentUser = null; // 현재 로그인 사용자 정보
+        const BotImg = 'logo_bapick copy.png';
+        const defaultProfileImg = "https://bit.ly/3K2rlSh";
 
-        let currentUser = null;
-        let searchTimeout;
-        // ▼▼▼ [추가] 친구 추가 모달 열기/닫기 이벤트 ▼▼▼
-        addFriendBtn.addEventListener('click', () => {
-            addFriendModal.classList.remove('hidden');
-            addFriendModal.classList.add('flex');
+        /* =================================================================
+        * 유틸리티 함수
+        * ================================================================= */
 
-            // 여기에 나중에 개발자가 FastAPI에서 
-            // '받은 친구 요청 목록'을 불러오는 함수를 실행할 거예요.
-            // 예: loadFriendRequests(); 
-        });
+        // API 호출 과부하를 방지하기 위한 디바운스 함수 (사용자 검색 input에서 사용)
+        function debounce(func, delay) {
+            let timeoutId;
+            return function(...args) {
+                clearTimeout(timeoutId);
+                timeoutId = setTimeout(() => {
+                    func.apply(this, args);
+                }, delay);
+            };
+        }
 
-        cancelAddFriendBtn.addEventListener('click', () => {
-            addFriendModal.classList.add('hidden');
-            addFriendModal.classList.remove('flex');
-        });
-        // ▲▲▲ [추가] ▲▲▲
+        // 마지막 메시지 전송시각 포맷 ('오전/오후 시:분', '어제', '월/일' 형식)
+        function formatTimestamp(dateObj) {
+            if (!(dateObj instanceof Date) || isNaN(dateObj.getTime())) return '';
 
-        // 로그인 상태 확인
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUser = user;
-                fetchChats(false); // 로그인 후 기본 탭 (1:1 채팅) 로드
+            const date = dateObj;
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const yesterday = new Date(today);
+            yesterday.setDate(today.getDate() - 1);
+
+            if (date >= today) {
+                return date.toLocaleTimeString('ko-KR', { hour: 'numeric', minute: '2-digit', hour12: true });
+            } else if (date >= yesterday) {
+                return '어제';
             } else {
-                window.location.href = 'index.html';
+                return date.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
             }
-        });
+        }
 
-        // 채팅 목록 호출 및 렌더링
-        async function fetchChats(isGroup) {
+        // 바텀 메뉴바의 '+' 버튼 팝업과 오버레이 배경 제거
+        const closeAllPopups = () => {
+            overlay.classList.add('hidden');
+            addChatPopup.classList.remove('popup-visible');
+            addChatPopup.classList.add('popup-hidden');
+        };
+
+
+        /* =================================================================
+        * 친구 관련 함수
+        * ================================================================= */
+
+        // 사용자 검색 결과 HTML 생성 - 사용자 프로필, 친구 요청 버튼
+        function createUserSearchResult(user) {
+            let buttonHtml = '';
+            // 관계 상태(relation_status)에 따라 버튼 렌더링
+            if (user.relation_status === "friend") {
+                buttonHtml = `<span class="text-sm text-green-500 font-medium px-3 py-1 rounded-md bg-green-100">친구</span>`;
+            } else if (user.relation_status === "sent_request") {
+                buttonHtml = `<span class="text-sm text-gray-500 font-medium px-3 py-1 rounded-md bg-gray-100">요청 완료</span>`;
+            } else if (user.relation_status === "received_request") {
+                buttonHtml = `<span class="text-sm text-orange-500 font-medium px-3 py-1 rounded-md bg-orange-100">요청 받음</span>`; 
+            } else {
+                // 관계가 없는 경우 (친구 요청 버튼 표시)
+                buttonHtml = `<button data-uid="${user.firebase_uid}" data-nickname="${user.nickname}"
+                                    class="send-friend-request-btn text-sm text-white bg-orange-500 hover:bg-orange-600 px-3 py-1 rounded-md">
+                                친구 요청
+                            </button>`;
+            }
+
+            const profileItem = document.createElement('div');
+            profileItem.className = "flex items-center justify-between p-2 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors";
+            profileItem.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <img class="h-10 w-10 rounded-full object-cover"
+                        src="${user.profile_image || defaultProfileImg}" alt="Profile">
+                    <span class="font-medium text-gray-700">${user.nickname}</span>
+                </div>
+                <div class="flex-shrink-0">
+                    ${buttonHtml}  
+                </div>
+            `;
+            return profileItem;
+        }
+
+        // 사용자 검색 API 호출 및 검색 결과 렌더링 (Debounce 적용 대상)
+        async function searchUsers(query) {
+            profileListContainer.innerHTML = ''; 
+            profileListContainer.classList.add('hidden');
+
+            if (query.trim().length < 2) {
+                profileListContainer.classList.remove('hidden');
+                profileListContainer.innerHTML = '<p class="text-sm text-gray-500 p-2">검색어는 최소 두 글자 이상이어야 합니다.</p>';
+                return;
+            }
+            
+            try {
+                const token = await currentUser.getIdToken();
+
+                const res = await fetch(`${fastapiUrl}/api/friends/search?query=${encodeURIComponent(query)}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+
+                const data = await res.json();
+                const users = data.users || [];
+                
+                if (users.length > 0) {
+                    users.forEach(user => {
+                        profileListContainer.appendChild(createUserSearchResult(user));
+                    });
+                    profileListContainer.classList.remove('hidden');
+                } else {
+                    profileListContainer.classList.remove('hidden');
+                    profileListContainer.innerHTML = '<p class="text-sm text-gray-500 p-2">검색 결과가 없습니다.</p>';
+                }
+
+                attachFriendRequestListeners(); // 새로 렌더링된 버튼에 이벤트 리스너 연결
+
+            } catch (error) {
+                console.error("사용자 검색 실패:", error);
+                profileListContainer.classList.remove('hidden');
+                profileListContainer.innerHTML = '<p class="text-sm text-red-500 p-2">검색 중 오류가 발생했습니다.</p>';
+            }
+        }
+
+        // 친구 요청 전송 API 호출 및 버튼 상태 업데이트 
+        async function sendFriendRequest(receiverUid, receiverNickname, buttonElement) {
+            if (!confirm(`${receiverNickname}님께 친구 요청을 보내시겠습니까?`)) {
+                return;
+            }
+
+            try {
+                const token = await currentUser.getIdToken();
+
+                // POST /friends/request (친구 요청 API) 호출
+                const res = await fetch(`${fastapiUrl}/api/friends/request`, { 
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        to_user: receiverUid 
+                    })
+                });
+
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    throw new Error(errorData.detail || `친구 요청 실패: ${res.status}`);
+                }
+
+                buttonElement.disabled = true;
+                buttonElement.textContent = '요청 완료'; 
+                buttonElement.classList.remove('bg-orange-500', 'hover:bg-orange-600', 'text-white');
+                buttonElement.classList.add('bg-gray-100', 'text-gray-500', 'font-medium');
+            } catch (error) {
+                console.error("친구 요청 실패:", error);
+                alert(`친구 요청 실패: ${error.message}`);
+            }
+        }
+
+        // 검색 결과에 동적으로 생긴 '친구 요청' 버튼에 이벤트 리스너 연결
+        function attachFriendRequestListeners() {
+            document.querySelectorAll('.send-friend-request-btn').forEach(button => {
+                if (!button.dataset.listenerAttached) {
+                    button.addEventListener('click', async (event) => {
+                        const btn = event.currentTarget;
+                        const receiverUid = btn.getAttribute('data-uid');
+                        const receiverNickname = btn.getAttribute('data-nickname');
+                        await sendFriendRequest(receiverUid, receiverNickname, btn);
+                    });
+                    button.dataset.listenerAttached = 'true';
+                }
+            });
+        }
+
+        // 받은 친구 요청 렌더링
+        function renderFriendRequest(req) {
+            const item = document.createElement('div');
+            item.className = "flex items-center justify-between p-2 rounded-lg bg-gray-50";
+            item.dataset.requesterUid = req.from_user_uid;
+
+            item.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <img class="h-10 w-10 rounded-full object-cover"
+                        src="${req.from_user_profile_image || defaultProfileImg}" alt="Profile">
+                    <span class="font-medium text-gray-700">${req.from_user_nickname}</span>
+                </div>
+                <div class="space-x-2 flex-shrink-0">
+                    <button data-action="accept" data-requester-uid="${req.from_user_uid}" 
+                            class="handle-request-btn text-sm text-white bg-blue-500 hover:bg-blue-600 px-3 py-1 rounded-md">수락</button>
+                    <button data-action="reject" data-requester-uid="${req.from_user_uid}"
+                            class="handle-request-btn text-sm text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded-md">거절</button>
+                </div>
+            `;
+            return item;
+        }
+
+        // 받은 친구 요청 조회 API 호출
+        async function loadFriendRequests() {
+            friendRequestList.innerHTML = '<p class="text-sm text-gray-500 py-2">친구 요청을 불러오는 중...</p>';
+            if (!currentUser) return;
+
+            try {
+                const token = await currentUser.getIdToken();
+                const res = await fetch(`${fastapiUrl}/api/friends/requests`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+                
+                const data = await res.json();
+                const requests = data.requests || [];
+
+                friendRequestList.innerHTML = '';
+                
+                if (requests.length === 0) {
+                    noRequestsText.classList.remove('hidden');
+                    friendRequestList.appendChild(noRequestsText);
+                } else {
+                    noRequestsText.classList.add('hidden');
+                    requests.forEach(req => {
+                        friendRequestList.appendChild(renderFriendRequest(req));
+                    });
+                }
+                attachRequestHandleListeners(); // 요청 처리 버튼에 이벤트 연결
+
+            } catch (error) {
+                console.error("친구 요청 목록 로드 실패:", error);
+                friendRequestList.innerHTML = '<p class="text-sm text-red-500 p-2">친구 요청 로드 중 오류 발생</p>';
+            }
+        }
+
+        // 친구 요청 수락/거절 API 호출
+        async function handleFriendRequest(requesterUid, action, buttonElement) {
+            if (!currentUser) return;
+            try {
+                const token = await currentUser.getIdToken();
+                const res = await fetch(`${fastapiUrl}/api/friends/handle`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        requester_uid: requesterUid,
+                        action: action 
+                    })
+                });
+
+                if (!res.ok) {
+                    const errorData = await res.json();
+                    throw new Error(errorData.detail || `요청 처리 실패: ${res.status}`);
+                }
+                
+                alert(action === 'accept' ? '친구가 되었습니다!' : '요청을 거절했습니다.');
+                
+                // 친구 요청 목록을 다시 로드
+                loadFriendRequests(); 
+
+            } catch (error) {
+                console.error(`요청 처리 실패 (${action}):`, error);
+                alert(`요청 처리 실패: ${error.message}`);
+                buttonElement.disabled = false;
+                buttonElement.textContent = action === 'accept' ? '수락' : '거절';
+            }
+        }
+
+        // 받은 친구 요청에 동적으로 생성된 요청 처리(요청 수락/거절) 버튼에 이벤트 리스너 연결
+        function attachRequestHandleListeners() {
+            document.querySelectorAll('.handle-request-btn').forEach(button => {
+                if (!button.dataset.listenerAttached) {
+                    button.addEventListener('click', async (event) => {
+                        const btn = event.currentTarget;
+                        const requesterUid = btn.getAttribute('data-requester-uid');
+                        const action = btn.getAttribute('data-action');
+                        await handleFriendRequest(requesterUid, action, btn);
+                    });
+                    button.dataset.listenerAttached = 'true';
+                }
+            });
+        }
+
+
+        /* =================================================================
+        * 채팅 목록 관련 함수
+        * ================================================================= */
+
+        // 그룹 채팅방 프로필 아이콘 HTML 생성
+        function createGroupProfileIcon(memberProfiles) {
+            const count = memberProfiles.length;
+            if (count === 1) {
+                const img = memberProfiles[0].profile_image || defaultProfileImg;
+                return `<img class="h-14 w-14 rounded-full object-cover flex-shrink-0" src="${img}" alt="${memberProfiles[0].nickname}">`;
+            }
+            
+            if (count === 2) {
+                const img1 = memberProfiles[0].profile_image || defaultProfileImg;
+                const img2 = memberProfiles[1].profile_image || defaultProfileImg;
+                
+                return `
+                    <div class="relative w-14 h-14 flex-shrink-0">
+                        <img class="absolute left-0 top-0 w-10 h-10 rounded-full border-2 border-white object-cover z-10" 
+                            src="${img1}" alt="${memberProfiles[0].nickname}">
+                        <img class="absolute right-0 bottom-0 w-10 h-10 rounded-full border-2 border-white object-cover" 
+                            src="${img2}" alt="${memberProfiles[1].nickname}">
+                    </div>
+                `;
+            }
+            
+            if (count === 3) {
+                const img1 = memberProfiles[0].profile_image || defaultProfileImg;
+                const img2 = memberProfiles[1].profile_image || defaultProfileImg;
+                const img3 = memberProfiles[2].profile_image || defaultProfileImg;
+                
+                return `
+                    <div class="relative w-14 h-14 flex-shrink-0">
+                        <img class="absolute left-0 top-0 w-8 h-8 rounded-full border-2 border-white object-cover z-20" 
+                            src="${img1}" alt="${memberProfiles[0].nickname}">
+                        <img class="absolute right-0 top-0 w-8 h-8 rounded-full border-2 border-white object-cover z-10" 
+                            src="${img2}" alt="${memberProfiles[1].nickname}">
+                        <img class="absolute left-1/2 -translate-x-1/2 bottom-0 w-8 h-8 rounded-full border-2 border-white object-cover" 
+                            src="${img3}" alt="${memberProfiles[2].nickname}">
+                    </div>
+                `;
+            }
+            
+            if (count >= 4) {
+                const img1 = memberProfiles[0].profile_image || defaultProfileImg;
+                const img2 = memberProfiles[1].profile_image || defaultProfileImg;
+                const img3 = memberProfiles[2].profile_image || defaultProfileImg;
+                const remaining = count - 3;
+                
+                return `
+                    <div class="relative w-14 h-14 flex-shrink-0">
+                        <img class="absolute left-0 top-0 w-8 h-8 rounded-full border-2 border-white object-cover z-20" 
+                            src="${img1}" alt="${memberProfiles[0].nickname}">
+                        <img class="absolute right-0 top-0 w-8 h-8 rounded-full border-2 border-white object-cover z-10" 
+                            src="${img2}" alt="${memberProfiles[1].nickname}">
+                        ${remaining > 0 
+                            ? `<div class="absolute left-1/2 -translate-x-1/2 bottom-0 w-8 h-8 rounded-full border-2 border-white bg-gray-700 text-white text-xs font-bold flex items-center justify-center">
+                                +${remaining}
+                            </div>`
+                            : `<img class="absolute left-1/2 -translate-x-1/2 bottom-0 w-8 h-8 rounded-full border-2 border-white object-cover" 
+                                    src="${img3}" alt="${memberProfiles[2].nickname}">`
+                        }
+                    </div>
+                `;
+            }
+        }
+
+        // 채팅방 목록 조회 API 호출
+        async function loadChatList(isGroup) {
             if (!currentUser) return;
 
             const chatType = isGroup ? "단체" : "1:1";
@@ -362,10 +644,7 @@
             try {
                 const token = await currentUser.getIdToken();
 
-                const url = new URL(`${FASTAPI_BASE_URL}/chat/list`);
-                url.searchParams.append('is_group', isGroup);
-
-                const response = await fetch(url.toString(), {
+                const response = await fetch(`${fastapiUrl}/api/chat/list?is_group=${isGroup}`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${token}`,
@@ -391,152 +670,24 @@
             }
         }
 
-        // 채팅방 나가기 로직
-        async function leaveChat(roomId) {
-            if (!currentUser) return;
-
-            try {
-                const token = await currentUser.getIdToken();
-
-                const response = await fetch(`${FASTAPI_BASE_URL}/chat/${roomId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
-                }
-
-                console.log(`Successfully left chat ${roomId}`);
-
-                // 목록 갱신
-                const isGroupActive = tabGroup.classList.contains('tab-active');
-                fetchChats(isGroupActive);
-
-            } catch (error) {
-                console.error("Error leaving chat: ", error);
-                alert(`채팅방 나가기에 실패했습니다: ${error.message}`);
-            }
-        }
-
-        tabPrivate.addEventListener('click', () => {
-            chatListPrivate.classList.remove('hidden');
-            chatListGroup.classList.add('hidden');
-
-            tabPrivate.classList.replace('tab-inactive', 'tab-active');
-            tabGroup.classList.replace('tab-active', 'tab-inactive');
-
-            fetchChats(false); // 1:1 채팅 로드
-        });
-
-        tabGroup.addEventListener('click', () => {
-            chatListPrivate.classList.add('hidden');
-            chatListGroup.classList.remove('hidden');
-
-            tabGroup.classList.replace('tab-inactive', 'tab-active');
-            tabPrivate.classList.replace('tab-active', 'tab-inactive');
-
-            fetchChats(true); // 단체 채팅 로드
-        });
-
-        // "오늘/이전" 그룹으로 나누어 렌더링하는 함수
-        async function renderGroupedList(containerElement, chats, chatType, isGroup) {
-            containerElement.innerHTML = '';
-
-            if (chats.length === 0) {
-                containerElement.innerHTML = showEmptyState(chatType);
-                return;
-            }
-
-            const chatsWithDate = chats.map(chat => ({
-                ...chat,
-                lastUpdatedAt: chat.last_message_timestamp ? new Date(chat.last_message_timestamp) : null
-            }));
-
-            chatsWithDate.sort((a, b) => {
-                const aTime = a.lastUpdatedAt ? a.lastUpdatedAt.getTime() : 0;
-                const bTime = b.lastUpdatedAt ? b.lastUpdatedAt.getTime() : 0;
-                return bTime - aTime;
-            });
-
-            const todayChats = [];
-            const previousChats = [];
-            const now = new Date();
-
-            const todayString = now.toLocaleDateString('ko-KR', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                timeZone: 'Asia/Seoul'
-            });
-            const todayKST = new Date(todayString + ' 00:00:00');
-
-            const today = todayKST;
-
-            const yesterday = new Date(today);
-            yesterday.setDate(today.getDate() - 1);
-
-            for (const chat of chatsWithDate) {
-                if (chat.lastUpdatedAt) {
-                    if (chat.lastUpdatedAt >= today) {
-                        todayChats.push(chat);
-                    } else {
-                        previousChats.push(chat);
-                    }
-                } else {
-                    previousChats.push(chat);
-                }
-            }
-
-            const ulClass = "bg-white";
-
-            if (todayChats.length > 0) {
-                const header = document.createElement('h2');
-                header.className = "text-sm font-medium text-gray-500 p-4 pb-2";
-                header.textContent = "오늘 받은 알림";
-                containerElement.appendChild(header);
-
-                const ul = document.createElement('ul');
-                ul.className = ulClass;
-                for (const chat of todayChats) {
-                    ul.appendChild(await createChatItem(chat, isGroup));
-                }
-                containerElement.appendChild(ul);
-            }
-
-            if (previousChats.length > 0) {
-                const header = document.createElement('h2');
-                header.className = "text-sm font-medium text-gray-500 p-4 pb-2";
-                header.textContent = "이전 알림";
-                containerElement.appendChild(header);
-
-                const ul = document.createElement('ul');
-                ul.className = ulClass;
-                for (const chat of previousChats) {
-                    ul.appendChild(await createChatItem(chat, isGroup));
-                }
-                containerElement.appendChild(ul);
-            }
-        }
-
-        // 각 채팅방 아이템(li) 생성
+        // 채팅방(li) HTML 생성 및 스와이프 이벤트 설정
         async function createChatItem(chat, isGroup) {
             let chatName = chat.name || '밥풀이';
-            let profileImageUrl = 'logo_bapick copy.png';
+            let profileIconHtml;
 
+            if (!isGroup) {
+                // 1:1 채팅은 봇 이미지 사용
+                profileIconHtml = `<img class="h-14 w-14 rounded-full object-cover flex-shrink-0" src="${BotImg}" alt="Profile">`;
+            } else {
+                // 단체 채팅은 멤버 프로필 조합 아이콘 사용
+                profileIconHtml = createGroupProfileIcon(chat.member_profiles);
+            }
+            
             const unreadCount = 0;
 
             const li = document.createElement('li');
             li.className = 'chat-list-item relative overflow-hidden border-b last:border-b-0';
             li.dataset.roomId = chat.id;
-
-            const link = document.createElement('a');
-            link.href = `/chat.html?roomId=${chat.id}`;
-            link.className = 'flex items-center w-full p-4 hover:bg-gray-50';
 
             const content = document.createElement('div');
             content.className = 'swipeable-content';
@@ -548,7 +699,6 @@
             let nameAndDetailHtml;
 
             if (isGroup) {
-                // 단체 채팅: 이름 + 멤버 수 표시
                 nameAndDetailHtml = `
                     <div class="flex items-center space-x-2"> 
                         <p class="font-semibold text-gray-800 truncate">${chatName}</p>
@@ -561,14 +711,13 @@
                     </div>
                 `;
             } else {
-                // 1:1 채팅: 이름만 표시
                 nameAndDetailHtml = `<p class="font-semibold text-gray-800 truncate">${chatName}</p>`;
             }
 
 
             content.innerHTML = `
                 <a href="chat.html?roomId=${chat.id}" class="flex items-center p-4 hover:bg-gray-100 transition-colors border-b border-gray-100">
-                    <img class="h-14 w-14 rounded-full object-cover flex-shrink-0" src="${profileImageUrl}" alt="Profile">
+                    ${profileIconHtml}
                     <div class="ml-4 flex-1 overflow-hidden">
                         ${nameAndDetailHtml}
                         <p class="text-sm text-gray-500 truncate mt-0.5">${messageContent}</p>
@@ -627,7 +776,116 @@
             return li;
         }
 
-        // 빈 화면 표시
+        // 채팅 목록을 '오늘/이전 알림' 그룹으로 나누어 렌더링
+        async function renderGroupedList(containerElement, chats, chatType, isGroup) {
+            containerElement.innerHTML = '';
+
+            if (chats.length === 0) {
+                containerElement.innerHTML = showEmptyState(chatType);
+                return;
+            }
+
+            const chatsWithDate = chats.map(chat => ({
+                ...chat,
+                lastUpdatedAt: chat.last_message_timestamp ? new Date(chat.last_message_timestamp) : null
+            }));
+
+            chatsWithDate.sort((a, b) => {
+                const aTime = a.lastUpdatedAt ? a.lastUpdatedAt.getTime() : 0;
+                const bTime = b.lastUpdatedAt ? b.lastUpdatedAt.getTime() : 0;
+                return bTime - aTime;
+            });
+
+            const todayChats = [];
+            const previousChats = [];
+            const now = new Date();
+
+            const todayString = now.toLocaleDateString('ko-KR', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                timeZone: 'Asia/Seoul'
+            });
+            const todayKST = new Date(todayString + ' 00:00:00');
+
+            const today = todayKST;
+
+            for (const chat of chatsWithDate) {
+                if (chat.lastUpdatedAt) {
+                    if (chat.lastUpdatedAt >= today) {
+                        todayChats.push(chat);
+                    } else {
+                        previousChats.push(chat);
+                    }
+                } else {
+                    previousChats.push(chat);
+                }
+            }
+
+            const ulClass = "bg-white";
+
+            if (todayChats.length > 0) {
+                const header = document.createElement('h2');
+                header.className = "text-sm font-medium text-gray-500 p-4 pb-2";
+                header.textContent = "오늘 받은 알림";
+                containerElement.appendChild(header);
+
+                const ul = document.createElement('ul');
+                ul.className = ulClass;
+                for (const chat of todayChats) {
+                    ul.appendChild(await createChatItem(chat, isGroup));
+                }
+                containerElement.appendChild(ul);
+            }
+
+            if (previousChats.length > 0) {
+                const header = document.createElement('h2');
+                header.className = "text-sm font-medium text-gray-500 p-4 pb-2";
+                header.textContent = "이전 알림";
+                containerElement.appendChild(header);
+
+                const ul = document.createElement('ul');
+                ul.className = ulClass;
+                for (const chat of previousChats) {
+                    ul.appendChild(await createChatItem(chat, isGroup));
+                }
+                containerElement.appendChild(ul);
+            }
+        }
+
+        // 채팅방 나가기 API 호출 후 목록 업데이트
+        async function leaveChat(roomId) {
+            if (!currentUser) return;
+
+            try {
+                const token = await currentUser.getIdToken();
+
+                const response = await fetch(`${fastapiUrl}/api/chat/${roomId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+                }
+
+                console.log(`Successfully left chat ${roomId}`);
+
+                // 목록 갱신
+                const isGroupActive = tabGroup.classList.contains('tab-active');
+                loadChatList(isGroupActive);
+
+            } catch (error) {
+                console.error("Error leaving chat: ", error);
+                alert(`채팅방 나가기에 실패했습니다: ${error.message}`);
+            }
+        }
+
+        // 빈 채팅 목록 또는 오류 상태 메시지 렌더링
         function showEmptyState(chatType = "채팅", isError = false) {
             const typeText = chatType === "1:1" ? "1:1 채팅" : "단체 채팅";
             const message = isError
@@ -647,26 +905,82 @@
                 </div>`;
         }
 
-        // 채팅 전송 시각 포맷
-        function formatTimestamp(dateObj) {
-            if (!(dateObj instanceof Date) || isNaN(dateObj.getTime())) return '';
 
-            const date = dateObj;
-            const now = new Date();
-            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            const yesterday = new Date(today);
-            yesterday.setDate(today.getDate() - 1);
-
-            if (date >= today) {
-                return date.toLocaleTimeString('ko-KR', { hour: 'numeric', minute: '2-digit', hour12: true });
-            } else if (date >= yesterday) {
-                return '어제';
+        /* =================================================================
+        * 이벤트 리스너 설정 및 초기화 
+        * ================================================================= */
+        // 로그인 상태 확인 및 초기 채팅 목록 로드
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                loadChatList(false); // 로그인 후 기본 탭 (1:1 채팅) 로드
             } else {
-                return date.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
+                alert('로그인이 필요합니다.');
+                window.location.href = 'index.html'; // 로그인 페이지로 이동
+                return;
             }
-        }
+        });
 
-        // '나가기' 버튼 클릭 이벤트 리스너
+        // DOMContentLoaded 이벤트 리스너
+        document.addEventListener('DOMContentLoaded', () => {
+            // 친구 검색 input 디바운스 적용
+            const debouncedSearch = debounce(searchUsers, 300);
+
+            // 1) 친구 검색 input 이벤트
+            if (userSearchInput) {
+                userSearchInput.addEventListener('input', (event) => {
+                    const query = event.target.value;
+                    if (query.trim() === '') {
+                        profileListContainer.innerHTML = '';
+                        profileListContainer.classList.add('hidden');
+                    } else {
+                        debouncedSearch(query);
+                    }
+                });
+            }
+
+            // 3) 친구 추가 모달 열기 버튼 이벤트
+            addFriendBtn.addEventListener('click', () => {
+                addFriendModal.classList.remove('hidden');
+                addFriendModal.classList.add('flex');
+                loadFriendRequests(); // 받은 친구 요청 목록 로드
+            });
+
+            // 4) 친구 추가 모달 닫기 버튼 이벤트
+            cancelAddFriendBtn.addEventListener('click', () => {
+                addFriendModal.classList.add('hidden');
+                addFriendModal.classList.remove('flex');
+
+                // 모달 닫을 때 검색 결과 및 입력 필드 초기화
+                userSearchInput.value = '';
+                profileListContainer.innerHTML = '';
+                profileListContainer.classList.add('hidden');
+            });
+        });
+
+        // 탭 클릭 이벤트: 1:1 채팅
+        tabPrivate.addEventListener('click', () => {
+            chatListPrivate.classList.remove('hidden');
+            chatListGroup.classList.add('hidden');
+
+            tabPrivate.classList.replace('tab-inactive', 'tab-active');
+            tabGroup.classList.replace('tab-active', 'tab-inactive');
+
+            loadChatList(false);
+        });
+
+        // 탭 클릭 이벤트: 단체 채팅
+        tabGroup.addEventListener('click', () => {
+            chatListPrivate.classList.add('hidden');
+            chatListGroup.classList.remove('hidden');
+
+            tabGroup.classList.replace('tab-inactive', 'tab-active');
+            tabPrivate.classList.replace('tab-active', 'tab-inactive');
+
+            loadChatList(true);
+        });
+
+        // '나가기' 버튼 클릭 이벤트
         document.getElementById('main-content').addEventListener('click', async (e) => {
             if (e.target.classList.contains('leave-chat-btn')) {
                 e.preventDefault();
@@ -681,13 +995,7 @@
             }
         });
 
-        // 하단 메뉴바 '+' 버튼 기능
-        function closeAllPopups() {
-            overlay.classList.add('hidden');
-            addChatPopup.classList.remove('popup-visible');
-            addChatPopup.classList.add('popup-hidden');
-        }
-
+        // 하단 메뉴바 '+' 버튼 이벤트
         addChatBtn.addEventListener('click', (event) => {
             event.stopPropagation();
             const isOpen = addChatPopup.classList.contains('popup-visible');
@@ -698,44 +1006,8 @@
                 addChatPopup.classList.add('popup-visible');
             }
         });
+
         overlay.addEventListener('click', closeAllPopups);
-
-
-        // 헤더 검색창 기능
-        searchBtn.addEventListener('click', () => {
-            headerMain.classList.add('hidden');
-            headerSearch.classList.remove('hidden');
-            headerSearch.classList.add('flex');
-            chatSearchInput.focus();
-        });
-
-        cancelSearchBtn.addEventListener('click', () => {
-            headerMain.classList.remove('hidden');
-            headerSearch.classList.add('hidden');
-            headerSearch.classList.remove('flex');
-            chatSearchInput.value = '';
-
-            document.querySelectorAll('#main-content li').forEach(item => {
-                item.style.display = '';
-            });
-        });
-
-        chatSearchInput.addEventListener('input', (e) => {
-            const term = e.target.value.toLowerCase().trim();
-            document.querySelectorAll('#main-content li.chat-list-item').forEach(item => {
-                const chatNameEl = item.querySelector('p.font-semibold');
-                if (chatNameEl) {
-                    const chatName = chatNameEl.textContent.toLowerCase();
-                    if (chatName.includes(term)) {
-                        item.style.display = '';
-                    } else {
-                        item.style.display = 'none';
-                    }
-                }
-            });
-        });
-
     </script>
 </body>
-
 </html>

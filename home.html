@@ -80,28 +80,31 @@
     <div class="mt-16 relative flex items-center w-full bg-[#FF7242] px-4 py-4">
         <div class="max-w-screen-xl mx-auto w-full relative">
             <input type="text" id="location-text" class="w-full pl-5 pr-16 py-3 bg-white/80 backdrop-blur-sm border-none rounded-full shadow-lg focus:ring-2 focus:ring-[#FF7242] focus:outline-none text-gray-800 placeholder-gray-400">
-            <a href="map.html" class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#FF7242] hover:bg-orange-600 text-white rounded-full flex items-center justify-center shadow-md transition-transform transform hover:scale-110">
+            <a href="set_location.html" class="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-[#FF7242] hover:bg-orange-600 text-white rounded-full flex items-center justify-center shadow-md transition-transform transform hover:scale-110">
                 <span class="material-symbols-outlined">location_on</span>
             </a>
         </div>
     </div>
 
-
     <main class="w-full mx-auto bg-slate-100 rounded-t-3xl p-4 lg:p-6 lg:pt-8 min-h-[calc(100vh-10rem)] pb-24 lg:mt-4">
         <div class="max-w-md lg:max-w-screen-xl w-full mx-auto">
-            <div class="flex flex-col lg:grid lg:grid-cols-3 gap-6">
-                <div class="lg:col-span-1">
-                    <div class="p-6 lg:py-8 bg-white backdrop-blur-sm rounded-2xl shadow-lg">
-                        <div class="text-center mb-6">
+
+            <div class="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-6 mb-6">
+                <div id="combined-profile-card"
+                    class="bg-white backdrop-blur-sm rounded-2xl shadow-lg p-6 flex flex-col lg:flex-row lg:items-start lg:gap-8">
+
+                    <!-- 사용자 프로필 및 사주 오행 -->
+                    <div class="flex flex-col items-center lg:items-center lg:w-1/2">
+                        <div id="profile-content" class="mb-6 text-center">
                             <h2 id="user-nickname" class="text-2xl font-bold text-gray-800"></h2>
                             <p id="user-birthdate" class="text-sm text-gray-500"></p>
                         </div>
 
-                        <div class="flex flex-col gap-4 items-center lg:grid lg:grid-cols-[auto_1fr] lg:items-center">
+                        <div class="flex flex-col gap-4 items-center lg:flex-row lg:items-center lg:gap-8 w-full">
                             <div class="profile-image-container flex-shrink-0 w-auto max-w-[122px]">
                                 <img id="user-profile-image"
                                     class="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-white"
-                                    src="https://bit.ly/3VZpUGD" alt="User Profile Image">
+                                    src="https://bapick-s3-bucket.s3.ap-northeast-2.amazonaws.com/default/default_profile.png" alt="프로필 사진">
                             </div>
 
                             <div id="stats-container" class="flex flex-col space-y-3 w-full">
@@ -112,7 +115,7 @@
                                         <div id="stat-wood" class="h-full rounded-full progress-bar-wood" style="width: 0%;">
                                         </div>
                                     </div>
-                                    <span id="stat-wood-value" class="font-bold text-gray-700 w-8 text-right">0</span>
+                                    <span id="stat-wood-value" class="font-bold text-gray-700 w-8 text-left"></span>
                                 </div>
                                 <div class="flex items-center space-x-2">
                                     <div class="w-6 h-6 flex items-center justify-center" title="화 (Fire)"><span
@@ -122,7 +125,7 @@
                                         <div id="stat-fire" class="h-full rounded-full progress-bar-fire" style="width: 0%;">
                                         </div>
                                     </div>
-                                    <span id="stat-fire-value" class="font-bold text-gray-700 w-8 text-right">0</span>
+                                    <span id="stat-fire-value" class="font-bold text-gray-700 w-8 text-left"></span>
                                 </div>
                                 <div class="flex items-center space-x-2">
                                     <div class="w-6 h-6 flex items-center justify-center" title="토 (Earth)"><span
@@ -131,7 +134,7 @@
                                         <div id="stat-earth" class="h-full rounded-full progress-bar-earth" style="width: 0%;">
                                         </div>
                                     </div>
-                                    <span id="stat-earth-value" class="font-bold text-gray-700 w-8 text-right">0</span>
+                                    <span id="stat-earth-value" class="font-bold text-gray-700 w-8 text-left"></span>
                                 </div>
                                 <div class="flex items-center space-x-2">
                                     <div class="w-6 h-6 flex items-center justify-center" title="금 (Metal)"><span
@@ -140,7 +143,7 @@
                                         <div id="stat-metal" class="h-full rounded-full progress-bar-metal" style="width: 0%;">
                                         </div>
                                     </div>
-                                    <span id="stat-metal-value" class="font-bold text-gray-700 w-8 text-right">0</span>
+                                    <span id="stat-metal-value" class="font-bold text-gray-700 w-8 text-left"></span>
                                 </div>
                                 <div class="flex items-center space-x-2">
                                     <div class="w-6 h-6 flex items-center justify-center" title="수 (Water)"><span
@@ -149,37 +152,65 @@
                                         <div id="stat-water" class="h-full rounded-full progress-bar-water" style="width: 0%;">
                                         </div>
                                     </div>
-                                    <span id="stat-water-value" class="font-bold text-gray-700 w-8 text-right">0</span>
+                                    <span id="stat-water-value" class="font-bold text-gray-700 w-8 text-left"></span>
                                 </div>
                             </div>
                         </div>
-                        <div class="mt-8 p-4 bg-[#FFEDC5]/50 border border-orange-200 rounded-xl shadow-inner">
-                            <span id="recommendation-type" class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-[#FF7242] text-white"></span>
-                            <h3 id="recommendation-headline" class="text-lg font-bold text-gray-800 mt-2"></h3>
+                    </div>
+
+                    <!-- 오행 메시지 -->
+                    <div id="recommendation-content" class="mt-6 lg:mt-0 lg:flex lg:flex-col lg:w-1/2 lg:self-end">
+                        <div class="p-4 bg-[#FFEDC5]/50 border border-orange-200 rounded-xl shadow-inner">
+                            <span id="recommendation-type"
+                                class="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-[#FF7242] text-white self-start"></span>
+                            <h4 id="recommendation-headline" class="text-lg font-bold text-gray-800 mt-2"></h4>
                             <p id="recommendation-advice" class="text-sm text-gray-600 mt-2"></p>
                         </div>
                     </div>
                 </div>
 
-                <div class="lg:col-span-2">
-                    <div class="p-6 bg-white backdrop-blur-sm rounded-2xl shadow-lg h-full overflow-hidden">
-                        <div class="pt-2 flex justify-between items-center">
-                            <h3 id="nearby-restaurants-heading" class="text-xl lg:text-2xl font-bold text-gray-800">
-                                나의 근처 맛집
-                            </h3>
-                            <a href="restaurant_list.html" class="text-base font-semibold text-gray-500 hover:text-[#FF7242]">
-                                전체보기 &gt;
-                            </a>
-                        </div>
-                        <div class="relative mt-4 lg:mt-10">
-                            <div id="restaurant-carousel" class="flex overflow-x-auto scroll-smooth scrollbar-hide space-x-4 py-2">
-                                <p id="nearby-restaurants-loading" class="text-gray-500">주변 맛집 정보를 불러오는 중...</p>
+
+
+                <!-- 포춘쿠키 섹션  -->
+                <div class="fortune-cookie-widget bg-white backdrop-blur-sm rounded-2xl shadow-lg p-6 flex flex-col">
+                        <h3 class="text-xl font-bold text-gray-800">오늘의 포춘쿠키</h3>
+
+                        <div id="closedCookieSection" class="flex flex-col items-center">
+                            <img src="close fortune cookie.png" alt="닫힌 포춘 쿠키" class="w-40 mx-auto animate-pulse">
                             </div>
+
+                        <div id="openedCookieSection" class="hidden flex flex-col items-center text-center">
+                            <img src="open fortune cookie.png" alt="열린 포춘 쿠키" class="w-60 mx-auto animate-fadeIn">
+                            <p id="fortuneMessage" class="text-sm font-semibold text-gray-700 leading-relaxed mt-4"></p>
                         </div>
+                        
+                        <button id="cookieActionButton" class="w-full bg-gradient-to-r from-orange-400 to-red-500 text-white font-semibold py-3 px-8 rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-200">
+                            열어보기
+                        </button>
+
                     </div>
                 </div>
-
             </div>
+
+            <!-- 식당 추천 -->
+            <div class="mt-6 p-6 max-w-md lg:max-w-screen-xl w-full mx-auto bg-white backdrop-blur-sm rounded-2xl shadow-lg overflow-hidden">
+                <div class="pt-2 flex justify-between items-center">
+                    <h3 id="nearby-restaurants-heading" class="text-xl lg:text-2xl font-bold text-gray-800">
+                        나의 근처 맛집
+                    </h3>
+                    <a href="restaurant_list.html"
+                        class="text-base font-semibold text-gray-500 hover:text-[#FF7242]">
+                        전체보기 &gt;
+                    </a>
+                </div>
+                <div class="relative mt-4 lg:mt-6">
+                    <div id="restaurant-carousel"
+                        class="flex overflow-x-auto scroll-smooth scrollbar-hide space-x-4 py-2 flex-nowrap">
+                        <p id="nearby-restaurants-loading" class="text-gray-500">주변 맛집 정보를 불러오는 중...</p>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </main>
 
@@ -224,18 +255,15 @@
         </nav>
     </footer>
 
+    <!-- + 버튼 -->
     <button id="add-chat-btn" class="fixed bottom-6 left-1/2 -translate-x-1/2 w-16 h-16 bg-[#FF7242] hover:bg-orange-600 text-white rounded-full flex items-center justify-center shadow-lg transition-transform transform hover:scale-110 z-40">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <line x1="12" y1="5" x2="12" y2="19"></line>
             <line x1="5" y1="12" x2="19" y2="12"></line>
         </svg>
     </button>
-    <a href="chat.html" id="secondary-action-btn"
-        class="fixed bottom-20 right-6 w-16 h-16 bg-[#FFF6E2] hover:bg-orange-600 text-white rounded-full flex items-center justify-center shadow-lg transition-transform transform hover:scale-110 z-40"
-        style="background-image: url('logo_bapick.png'); background-size: 132%; background-repeat: no-repeat; background-position: center 0.5%;">
-    </a>
-    <div id="overlay" class="fixed inset-0 bg-black bg-opacity-30 z-40 hidden"></div>
-
+    
+    <!-- + 버튼 팝업-->
     <div id="add-chat-popup"
         class="absolute bottom-24 left-1/2 -translate-x-1/2 w-48 bg-white rounded-md shadow-xl z-50 popup-hidden">
         <div class="py-2">
@@ -271,6 +299,14 @@
         </div>
     </div>
 
+    <!-- FAB 버튼-->
+    <a href="chat.html" id="secondary-action-btn"
+        class="fixed bottom-20 right-6 w-16 h-16 bg-[#FFF6E2] hover:bg-orange-600 text-white rounded-full flex items-center justify-center shadow-lg transition-transform transform hover:scale-110 z-40"
+        style="background-image: url('logo_bapick.png'); background-size: 132%; background-repeat: no-repeat; background-position: center 0.5%;">
+    </a>
+
+    <div id="overlay" class="fixed inset-0 bg-black bg-opacity-30 z-40 hidden"></div>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
@@ -279,14 +315,19 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        const FASTAPI_BASE_URL = "https://bab-back.onrender.com"; 
-        //const FASTAPI_BASE_URL = 'http://127.0.0.1:8000'; // 로컬 테스트용
+        const fastapiUrl = "https://bapick.duckdns.org"
 
         const userNameEl = document.getElementById('user-nickname');
         const userbirthdateEl = document.getElementById('user-birthdate');
         const userProfileImageEl = document.getElementById('user-profile-image');
+
+        const recommendationTypeEl = document.getElementById('recommendation-type');
+        const recommendationHeadlineEl = document.getElementById('recommendation-headline');
+        const recommendationAdviceEl = document.getElementById('recommendation-advice');
+        
         const locationTextEl = document.getElementById('location-text');
 
+        // 오행 통계 요소 맵
         const statElements = {
             wood: { bar: document.getElementById('stat-wood'), value: document.getElementById('stat-wood-value') },
             fire: { bar: document.getElementById('stat-fire'), value: document.getElementById('stat-fire-value') },
@@ -364,23 +405,28 @@
 
         // 오행 비율 바 업데이트 함수
         function updateSajuStats(stats) {
+            const MAX_SCALING_VALUE = 60;
+
             for (const elementKey in stats) {
                 const percentage = stats[elementKey];
                 const element = statElements[elementKey];
-                if (element) {
-                    element.bar.style.width = `${percentage.toFixed(1)}%`;
+
+                let scaledWidth = (percentage / MAX_SCALING_VALUE) * 100;
+
+                if (scaledWidth > 100) {
+                    scaledWidth = 100;
+                }
+
+                if (element && element.bar && element.value) {
+                    element.bar.style.width = `${scaledWidth.toFixed(1)}%`;
                     element.value.textContent = Math.round(percentage);
                 }
             }
-        }
-
-        const recommendationTypeEl = document.getElementById('recommendation-type');
-        const recommendationHeadlineEl = document.getElementById('recommendation-headline');
-        const recommendationAdviceEl = document.getElementById('recommendation-advice');
+        };
 
         // 오행 분석 및 추천 메시지 가져오는 함수
         async function fetchRecommendation(idToken) {
-            const res = await fetch(`${FASTAPI_BASE_URL}/saju/analyze`, {
+            const res = await fetch(`${fastapiUrl}/api/saju/analyze`, {
                 headers: { 'Authorization': `Bearer ${idToken}` }
             });
 
@@ -400,53 +446,58 @@
 
             // 이미지 렌더링: image가 문자열인 동시에 비어있지 않은 경우 첫 번째 이미지 렌더링
             if (typeof restaurant.image === 'string' && restaurant.image.trim() !== '') {
-                // 쉼표로 분리 후 앞뒤 공백 제거
                 const images = restaurant.image.split(',').map(url => url.trim()).filter(url => url);
-                
-                // 첫 번째 이미지 사용
                 if (images.length > 0) {
                     imageUrl = images[0];
                 }
             }
 
-            // 조건부 렌더링
+            // 거리 정보 (m/km 변환 로직 추가)
+            let distanceText = '';
+            if (restaurant.distance_m !== undefined) {
+                if (restaurant.distance_m < 1000) {
+                    distanceText = `${restaurant.distance_m}m`;
+                } else {
+                    // 1km 이상: km 단위 (소수점 1자리)
+                    distanceText = `${(restaurant.distance_m / 1000).toFixed(1)}km`;
+                }
+            }
+
+            // 조건부 렌더링 (평점/리뷰)
             const ratingValue = restaurant.rating || 0; 
             const reviewCount = restaurant.review_count || 0;
             let statsHtml = '';
 
-            // 1) 평점이 있으면 평점과 리뷰 개수 모두 표시
             if (ratingValue > 0) {
                 statsHtml = `
-                    <div class="flex items-center text-sm text-gray-500 mt-2">
-                        <span class="material-symbols-outlined text-yellow-500 text-base mr-1 fill-1">star</span>
+                    <div class="flex items-center text-xs md:text-sm text-gray-500 mb-1">
+                        <span class="material-symbols-outlined text-yellow-500 text-sm md:text-base mr-1 fill-1">star</span>
                         <span class="font-semibold">${ratingValue.toFixed(1)}</span>
                         <span class="ml-2 text-gray-400">리뷰 ${reviewCount}개</span>
                     </div>
                 `;
-            } 
-            // 2) 평점이 없으면 리뷰 개수만 표시
-            else {
+            } else if (reviewCount > 0) {
                 statsHtml = `
-                    <div class="flex items-center text-sm text-gray-500 mt-2">
+                    <div class="flex items-center text-xs md:text-sm text-gray-500 mb-1">
                         <span class="text-gray-400">리뷰 ${reviewCount}개</span>
                     </div>
                 `;
             }
 
+
             return `
-                <a href="detail.html?id=${restaurant.id}" class="flex-shrink-0 w-56 bg-white rounded-lg shadow-xl overflow-hidden transform transition-transform duration-300 hover:scale-[1.03] hover:shadow-2xl">
-                    <div class="relative w-full h-64"> 
+                <a href="detail.html?id=${restaurant.id}" class="w-80 h-44 flex-shrink-0 flex bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden">
+                    
+                    <div class="flex-shrink-0 w-32 h-full rounded-lg overflow-hidden"> 
                         <img class="w-full h-full object-cover" src="${imageUrl}" alt="${restaurant.name}">
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                     </div>
-                    <div class="p-4">
-                        <p class="text-xs text-orange-500 mb-1">${restaurant.distance_km}km 거리</p>
-                        <h4 class="font-bold text-lg text-gray-900 truncate">${restaurant.name}</h4>
-                        <p class="text-sm text-gray-600 truncate mt-1">${restaurant.category}</p>
-                        
+
+                    <div class="p-4 flex-1 min-w-0">
+                        <p class="text-xs md:text-sm text-orange-500 mb-0.5">${distanceText} 거리</p>
+                        <h4 class="font-bold text-lg md:text-xl text-gray-800 truncate mb-1">${restaurant.name}</h4>
+                        <p class="text-sm md:text-base text-gray-500 truncate mb-1 md:mb-2">${restaurant.category}</p>
                         ${statsHtml}
-                        
-                        <p class="text-xs text-gray-400 mt-2 truncate">${restaurant.address}</p>
+                        <p class="text-xs md:text-sm text-gray-400 truncate">${restaurant.address}</p>
                     </div>
                 </a>
             `;
@@ -476,11 +527,11 @@
                     lon = pos.coords.longitude;
                 }
 
-                const response = await fetch(`${FASTAPI_BASE_URL}/restaurants/nearby?lat=${lat}&lon=${lon}&limit=5`, {
+                const response = await fetch(`${fastapiUrl}/api/restaurants/nearby?lat=${lat}&lon=${lon}&limit=15`, {
                     method: 'GET',
                     headers: { 'Authorization': `Bearer ${idToken}` },
                 });
-                
+
                 if (!response.ok) {
                     if (response.status === 404) {
                         throw new Error('주변 식당 정보를 가져오지 못했습니다.');
@@ -494,7 +545,6 @@
                 // 추천 식당 목록을 로컬 스토리지에 저장
                 try {
                     localStorage.setItem('recommendedRestaurants', JSON.stringify(restaurants));
-                    console.log(`추천 식당 목록 ${restaurants.length}개가 로컬 스토리지에 저장되었습니다.`);
                 } catch (e) {
                     console.error("로컬 스토리지 저장 실패:", e);
                 }
@@ -519,39 +569,48 @@
         // 로그인 인증 및 데이터 로드
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
+                // 로그인 안 되어 있으면 로그인 페이지로 리디렉션
                 window.location.href = 'index.html';
                 return;
             }
 
             const idToken = await user.getIdToken();
+            let userData = {};
+            let sajuStats = {};
 
             // 사용자 정보 (프로필 사진, 닉네임, 생년월일) 및 기본 오행 비율 로드
             try {
                 const sajuFields = ['ohengWood', 'ohengFire', 'ohengEarth', 'ohengMetal', 'ohengWater'];
                 const fields = ['nickname', 'birthDate', 'profileImage', ...sajuFields];
-                const res = await fetch(`${FASTAPI_BASE_URL}/users/me?fields=${fields.join(',')}`, {
+                const res = await fetch(`${fastapiUrl}/api/users/me?fields=${fields.join(',')}`, {
                     headers: { 'Authorization': `Bearer ${idToken}` }
                 });
 
                 if (!res.ok) throw new Error(`API error: ${res.status}`);
-                const data = await res.json();
+                userData = await res.json();
 
-                userNameEl.textContent = data.nickname ? `${data.nickname}님` : '사용자';
-                userbirthdateEl.textContent = data.birthDate || '생년월일 정보 없음';
-                userProfileImageEl.src = data.profileImage || 'https://bit.ly/3VZpUGD';
+                const nickname = userData.nickname ? `${userData.nickname}님` : '사용자';
+                const birthDate = userData.birthDate || '생년월일 정보 없음';
+                const profileImage = userData.profileImage;
+
+                userNameEl.textContent = nickname;
+                userbirthdateEl.textContent = birthDate;
+                userProfileImageEl.src = profileImage;
 
                 const nearbyRestaurantsHeading = document.getElementById('nearby-restaurants-heading');
-                if (data.nickname) {
-                    nearbyRestaurantsHeading.textContent = `${data.nickname}님 근처 맛집`;
+                if (userData.nickname) {
+                    nearbyRestaurantsHeading.textContent = `${userData.nickname}님 근처 맛집`;
                 }
 
-                const sajuStats = {
-                    wood: data.ohengWood || 0.0,
-                    fire: data.ohengFire || 0.0,
-                    earth: data.ohengEarth || 0.0,
-                    metal: data.ohengMetal || 0.0,
-                    water: data.ohengWater || 0.0,
+                sajuStats = {
+                    wood: userData.ohengWood || 0.0,
+                    fire: userData.ohengFire || 0.0,
+                    earth: userData.ohengEarth || 0.0,
+                    metal: userData.ohengMetal || 0.0,
+                    water: userData.ohengWater || 0.0,
                 };
+
+                // 초기 비율 업데이트
                 updateSajuStats(sajuStats);
 
                 // 위치 설정
@@ -559,16 +618,23 @@
 
             } catch (err) {
                 console.error("User profile fetch failed:", err);
-                userNameEl.textContent = '정보를 불러오지 못했습니다';
+                const errorMsg = '정보를 불러오지 못했습니다';
+                // 오류 메시지 동기화
+                userNameEl.textContent = errorMsg;
                 userbirthdateEl.textContent = '';
             }
 
-            // 일진에 따라 보정된 오행 비율 및 오늘의 추천 메시지 로드
+            // 2. 일진에 따라 보정된 오행 비율 및 오늘의 추천 메시지 로드
             try {
                 const analysisData = await fetchRecommendation(idToken);
-                recommendationTypeEl.textContent = analysisData.user_type;
-                recommendationHeadlineEl.textContent = `"${analysisData.recommendation_headline}"`;
-                recommendationAdviceEl.textContent = analysisData.recommendation_advice;
+
+                const type = analysisData.user_type;
+                const headline = `"${analysisData.recommendation_headline}"`;
+                const advice = analysisData.recommendation_advice;
+
+                recommendationTypeEl.textContent = type;
+                recommendationHeadlineEl.textContent = headline;
+                recommendationAdviceEl.textContent = advice;
 
                 // 최종 보정 오행 비율
                 const finalOheng = analysisData.oheng_analysis_scores;
@@ -579,16 +645,104 @@
                     metal: finalOheng['금(金)'] || 0,
                     water: finalOheng['수(水)'] || 0
                 };
+
+                // 최종 보정 비율로 업데이트
                 updateSajuStats(mappedStats);
 
                 await fetchNearbyRestaurants(idToken);
             } catch (err) {
                 console.error("Recommendation fetch failed:", err);
+                const errorMsg = err.message || '서버 오류가 발생했습니다.';
+                // 오류 메시지 동기화
                 recommendationTypeEl.textContent = '정보 없음';
                 recommendationHeadlineEl.textContent = '추천 분석 정보를 불러올 수 없습니다.';
-                recommendationAdviceEl.textContent = err.message || '서버 오류가 발생했습니다.';
+                recommendationAdviceEl.textContent = errorMsg;
             }
         });
+
+        /* =========================================================
+        * 포춘쿠키
+        * ======================================================= */
+        // DOM 요소 정의
+        const closedCookieSection = document.getElementById('closedCookieSection');
+        const openedCookieSection = document.getElementById('openedCookieSection');
+        const fortuneMessage = document.getElementById('fortuneMessage');
+        const cookieActionButton = document.getElementById('cookieActionButton');
+        
+        // 상태 변수
+        let isCookieOpened = false;
+
+        const fortunes = [
+            "오늘은 매운 음식을 먹어야 운이 풀려요! 새로운 곳을 탐험하세요.",
+            "뜻밖의 행운이 찾아옵니다. 가장 친한 친구에게 연락해 보세요.",
+            "오랜만에 만나는 친구와 즐거운 식사를 하세요. 행운이 따를 거예요.",
+            "오늘은 달콤한 디저트가 행운을 가져다줍니다. 새로운 카페를 방문해 보세요.",
+            "새로운 도전을 두려워하지 마세요. 용기가 큰 보상으로 돌아올 거예요.",
+            "스트레스는 금물! 오늘은 편안한 식사를 하며 휴식을 취하세요.",
+            "오늘은 따뜻한 한 끼가 운을 부릅니다. 마음 가는 음식을 선택해 보세요.",
+            "가볍게 즐기는 식사가 오늘 하루를 부드럽게 풀어 줄 거예요.",
+            "배를 너무 빵빵하게 채우기보다, 기분 좋아질 만큼만 먹으면 행운이 따를 거예요.",
+            "느긋하게 천천히 씹어 먹으면 답답했던 마음이 조금씩 풀릴 거예요.",
+            "좋아하는 음식을 한 번쯤 허용해 주세요. 작은 행복이 큰 운을 부릅니다.",
+            "혼자 먹더라도 식탁을 예쁘게 차리면, 예상 못 한 좋은 소식이 찾아올 거예요.",
+            "오늘 첫 끼를 즐겁게 먹으면 남은 하루의 흐름도 밝아집니다.",
+            "배고픔을 오래 참지 말고 제때 챙겨 먹으면 생각지 못한 도움이 들어올 거예요.",
+            "간단한 간식 하나가 지친 마음을 다독여 줄 거예요. 스스로를 조금은 챙겨 주세요.",
+            "당이 살짝 떨어졌다면, 달콤한 한 입이 마음의 여유와 함께 행운도 데려올 거예요.",
+            "오늘은 식사 시간만큼은 휴식 시간으로 정해 보세요. 그 여유가 좋은 인연을 불러옵니다.",
+            "익숙한 맛의 식사가 불안한 마음을 안정시켜 줄 거예요. 편안한 메뉴를 골라 보세요.",
+            "식사할 때 휴대폰을 잠시 내려두면, 머릿속이 맑아지고 좋은 아이디어가 떠오를 거예요.",
+            "누군가와 음식을 나누어 먹으면, 그만큼 기쁨과 운도 나누어 돌아올 거예요.",
+            "오늘 한 끼는 스스로를 응원하는 식사로 준비해 보세요. 자신감이 행운을 끌어당깁니다.",
+            "물을 자주 마시며 식사 리듬을 맞추면 몸도 마음도 가벼워지고 일이 수월해질 거예요.",
+            "식사 전에 오늘 잘 되고 싶은 일을 한 번 떠올리면, 그 에너지가 음식과 함께 스며들 거예요.",
+            "배부름보다 ‘만족감’을 기준으로 식사를 마치면, 마음이 한결 단단해질 거예요.",
+            "조용한 곳에서 차분히 먹는 한 끼가 흐트러진 운을 정리해 줄 거예요.",
+            "오늘 마지막 한 입까지 감사한 마음으로 먹으면, 내일 맞이할 행운의 크기가 커집니다.",
+        ];
+
+        // 포춘 쿠키 열기 함수
+        function openCookie() {
+            if (!cookieActionButton || !fortuneMessage) return;
+
+            isCookieOpened = true;
+
+            const randomIndex = Math.floor(Math.random() * fortunes.length);
+            fortuneMessage.textContent = fortunes[randomIndex];
+
+            if (closedCookieSection) closedCookieSection.classList.add('hidden');
+            if (openedCookieSection) openedCookieSection.classList.remove('hidden');
+            
+            cookieActionButton.textContent = '닫기';
+            cookieActionButton.classList.remove('from-orange-400', 'to-red-500', 'text-white');
+            cookieActionButton.classList.add('bg-gray-200', 'text-gray-800', 'bg-gradient-to-r');
+        }
+
+        // 포춘 쿠키 닫기/리셋 함수
+        function closeCookie() {
+            if (!cookieActionButton) return;
+
+            isCookieOpened = false;
+
+            if (openedCookieSection) openedCookieSection.classList.add('hidden');
+            if (closedCookieSection) closedCookieSection.classList.remove('hidden');
+
+            cookieActionButton.textContent = '열어보기';
+            cookieActionButton.classList.remove('bg-gray-200', 'text-gray-800');
+            cookieActionButton.classList.add('from-orange-400', 'to-red-500', 'text-white');
+        }
+
+        // 액션 버튼 클릭 시 상태에 따라 함수 실행
+        if (cookieActionButton) {
+            cookieActionButton.addEventListener('click', (e) => {
+                e.preventDefault(); 
+                if (isCookieOpened) {
+                    closeCookie();
+                } else {
+                    openCookie();
+                }
+            });
+        }
 
         // 핍압/모달 관련 로직
         const addChatBtn = document.getElementById('add-chat-btn');
