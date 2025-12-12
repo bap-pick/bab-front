@@ -65,6 +65,18 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+
+        /* [추가] 드래그 씹힘 방지: 이미지나 링크가 파일처럼 끌리는 현상 제거 */
+        #restaurant-carousel img,
+        #restaurant-carousel a {
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            user-drag: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
     </style>
 </head>
 
@@ -216,7 +228,7 @@
             </div>
             <div class="relative mt-4 lg:mt-6">
                 <div id="restaurant-carousel"
-                    class="flex overflow-x-auto scroll-smooth scrollbar-hide space-x-4 py-2 flex-nowrap">
+                    class="flex overflow-x-auto scrollbar-hide space-x-4 py-2 flex-nowrap cursor-grab active:cursor-grabbing select-none">
                     <p id="nearby-restaurants-loading" class="text-gray-500">주변 맛집 정보를 불러오는 중...</p>
                 </div>
             </div>
@@ -779,6 +791,40 @@
         });
 
         overlay.addEventListener('click', closeAllPopups);
+        /* =========================================================
+         * PC 마우스 드래그 스크롤 (Drag to Scroll)
+         * ======================================================= */
+        const carousel = document.getElementById('restaurant-carousel');
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        carousel.addEventListener('mousedown', (e) => {
+            isDown = true;
+            carousel.classList.add('active');
+            // 시작 지점 저장
+            startX = e.pageX - carousel.offsetLeft;
+            scrollLeft = carousel.scrollLeft;
+        });
+
+        carousel.addEventListener('mouseleave', () => {
+            isDown = false;
+            carousel.classList.remove('active');
+        });
+
+        carousel.addEventListener('mouseup', () => {
+            isDown = false;
+            carousel.classList.remove('active');
+        });
+
+        carousel.addEventListener('mousemove', (e) => {
+            if (!isDown) return; // 클릭 상태가 아니면 중단
+            e.preventDefault();  // 기본 동작(텍스트 선택 등) 방지
+
+            const x = e.pageX - carousel.offsetLeft;
+            const walk = (x - startX) * 2; // 스크롤 속도 (숫자가 클수록 빠름)
+            carousel.scrollLeft = scrollLeft - walk;
+        });
     </script>
 </body>
 
