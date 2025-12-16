@@ -251,6 +251,7 @@
     const greetingMessage = "안녕! 나는 오늘의 운세에 맞춰 행운의 맛집을 추천해주는 밥풀이야🍀 지금 너한테 딱 맞는 메뉴 추천해줄까? 먹고 싶은 메뉴 고르면 식당도 알려줄게!"; 
     let websocket = null;
     let isWebSocketConnected = false;
+    let ohengInfoShown = false;
 
     // DOM 요소
     const sendButton = document.getElementById('sendButton');
@@ -353,10 +354,12 @@
             messageBox.appendChild(createProfileIcon(msg, true));
             messageBox.appendChild(bubbleDiv);
 
-            // ✨ 버튼을 표시하지 않아야 하는 메시지들
+            // 버튼을 표시하지 않아야 하는 메시지들
             const isOhengInfo = msg.message_type === 'oheng_info';
             const isLocationSelect = msg.message_type === 'location_select';
-            
+            if (isOhengInfo) {
+                ohengInfoShown = true;
+            }   
             // 제외할 메시지 패턴들
             const excludePatterns = [
                 '안녕!',                           // 인사 메시지
@@ -376,7 +379,7 @@
                 (msg.content.includes('어때?') && msg.content.includes(',')) ||  // "메뉴1, 메뉴2 어때?"
                 msg.content.includes('골라봐');                                   // "골라봐"
             
-            if (hasRecommendationPattern && !shouldExclude && !isOhengInfo && !isLocationSelect) {
+            if (hasRecommendationPattern && !shouldExclude && !isOhengInfo && !isLocationSelect && !ohengInfoShown) {
                 const ohengButton = document.createElement('button');
                 
                 ohengButton.className = 'location-select-button px-3 py-2 rounded-xl text-sm font-medium border transition bg-[#FF7242] text-white hover:bg-[#E85F33]';
@@ -390,10 +393,11 @@
                 `;
                                 
                 ohengButton.onclick = function() {
+                    ohengInfoShown = true;
                     messageInput.value = '[REQUEST_OHENG_INFO]';
                     sendMessage();
                 };
-                
+
                 // 버튼을 감싸는 컨테이너를 하나 더 만들어서 버블 안에 배치
                 const buttonContainer = document.createElement('div');
                 buttonContainer.className = 'w-full flex justify-start'; 
@@ -686,7 +690,7 @@
                     return;
                 }
                 
-                // ✨ 로딩 UI 제거 (봇 응답이 오면)
+                // 로딩 UI 제거 (봇 응답이 오면)
                 // 단, 오행 정보 메시지나 위치 선택 메시지는 로딩 없이 바로 표시됨
                 if (msg.role === 'assistant') {
                     removeLoadingIndicator();
@@ -798,6 +802,14 @@
             const data = await res.json();
             setRoomTypeUI(data); // 방의 타입(그룹/1:1)에 따라 제목, placeholder 설정
 
+            ohengInfoShown = messages.some(msg => msg.message_type === 'oheng_info');
+
+            messages.forEach(msg => {
+                if (msg.message_type === 'oheng_info') {
+                    ohengInfoShown = true;
+                }
+            });
+
             container.innerHTML = ''; 
             const messages = Array.isArray(data) ? data : data.messages || [];
 
@@ -872,11 +884,11 @@
             return;
         }
         
-        // ✨ 특수 태그들 (화면에 표시하지 않음)
+        // 특수 태그들 (화면에 표시하지 않음)
         const isLocationMessage = messageText.startsWith('[LOCATION_SELECTED:');
-        const isOhengInfoRequest = messageText === '[REQUEST_OHENG_INFO]'; // ✨ 추가
+        const isOhengInfoRequest = messageText === '[REQUEST_OHENG_INFO]'; // 추가
 
-        // ✨ 특수 태그가 아닌 일반 메시지만 화면에 표시
+        // 특수 태그가 아닌 일반 메시지만 화면에 표시
         if (!isLocationMessage && !isOhengInfoRequest) {
             const userMsg = { role: 'user', content: messageText, sender_id: currentUserUid};
             chatArea.appendChild(createTextMessage(userMsg));
@@ -910,10 +922,10 @@
         sendButton.classList.remove('active');
         messageInput.disabled = true;
 
-        // ✨ 오행 정보 요청은 로딩 표시 안 함
+        // 오행 정보 요청은 로딩 표시 안 함
         const shouldShowLoading = !currentChatroomIsGroup || messageText.includes('@밥풀이');
         let loadingDiv = null;
-        if (shouldShowLoading && !isOhengInfoRequest) { // ✨ 조건 추가
+        if (shouldShowLoading && !isOhengInfoRequest) { // 조건 추가
             loadingDiv = renderLoadingIndicator();
         }
 
@@ -968,7 +980,8 @@
                         errorMessage += ' 위치 권한을 허용했는지 확인해 주세요.';
                     }
                 },
-                { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+                
+                { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 }
             );
         } else {
             // GPS를 지원하지 않는 브라우저인 경우
