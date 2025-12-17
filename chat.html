@@ -702,7 +702,7 @@
     }
     
     // 기존 채팅방의 메시지를 렌더링
-    async function loadMessages(roomId, container) {
+   async function loadMessages(roomId, container) {
         if (!idToken || !roomId || String(roomId).toLowerCase() === 'null') {
             console.error("메시지 로드 오류: 유효하지 않은 방 또는 토큰");
             container.innerHTML = ''; 
@@ -725,10 +725,12 @@
             }
 
             const data = await res.json();
+
+            const messages = Array.isArray(data) ? data : data.messages || [];
+
             setRoomTypeUI(data); // 방의 타입(그룹/1:1)에 따라 제목, placeholder 설정
 
             container.innerHTML = ''; 
-            const messages = Array.isArray(data) ? data : data.messages || [];
 
             messages.forEach(msg => {
                 // 위치 정보 메시지는 렌더링하지 않음
@@ -746,6 +748,7 @@
             connectWebSocket(roomId, idToken);
         }
     }
+
 
     // 채팅방 입장 시 인사 메시지 렌더링
     async function renderInitialMessage(roomId, container) {
